@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Sandbox</title>
+        <style>
+            :root {
+                --main-bg-color: #ccc;
+                --paper-bg-color: #fff;
+                --paper-width: 210mm;
+                --paper-height: 297mm;
+                --paper-space: 4rem;
+                --content-bg-color: #eee;
+                --font-annotation-size: 0.7rem;
+            }
+
+            html, body {
+                font-family: Garamond, sans-serif;
+                font-size: 1rem;
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                background: var(--main-bg-color);
+            }
+
+            p {
+                text-align: justify;
+                hyphens: auto;
+            }
+
+            pre {
+                font-size: var(--font-annotation-size);
+                border-radius: 0.25rem;
+                background-color: var(--content-bg-color);
+                display: block;
+                width: 100%;
+            }
+
+            #page-template {
+                display: none;
+            }
+
+            .page {
+                margin: 2rem auto;
+                padding: var(--paper-space);
+                width: var(--paper-width);
+                height: var(--paper-height);
+                background: var(--paper-bg-color);
+                break-inside: avoid;
+                box-shadow: 0px 0px 32px -8px #0008;
+            }
+
+            .page-frame {
+                max-height: 100%;
+            }
+
+            .page-grid {
+                display: grid;
+                gap: 2rem;
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .page-column {
+                overflow: hidden;
+            }
+
+            .page-column * {
+                text-overflow: ellipsis;
+                overflow-wrap: break-word;
+                white-space: pre-wrap;
+            }
+
+            img {
+                object-fit: contain;
+                margin: auto;
+                width: 100%;
+                max-width: 100%;
+                border-radius: 0.25rem;
+            }
+
+            figcaption {
+                font-size: var(--font-annotation-size);
+                opacity: 70%;
+            }
+
+            code {
+                display: block;
+                padding: 1rem;
+            }
+
+            @media print {
+                html, body {
+                    background: var(--paper-bg-color);
+                }
+
+                .page{
+                    box-shadow: none;
+                }
+            }
+        </style>
+
+        <script id="Markdown" type="text/plain" src="./script.md"></script>
+
+        <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script src="https://viewer.diagrams.net/js/viewer-static.min.js"></script>
+
+        <script>
+            async function loadMarkdown() {
+                // load content of tag
+                const markdown = document.getElementById('Markdown');
+                const markdownSrc = markdown.getAttribute('src');
+                let markdownContent = markdown.innerHTML;
+
+                // fetch if src is defined
+                if (markdownSrc) {
+                    const response = await fetch(markdownSrc);
+                    markdownContent = await response.text();
+                }
+
+                // convert markdown to HTML elements
+                let content = document.createElement('div')
+                content.innerHTML = marked.parse(markdownContent);
+                return [...content.children];
+            }
+
+            async function handleContent(contentElements) {
+                function newColumn() {
+                    const newColumn = currentColumn.cloneNode(false);
+                    currentColumn.parentElement.appendChild(newColumn);
+
+                    const currTop = currentColumn.getBoundingClientRect().top;
+                    const newTop = newColumn.getBoundingClientRect().top;
+
+                    if (currTop == newTop)
+                        currentColumn = newColumn;
+                    else {
+                        newColumn.remove();
+                        newPage();
+                    }
+                }
+
+                function newPage() {
+                    currentPage = pageTemplate.cloneNode(true);
+                    currentFrame = currentPage.querySelector('.page-frame');
+                    currentHead = currentPage.querySelector('.page-header');
+                    currentColumn = currentPage.querySelector('.page-column');
+                    document.body.appendChild(currentPage);
+                }
+
+
+                let currentPage = document.querySelector('.page');
+                let currentHead = currentPage.querySelector('.page-header');
+                let currentFrame = currentPage.querySelector('.page-frame');
+                let currentColumn = currentPage.querySelector('.page-column');
+                const pageTemplate = currentPage.cloneNode(true);
+
+                let headItems = []
+                let previousHeading = null;
+                let headingLevels = [0, 0, 0, 0, 0, 0];
+                for (let item of contentElements) {
+                    if (item.tagName == 'H1')
+                        document.title = item.innerHTML;
+
+                    // heading manipulation
+                    if (/^H[2-6]$/.test(item.tagName)) {
+                        const level = parseInt(item.tagName[1]) - 1;
+                        headingLevels[level - 1]++;
+                        for (let i = level; i < headingLevels.length; i++) {
+                            headingLevels[i] = 0;
+                        }
+
+                        const prefix = headingLevels.map(e => Math.max(1, e)).slice(0, level).join(".");
+                        item.textContent = `${prefix}. ${item.textContent}`;
+                    }
+
+                    // image manipulation
+                    const image = item.querySelector('img');
+                    if (image)
+                    {
+                        const figure = document.createElement('figure');
+                        const caption = document.createElement('figcaption');
+                        caption.innerHTML = image.getAttribute('alt');
+
+                        figure.appendChild(image);
+                        figure.appendChild(caption);
+                        item.replaceWith(figure);
+                        item = figure;
+
+                        if (!image.complete)
+                            await new Promise(resolve => {
+                                image.addEventListener('load', resolve, { once: true });
+                                image.addEventListener('error', resolve, { once: true });
+                            });
+
+                    }
+
+                    // Add to page
+                    if (item.tagName == 'H2')
+                        newPage();
+
+                    currentColumn.appendChild(item);
+
+                    pageBottom = currentFrame.getBoundingClientRect();
+                    itemBottom = item.getBoundingClientRect();
+                    if (pageBottom.bottom < itemBottom.bottom) {
+                        newColumn();
+                        if (previousHeading)
+                            currentColumn.appendChild(previousHeading);
+                        currentColumn.appendChild(item);
+                    }
+
+
+                    previousHeading = /^H[1-6]$/.test(item.tagName) ? item : null;
+                }
+            }
+
+
+            window.onload = async () => {
+                const content = await loadMarkdown();
+                handleContent(content);
+            };
+        </script>
+    </head>
+    <body>
+        <div class="page">
+            <div class="page-frame">
+                <div class="page-header">
+                </div>
+                <div class="page-grid">
+                    <div class="page-column">
+                    </div>
+                </div>
+                <div class="page-footer">
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
