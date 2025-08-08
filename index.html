@@ -65,7 +65,10 @@
             grid-template-columns: 1fr 1fr;
         }
 
-
+        a {
+            color: inherit;
+            text-decoration: inherit;
+        }
 
         img {
             object-fit: contain;
@@ -140,7 +143,7 @@
 
     <script>
         // Holds all collected reference objects
-        const references = {};
+        const linkReferences = {};
 
         // Holds all created page objects
         const pageList = [];
@@ -237,16 +240,16 @@
                 if (element.tagName == 'REF') {
                     const refInfo = element.querySelector('refInfo');
                     const refType = refInfo.getAttribute('type');
-                    if (refType in references) {
-                        references[refType].push(element);
+                    if (refType in linkReferences) {
+                        linkReferences[refType].push(element);
                     }
                     else {
-                        references[refType] = [element];
+                        linkReferences[refType] = [element];
                     }
 
                     const refContent = marked.parse(refInfo.innerHTML);
                     const refLabel = String(refType).charAt(0).toUpperCase() + String(refType).slice(1);
-                    refInfo.innerHTML = `<span><b>${refLabel} ${references[refType].length}: </b></span>` + refContent;
+                    refInfo.innerHTML = `<span><b id="refLabel">${refLabel} ${linkReferences[refType].length}</b>: </span>` + refContent;
                 }
 
                 // wait until images are loaded, otherwise their size is unknown.
@@ -272,6 +275,19 @@
                     }
                     const prefix = headingLevels.map(e => Math.max(1, e)).slice(0, level).join(".");
                     element.textContent = `${prefix}. ${element.textContent}`;
+                }
+            }
+
+            for (let element of markdownElements) {
+                // replace the link ids with the labels and actual links.
+                for (const [type, refs] of Object.entries(linkReferences)) {
+                    for (const refItem of refs) {
+                        const refInfo = refItem.querySelector('refInfo');
+                        const refLabel = refInfo.querySelector('#refLabel').innerHTML;
+                        const refId = refInfo.getAttribute('id');
+                        const linkLabel = `<a href="#${refId}"><i>[${refLabel}]</i></a>`;
+                        element.innerHTML = element.innerHTML.replace(`[${refId}]`, linkLabel);
+                    }
                 }
             }
         }
