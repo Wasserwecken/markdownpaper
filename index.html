@@ -3,42 +3,35 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Sandbox</title>
+
+        <script id="mdContent" type="text/plain" src="./content.md"></script>
+        <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script src="https://viewer.diagrams.net/js/viewer-static.min.js"></script>
+
         <style>
             :root {
-                --main-bg-color: #ccc;
-                --paper-bg-color: #fff;
+                /* Config for the page appearance */
+                --paper-bg-color: #fff; /* Background color for the page */
+                --main-bg-color: #ccc; /* Background color for all the content that is not the page */
+                --paper-space: 4rem; /* Space around the page content, acting as print margins */
                 --paper-width: 210mm;
                 --paper-height: 297mm;
-                --paper-space: 4rem;
-                --content-bg-color: #eee;
+
                 --font-annotation-size: 0.7rem;
+                --content-bg-color: #eee;
+
+                font-family: Garamond, sans-serif;
+                font-size: 1rem;
+                hyphens: auto;
+                text-align: justify;
             }
 
             html, body {
-                font-family: Garamond, sans-serif;
-                font-size: 1rem;
+                background: var(--main-bg-color);
+                width: 100%;
                 margin: 0;
                 padding: 0;
-                width: 100%;
-                background: var(--main-bg-color);
-            }
-
-            p {
-                text-align: justify;
-                hyphens: auto;
-            }
-
-            pre {
-                font-size: var(--font-annotation-size);
-                border-radius: 0.25rem;
-                background-color: var(--content-bg-color);
-                display: block;
-                width: 100%;
-            }
-
-            #page-template {
-                display: none;
             }
 
             .page {
@@ -71,6 +64,15 @@
                 white-space: pre-wrap;
             }
 
+
+            pre {
+                font-size: var(--font-annotation-size);
+                border-radius: 0.25rem;
+                background-color: var(--content-bg-color);
+                display: block;
+                width: 100%;
+            }
+
             img {
                 object-fit: contain;
                 margin: auto;
@@ -100,16 +102,15 @@
             }
         </style>
 
-        <script id="Markdown" type="text/plain" src="./script.md"></script>
-
-        <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-        <script src="https://viewer.diagrams.net/js/viewer-static.min.js"></script>
-
         <script>
+            /**
+             * Load markdown content from the script tag with id 'Markdown'.
+             * If the 'src' attribute is defined, fetch the content from that URL.
+             * Otherwise, use the inner HTML of the tag.
+             * */
             async function loadMarkdown() {
                 // load content of tag
-                const markdown = document.getElementById('Markdown');
+                const markdown = document.getElementById('mdContent');
                 const markdownSrc = markdown.getAttribute('src');
                 let markdownContent = markdown.innerHTML;
 
@@ -224,17 +225,25 @@
         </script>
     </head>
     <body>
+
+        <!-- Template for the page structure -->
         <div class="page">
             <div class="page-frame">
+
                 <div class="page-header">
+                    <!-- Header content will be dynamically filled -->
                 </div>
                 <div class="page-grid">
                     <div class="page-column">
+                        <!-- Content will be dynamically filled -->
                     </div>
                 </div>
                 <div class="page-footer">
+                    <!-- Footer content will be dynamically filled -->
                 </div>
+
             </div>
         </div>
+
     </body>
 </html>
