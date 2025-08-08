@@ -20,6 +20,7 @@ Das Thema der Künstlichen Intelligenz gibt es bereits seit den 50er Jahren. All
 Als Künstliche Intelligenz (KI) werden Systeme bezeichnet die Probleme und Aufgaben lösen können die menschliche Intelligenz benötigen oder diese sogar übersteigen.
 </ref>
 
+$$\pi^* = v_{\pi^*}(s) = \max_{a \in A} \sum_{s',r} p(s',r|s,a) [r+\gamma v(s')]$$
 
 ## Bullshit Bingo
 Kaum eine Software wird momentan ohne integrierte "KI"-Funktion beworben. Überall werden Chat-Assistenten beworben und auch teils kostenlos angeboten. Nahezu jede Softwarefirma hat einen Blogeintrag über KI und maschinelles Lernen. Denn alles wird besser, schneller, effizienter, produktiver und genauer mit Neuronalen Netzten, LLM's, KI-Agenten und maschinellem Lernen. Bei all diesen Angeboten und Schlagwörter ist es schwierig zu erkennen was genau KI in Produkten macht und ob KI überhaupt einen Mehrwert für die eigene Produktivität bieten kann.
