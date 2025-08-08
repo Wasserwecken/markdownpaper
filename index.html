@@ -1,249 +1,320 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-        <script id="mdContent" type="text/plain" src="./content.md"></script>
-        <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-        <script src="https://viewer.diagrams.net/js/viewer-static.min.js"></script>
+<head>
+    <script id="mdContent" type="text/plain" src="content.md">
+<!-- Write here your markdown content, or specify a valid 'src' to your markdown file -->
+    </script>
 
-        <style>
-            :root {
-                /* Config for the page appearance */
-                --paper-bg-color: #fff; /* Background color for the page */
-                --main-bg-color: #ccc; /* Background color for all the content that is not the page */
-                --paper-space: 4rem; /* Space around the page content, acting as print margins */
-                --paper-width: 210mm;
-                --paper-height: 297mm;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-                --font-annotation-size: 0.7rem;
-                --content-bg-color: #eee;
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://viewer.diagrams.net/js/viewer-static.min.js"></script>
 
-                font-family: Garamond, sans-serif;
-                font-size: 1rem;
-                hyphens: auto;
-                text-align: justify;
-            }
+    <style>
+        * {
+            box-sizing: border-box;
+        }
 
-            html, body {
-                background: var(--main-bg-color);
-                width: 100%;
-                margin: 0;
-                padding: 0;
+        :root {
+            --paper-bg-color: #fff;
+            --main-bg-color: #ccc;
+            --paper-width: 210mm;
+            --paper-height: 297mm;
+            --paper-space: 20mm;
+
+        }
+
+        html,
+        body {
+            background: var(--main-bg-color);
+            width: 100%;
+            min-height: 100dvh;
+            margin: 0;
+            padding: 0;
+
+            font-family: 'Linux Libertine O', math, Georgia, serif;
+            font-size: 9pt;
+            --font-annotation-size: 0.8rem;
+        }
+
+        p {
+            hyphens: auto;
+            text-align: justify;
+        }
+
+        .page {
+            background: var(--paper-bg-color);
+            width: var(--paper-width);
+            height: var(--paper-height);
+            margin: 2rem auto;
+            padding: var(--paper-space);
+            box-shadow: 0px 0px 32px -8px #0008;
+        }
+
+        .page-frame {
+            display: flex;
+            height: 100%;
+        }
+
+        .page-grid {
+            display: grid;
+            gap: 2rem;
+            grid-template-columns: 1fr 1fr;
+        }
+
+
+
+        img {
+            object-fit: contain;
+            margin: auto;
+            width: 100%;
+            max-width: 100%;
+            border-radius: 0.25rem;
+        }
+
+
+        pre {
+            font-size: var(--font-annotation-size);
+            border-radius: 0.25rem;
+            background-color: var(--content-bg-color);
+            display: block;
+            width: 100%;
+        }
+
+        refinfo {
+            font-size: var(--font-annotation-size);
+            opacity: 80%;
+        }
+
+        refinfo * {
+            font-style: italic;
+            display: inline;
+        }
+
+        code {
+            display: block;
+            padding: 1rem;
+        }
+
+
+        @media print {
+
+            html,
+            body {
+                background: var(--paper-bg-color);
             }
 
             .page {
-                margin: 2rem auto;
-                padding: var(--paper-space);
-                width: var(--paper-width);
-                height: var(--paper-height);
-                background: var(--paper-bg-color);
+                margin: 0;
+                box-shadow: none;
                 break-inside: avoid;
-                box-shadow: 0px 0px 32px -8px #0008;
             }
+        }
+    </style>
+</head>
 
-            .page-frame {
-                max-height: 100%;
-            }
+<body>
 
-            .page-grid {
-                display: grid;
-                gap: 2rem;
-                grid-template-columns: 1fr 1fr;
-            }
+    <!-- Template for the page structure -->
+    <div id="page-template" class="page">
+        <div class="page-frame">
 
-            .page-column {
-                overflow: hidden;
-            }
-
-            .page-column * {
-                text-overflow: ellipsis;
-                overflow-wrap: break-word;
-                white-space: pre-wrap;
-            }
-
-
-            pre {
-                font-size: var(--font-annotation-size);
-                border-radius: 0.25rem;
-                background-color: var(--content-bg-color);
-                display: block;
-                width: 100%;
-            }
-
-            img {
-                object-fit: contain;
-                margin: auto;
-                width: 100%;
-                max-width: 100%;
-                border-radius: 0.25rem;
-            }
-
-            figcaption {
-                font-size: var(--font-annotation-size);
-                opacity: 70%;
-            }
-
-            code {
-                display: block;
-                padding: 1rem;
-            }
-
-            @media print {
-                html, body {
-                    background: var(--paper-bg-color);
-                }
-
-                .page{
-                    box-shadow: none;
-                }
-            }
-        </style>
-
-        <script>
-            /**
-             * Load markdown content from the script tag with id 'Markdown'.
-             * If the 'src' attribute is defined, fetch the content from that URL.
-             * Otherwise, use the inner HTML of the tag.
-             * */
-            async function loadMarkdown() {
-                // load content of tag
-                const markdown = document.getElementById('mdContent');
-                const markdownSrc = markdown.getAttribute('src');
-                let markdownContent = markdown.innerHTML;
-
-                // fetch if src is defined
-                if (markdownSrc) {
-                    const response = await fetch(markdownSrc);
-                    markdownContent = await response.text();
-                }
-
-                // convert markdown to HTML elements
-                let content = document.createElement('div')
-                content.innerHTML = marked.parse(markdownContent);
-                return [...content.children];
-            }
-
-            async function handleContent(contentElements) {
-                function newColumn() {
-                    const newColumn = currentColumn.cloneNode(false);
-                    currentColumn.parentElement.appendChild(newColumn);
-
-                    const currTop = currentColumn.getBoundingClientRect().top;
-                    const newTop = newColumn.getBoundingClientRect().top;
-
-                    if (currTop == newTop)
-                        currentColumn = newColumn;
-                    else {
-                        newColumn.remove();
-                        newPage();
-                    }
-                }
-
-                function newPage() {
-                    currentPage = pageTemplate.cloneNode(true);
-                    currentFrame = currentPage.querySelector('.page-frame');
-                    currentHead = currentPage.querySelector('.page-header');
-                    currentColumn = currentPage.querySelector('.page-column');
-                    document.body.appendChild(currentPage);
-                }
-
-
-                let currentPage = document.querySelector('.page');
-                let currentHead = currentPage.querySelector('.page-header');
-                let currentFrame = currentPage.querySelector('.page-frame');
-                let currentColumn = currentPage.querySelector('.page-column');
-                const pageTemplate = currentPage.cloneNode(true);
-
-                let headItems = []
-                let previousHeading = null;
-                let headingLevels = [0, 0, 0, 0, 0, 0];
-                for (let item of contentElements) {
-                    if (item.tagName == 'H1')
-                        document.title = item.innerHTML;
-
-                    // heading manipulation
-                    if (/^H[2-6]$/.test(item.tagName)) {
-                        const level = parseInt(item.tagName[1]) - 1;
-                        headingLevels[level - 1]++;
-                        for (let i = level; i < headingLevels.length; i++) {
-                            headingLevels[i] = 0;
-                        }
-
-                        const prefix = headingLevels.map(e => Math.max(1, e)).slice(0, level).join(".");
-                        item.textContent = `${prefix}. ${item.textContent}`;
-                    }
-
-                    // image manipulation
-                    const image = item.querySelector('img');
-                    if (image)
-                    {
-                        const figure = document.createElement('figure');
-                        const caption = document.createElement('figcaption');
-                        caption.innerHTML = image.getAttribute('alt');
-
-                        figure.appendChild(image);
-                        figure.appendChild(caption);
-                        item.replaceWith(figure);
-                        item = figure;
-
-                        if (!image.complete)
-                            await new Promise(resolve => {
-                                image.addEventListener('load', resolve, { once: true });
-                                image.addEventListener('error', resolve, { once: true });
-                            });
-
-                    }
-
-                    // Add to page
-                    if (item.tagName == 'H2')
-                        newPage();
-
-                    currentColumn.appendChild(item);
-
-                    pageBottom = currentFrame.getBoundingClientRect();
-                    itemBottom = item.getBoundingClientRect();
-                    if (pageBottom.bottom < itemBottom.bottom) {
-                        newColumn();
-                        if (previousHeading)
-                            currentColumn.appendChild(previousHeading);
-                        currentColumn.appendChild(item);
-                    }
-
-
-                    previousHeading = /^H[1-6]$/.test(item.tagName) ? item : null;
-                }
-            }
-
-
-            window.onload = async () => {
-                const content = await loadMarkdown();
-                handleContent(content);
-            };
-        </script>
-    </head>
-    <body>
-
-        <!-- Template for the page structure -->
-        <div class="page">
-            <div class="page-frame">
-
-                <div class="page-header">
-                    <!-- Header content will be dynamically filled -->
-                </div>
-                <div class="page-grid">
-                    <div class="page-column">
-                        <!-- Content will be dynamically filled -->
-                    </div>
-                </div>
-                <div class="page-footer">
-                    <!-- Footer content will be dynamically filled -->
-                </div>
-
+            <div class="page-header">
+                <!-- Header content will be dynamically filled -->
             </div>
-        </div>
+            <div class="page-grid">
+                <div class="page-column">
+                    <!-- Content will be dynamically filled -->
+                </div>
+            </div>
+            <div class="page-footer">
+                <!-- Footer content will be dynamically filled -->
+            </div>
 
-    </body>
+        </div>
+    </div>
+
+
+    <script>
+        // Holds all collected reference objects
+        const references = {};
+
+        // Holds all created page objects
+        const pageList = [];
+
+        // Template elements for cloning
+        const pageTemplate = document.querySelector('#page-template')
+        const columnTemplate = pageTemplate.querySelector('.page-column');
+        pageTemplate.remove();
+
+
+        /**
+         * Load markdown content from the script tag with id 'Markdown'.
+         * If the 'src' attribute is defined, fetches the content from that URL,
+         * otherwise the inner HTML of the tag is used.
+         * @returns {Element[]} A list of HTML elements, defined my markdown.
+         */
+        async function LoadMarkdown() {
+            const markdown = document.getElementById('mdContent');
+            const markdownSrc = markdown.getAttribute('src');
+
+            // get the raw markdown content
+            let markdownContent = markdown.innerHTML;
+
+            // fetch if src is defined
+            if (markdownSrc) {
+                const response = await fetch(markdownSrc);
+                markdownContent = await response.text();
+                contentRoot = markdownSrc.substr(0, markdownSrc.lastIndexOf("/"));
+            }
+
+            // convert markdown to HTML elements
+            let content = document.createElement('div')
+            content.innerHTML = marked.parse(markdownContent);
+            return [...content.children];
+        }
+
+
+        /**
+         * Adds a new page to the document, with a initial column.
+         * @returns {Object} - A new page object.
+         */
+        function AddPage() {
+            const newPage = pageTemplate.cloneNode(true);
+            pageList.push(newPage);
+            document.body.appendChild(newPage);
+
+            const currentPage = {
+                Frame: newPage.querySelector('.page-frame'),
+                Grid: newPage.querySelector('.page-grid'),
+                Header: newPage.querySelector('.page-header'),
+                Footer: newPage.querySelector('.page-footer'),
+                Columns: [newPage.querySelector('.page-column')],
+            }
+
+            return currentPage;
+        }
+
+        /**
+         * Adds a new column to the current page. If the grid is full, a new page is created.
+         * @param {Object} currentPage - The current page object.
+         * @returns {Object} - The the current or a new page object.
+         */
+        function AddColumn(currentPage) {
+            const currentColumn = currentPage.Columns.at(-1);
+            const newColumn = currentColumn.cloneNode(false);
+            currentColumn.parentElement.appendChild(newColumn);
+
+            // if the column has the same height, it was added next to the other one.
+            const currTop = currentColumn.getBoundingClientRect().top;
+            const newTop = newColumn.getBoundingClientRect().top;
+            if (currTop == newTop) {
+                currentPage.Columns.push(newColumn);
+                return currentPage;
+            }
+            // if not, there are more columns than definitions, thus a new page is required.
+            else {
+                newColumn.remove();
+                return AddPage();
+            }
+        }
+
+
+        /**
+         * Iterates through the markdown elements and processes for special cases.
+         * Headings need to be enumerated, references collected, and images loaded, etc, etc.
+         * @param {Element[]} markdownElements - The markdown elements to process.
+         */
+        async function PostProcessElements(markdownElements) {
+            let headingLevels = [0, 0, 0, 0, 0, 0];
+
+            for (let element of markdownElements) {
+
+                // collect references, to link their usages in text and set their label.
+                if (element.tagName == 'REF') {
+                    const refInfo = element.querySelector('refInfo');
+                    const refType = refInfo.getAttribute('type');
+                    if (refType in references) {
+                        references[refType].push(element);
+                    }
+                    else {
+                        references[refType] = [element];
+                    }
+
+                    const refContent = marked.parse(refInfo.innerHTML);
+                    const refLabel = String(refType).charAt(0).toUpperCase() + String(refType).slice(1);
+                    refInfo.innerHTML = `<span><b>${refLabel} ${references[refType].length}: </b></span>` + refContent;
+                }
+
+                // wait until images are loaded, otherwise their size is unknown.
+                const image = element.querySelector('img');
+                if (image && !image.complete) {
+                    await new Promise(resolve => {
+                        image.addEventListener('load', resolve, { once: true });
+                        image.addEventListener('error', resolve, { once: true });
+                    });
+                }
+
+                // sets the title of the document by the main heading content.
+                if (element.tagName == 'H1') {
+                    document.title = element.innerHTML;
+                }
+
+                // enumerating headings by their order and level.
+                if (/^H[2-6]$/.test(element.tagName)) {
+                    const level = parseInt(element.tagName[1]) - 1;
+                    headingLevels[level - 1]++;
+                    for (let i = level; i < headingLevels.length; i++) {
+                        headingLevels[i] = 0;
+                    }
+                    const prefix = headingLevels.map(e => Math.max(1, e)).slice(0, level).join(".");
+                    element.textContent = `${prefix}. ${element.textContent}`;
+                }
+            }
+        }
+
+
+        /**
+         * Places the markdown elements into the pages, creates new columns and pages as needed.
+         */
+        async function PlaceElements(markdownElement) {
+            let currentPage = AddPage();
+            let currentColumn = currentPage.Columns.at(-1);
+            let previousHeading = null;
+
+            for (let item of markdownElement) {
+
+                // place the element in the current column
+                currentColumn.appendChild(item);
+
+                // check if the item is overflowing the page grid and move it to the next column.
+                gridBottom = currentPage.Grid.getBoundingClientRect();
+                itemBottom = item.getBoundingClientRect();
+                if (itemBottom.bottom > gridBottom.bottom) {
+                    currentPage = AddColumn(currentPage);
+                    currentColumn = currentPage.Columns.at(-1);
+                    if (previousHeading)
+                        currentColumn.appendChild(previousHeading);
+                    currentColumn.appendChild(item);
+                }
+
+                previousHeading = /^H[1-6]$/.test(item.tagName) ? item : null;
+            }
+        }
+
+
+        /**
+         * Entry point of parsing the markdown and placing it on pages.
+         */
+        window.onload = async () => {
+            const markdownElements = await LoadMarkdown();
+            await PostProcessElements(markdownElements);
+            await PlaceElements(markdownElements);
+        };
+    </script>
+</body>
+
 </html>
