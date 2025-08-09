@@ -101,10 +101,24 @@
             grid-template-columns: 1fr 1fr;
         }
 
-        ref * {
+        src {
+            margin: 1rem 0;
+            display: block;
+            font-size: var(--font-annotation-size);
+        }
+
+        src * {
+            display: inline;
+        }
+
+        ref {
+            display: block;
             font-size: var(--font-annotation-size);
             opacity: 66%;
             font-style: italic;
+        }
+
+        ref * {
             display: inline;
         }
 
@@ -112,10 +126,52 @@
             font-weight: bold;
         }
 
+
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            margin: 2rem 0 0 0;
+        }
+
+        h1 {
+            font-size: 3.0rem;
+        }
+
+        h2 {
+            font-size: 2.0rem;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+        }
+
+        h4 {
+            font-size: 1.25rem;
+        }
+
+        h5 {
+            font-size: 1.125rem;
+        }
+
+        h6 {
+            font-size: 1.0rem;
+        }
+
         a {
+            font-style: italic;
             color: inherit;
             text-decoration: inherit;
         }
+
+        ul, ol {
+            padding-inline-start: 2rem;
+            word-break: break-all;
+        }
+
 
         img {
             object-fit: contain;
@@ -131,12 +187,23 @@
             border-radius: 0.25rem;
             background-color: var(--content-bg-color);
             display: block;
-            width: 100%;
         }
 
         code {
-            display: block;
+            display: inline;
+            padding: 0 0.3rem;
+
+            font-size: var(--font-annotation-size);
+
+            background-color: Gainsboro;
+            border-radius: 0.25rem;
+        }
+
+        pre code {
             padding: 1rem;
+            width: 100%;
+            display: block;
+            white-space: pre-wrap;
         }
 
 
@@ -171,8 +238,11 @@
 
 
     <script>
-        // Holds all collected reference objects
+        // Holds all internal reference in the document.
         const linkReferences = {};
+
+        // Holds all external reference sources.
+        const srcReferences = [];
 
         // Holds all created page objects
         const pageList = [];
@@ -274,6 +344,14 @@
 
             // first iteration.
             for (let element of markdownElements) {
+
+                // remember source reference
+                if (element.tagName == 'SRC') {
+                    const srcId = element.getAttribute('id');
+                    const srcLabel = `[${srcReferences.length + 1}]`;
+                    srcReferences.push([srcId, srcLabel, element]);
+                }
+
                 // collect references, to link their usages in text and set their label.
                 if (element.tagName == 'REF') {
                     const refId = element.getAttribute('id');
@@ -292,7 +370,7 @@
                 }
 
                 // wait until images are loaded, otherwise their size is unknown.
-                const image = element.querySelector('img');
+                const image = element.tagName == 'IMG' ? element : element.querySelector('img');
                 if (image && !image.complete) {
                     await new Promise(resolve => {
                         image.addEventListener('load', resolve, { once: true });
@@ -323,7 +401,6 @@
             // second iteration.
             let processedElements = [];
             for (let element of markdownElements) {
-
                 // check if the element defines the page header or footer content.
                 if (element.tagName == 'HEADER') {
                     const headerContent = document.createElement('div');
@@ -338,12 +415,18 @@
                     continue;
                 }
 
-                // replace the link ids with the labels and actual links.
+                // replace the internal link ids with the labels and actual links.
                 for (const [type, refs] of Object.entries(linkReferences)) {
                     for (const [refId, refLabel] of refs) {
-                        const linkLabel = `<a href="#${refId}"><i>[${refLabel}]</i></a>`;
+                        const linkLabel = `<a href="#${refId}">[${refLabel}]</a>`;
                         element.innerHTML = element.innerHTML.replace(`[${refId}]`, linkLabel);
                     }
+                }
+
+                // replace the externsal source references with the actual links.
+                for (const [srcId, srcLabel, srcRef] of srcReferences) {
+                    const linkLabel = `<a href="#${srcId}">${srcLabel}</a>`;
+                    element.innerHTML = element.innerHTML.replace(`[${srcId}]`, linkLabel);
                 }
 
                 // bundle the reference with the previous element to be one.
@@ -356,6 +439,12 @@
 
                 // accept processed element
                 processedElements.push(element);
+            }
+
+            // add references at the end
+            for (const [srcId, srcLabel, srcRef] of srcReferences) {
+                srcRef.innerHTML = `<p>${srcLabel}:</p> ${marked.parse(srcRef.innerHTML)}`;
+                processedElements.push(srcRef);
             }
 
             // return [];
