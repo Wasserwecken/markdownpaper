@@ -9,18 +9,18 @@
 
 
 <!-- CONTENT -->
-# (H4) KI unter der Haube - Wie funktioniert ein LLM?
+# (H4) KI unter
 Als Künstliche Intelligenz (KI) werden Systeme bezeichnet die Probleme und Aufgaben lösen können die menschliche Intelligenz benötigen oder diese sogar übersteigen. Solche System können aus riesigen Datenmengen Muster erkennen um Vorhersagen zu erzeugen oder Inhalte zu generieren. Künstliche Intelligenz ist heute so etwas wie die Industrielle Revolution, nur eben für die Verwaltung und Steuerung.
 
-Das Thema der Künstlichen Intelligenz $a = b$ gibt es bereits seit den 50er Jahren. Allerdings waren das alles aber nur theoretische und mathematische Konzepte. Mit den 2000er Jahren kam das Internet in der Gesellschaft an, und die ersten Datenmengen. [sail] Auch die Leistung der Computerhardware wurde mit jedem Jahr leistungsstärker so dass die frühen Konzepte tatsächlich Anwendbar und Wirtschaftlich wurden. Das Interesse die Forschung, und die Ausbildungen dahin sind seit jeher angestiegen und es gab immer neue Durchbrüche, wie z.B. neuronale Netze. Und seit 2020 / 2021 hat es die Aufmerksamkeit der breiten Bevölkerung, angestoßen durch die Veröffentlichung von ChatGPT und DALLE durch OpenAI. Auf einmal konnte jeder ohne technischen Vorkenntnisse Text und Bilder generieren, nur durch die Eingabe von ganz normalem Text, auch natürliche Sprache genannt. Die Möglichkeit das System natürliche Sprache erst seit kurzem verarbeiten und verstehen können.
-
-<ref>
 <img src="./.doc/sailboat.bmp"/>
-<refInfo id="sail" type="figure" />
+<ref id="sail" type="figure">
 Als Künstliche Intelligenz (KI) werden Systeme bezeichnet die Probleme und Aufgaben lösen können die menschliche Intelligenz benötigen oder diese sogar übersteigen.
 </ref>
 
+Das Thema der Künstlichen Intelligenz $a = b$ gibt es bereits seit den 50er Jahren. Allerdings waren das alles aber nur theoretische und mathematische Konzepte. Mit den 2000er Jahren kam das Internet in der Gesellschaft an, und die ersten Datenmengen. [sail] Auch die Leistung der Computerhardware wurde mit jedem Jahr leistungsstärker so dass die frühen Konzepte tatsächlich Anwendbar und Wirtschaftlich wurden. Das Interesse die Forschung, und die Ausbildungen dahin sind seit jeher angestiegen und es gab immer neue Durchbrüche, wie z.B. neuronale Netze. Und seit 2020 / 2021 hat es die Aufmerksamkeit der breiten Bevölkerung, angestoßen durch die Veröffentlichung von ChatGPT und DALLE durch OpenAI. Auf einmal konnte jeder ohne technischen Vorkenntnisse Text und Bilder generieren, nur durch die Eingabe von ganz normalem Text, auch natürliche Sprache genannt. Die Möglichkeit das System natürliche Sprache erst seit kurzem verarbeiten und verstehen können.
+
 $$\pi^* = v_{\pi^*}(s) = \max_{a \in A} \sum_{s',r} p(s',r|s,a) [r+\gamma v(s')]$$
+
 
 ## Bullshit Bingo
 Kaum eine Software wird momentan ohne integrierte "KI"-Funktion beworben. Überall werden Chat-Assistenten beworben und auch teils kostenlos angeboten. Nahezu jede Softwarefirma hat einen Blogeintrag über KI und maschinelles Lernen. Denn alles wird besser, schneller, effizienter, produktiver und genauer mit Neuronalen Netzten, LLM's, KI-Agenten und maschinellem Lernen. Bei all diesen Angeboten und Schlagwörter ist es schwierig zu erkennen was genau KI in Produkten macht und ob KI überhaupt einen Mehrwert für die eigene Produktivität bieten kann.

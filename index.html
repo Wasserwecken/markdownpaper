@@ -94,14 +94,15 @@
             width: 100%;
         }
 
-        refinfo {
+        ref * {
             font-size: var(--font-annotation-size);
             opacity: 80%;
-        }
-
-        refinfo * {
             font-style: italic;
             display: inline;
+        }
+
+        .refLabel {
+            font-weight: bold;
         }
 
         code {
@@ -182,8 +183,10 @@
             }
 
             // convert markdown to HTML elements
-            let content = document.createElement('div')
+            let content = document.createElement('div');
+            content.style.display = 'none';
             content.innerHTML = marked.parse(markdownContent);
+            document.body.appendChild(content);
             return [...content.children];
         }
 
@@ -240,23 +243,23 @@
          */
         async function PostProcessElements(markdownElements) {
             let headingLevels = [0, 0, 0, 0, 0, 0];
-
             for (let element of markdownElements) {
 
                 // collect references, to link their usages in text and set their label.
                 if (element.tagName == 'REF') {
-                    const refInfo = element.querySelector('refInfo');
-                    const refType = refInfo.getAttribute('type');
-                    if (refType in linkReferences) {
-                        linkReferences[refType].push(element);
-                    }
-                    else {
-                        linkReferences[refType] = [element];
-                    }
+                    const refId = element.getAttribute('id');
+                    const refType = element.getAttribute('type');
+                    if (!(refType in linkReferences))
+                        linkReferences[refType] = [];
 
-                    const refContent = marked.parse(refInfo.innerHTML);
-                    const refLabel = String(refType).charAt(0).toUpperCase() + String(refType).slice(1);
-                    refInfo.innerHTML = `<span><b id="refLabel">${refLabel} ${linkReferences[refType].length}</b>: </span>` + refContent;
+                    const refCount = linkReferences[refType].length + 1;
+                    const refLabel = `${refType.charAt(0).toUpperCase()}${refType.slice(1)} ${refCount}`;
+                    const refContent = marked.parse(element.innerHTML);
+
+                    linkReferences[refType].push([refId, refLabel]);
+                    element.innerHTML = `<span class="refLabel">${refLabel}: </span>` + refContent;
+
+                    markdownElements.pop(element); // remove the element from the list, as it is not needed anymore.
                 }
 
                 // wait until images are loaded, otherwise their size is unknown.
@@ -285,18 +288,32 @@
                 }
             }
 
+            // render all math formulas.
+            MathJax.typeset();
+
+
+            let processedElements = [];
             for (let element of markdownElements) {
                 // replace the link ids with the labels and actual links.
                 for (const [type, refs] of Object.entries(linkReferences)) {
-                    for (const refItem of refs) {
-                        const refInfo = refItem.querySelector('refInfo');
-                        const refLabel = refInfo.querySelector('#refLabel').innerHTML;
-                        const refId = refInfo.getAttribute('id');
+                    for (const [refId, refLabel] of refs) {
                         const linkLabel = `<a href="#${refId}"><i>[${refLabel}]</i></a>`;
                         element.innerHTML = element.innerHTML.replace(`[${refId}]`, linkLabel);
                     }
                 }
+
+                // bundle the reference with the previous element to be one.
+                if (element.tagName == 'REF') {
+                    let refDiv = document.createElement('div');
+                    refDiv.appendChild(processedElements.pop());
+                    refDiv.appendChild(element);
+                    element = refDiv;
+                }
+
+                processedElements.push(element);
             }
+
+            return processedElements;
         }
 
 
@@ -333,10 +350,9 @@
          * Entry point of parsing the markdown and placing it on pages.
          */
         window.onload = async () => {
-            const markdownElements = await LoadMarkdown();
-            await PostProcessElements(markdownElements);
+            let markdownElements = await LoadMarkdown();
+            markdownElements = await PostProcessElements(markdownElements);
             await PlaceElements(markdownElements);
-            MathJax.typeset();
         };
     </script>
 </body>
