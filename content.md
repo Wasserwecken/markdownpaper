@@ -46,11 +46,9 @@ https://marked.js.org/
 
 <!-- CONTENT -->
 # markdownpaper
-Use markdown[markdown] syntax to create beautiful documentations, scientific scripts or papers, through a single static HTML file without runtime dependencies or build processes.
-Its plain HTML, CSS and Javascript, which does all the workload.
+Use markdown[markdown] syntax to create beautiful documentations, scientific scripts or papers, through a single static HTML file without runtime dependencies or build processes. Its plain HTML, CSS and Javascript, which does all the workload.
 
-There is no need for NPM, Ruby, Python, Perl Envirnment, Docker container, Java runtime, online dependencies or subscription.
-It runs offline *(if your really want to)*, it runs anywhere without any installation, and uses a simple syntax *(markdown)* to define content.
+There is no need for NPM, Ruby, Python, Perl Envirnment, Docker container, Java runtime, online dependencies or subscription. It runs offline *(if your really want to)*, it runs anywhere without any installation, and uses a simple syntax *(markdown)* to define content.
 
 ## Introduction
 
@@ -75,9 +73,11 @@ Quickstart:
 - Load the `index.html` in your browser
 
 ### Customisation
-#### Styling
-#### Behaviour
-#### Content source
+If you dont like the current styling or choice for font, feel free to edit the embedded stylsheets. If you want to use a CSS framework of your choice for special formatting, just add their CDN link.
+
+If you want to embedd more complex objects or renderning, add your JavaScript library of choice to the header. If you want to change the behaviour of how markdown elements are processed, have a look at the embedded JavaScript code. Its is not minified and should be well documented through comments.
+
+The restriction is that you can use only static compiled resources libraries, there is no support for NPM modules or TypeScript, except you are adding this support by yourself.
 
 ### Printing
 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
@@ -95,30 +95,12 @@ Please keep following guidelines for contributions:
 - The `index.html` should stay the only file required to run the tool, do not add additional files or folders as dependencies. I want this too to be as lightweight and accessable as possible.
 - Do not add a CSS framework. All styling made should be included in the `index.html` file. The formatting should be kept simple and minimal, everything else is the choice of the user and can be added by themself.
 
-### Layout configuration
-Use the tag `<config>` to configure the layout of the page and set some global settings. Set the attributes by writing a JSON object inside the tag.
-
-```
-<config>
-{
-    "columnCount": 2,
-    "columnGap": "2rem",
-    "paddingX": "20mm",
-    "paddingY": "20mm",
-    "hyphens": true,
-    "pageNoTop": true,
-    "pageNoBottom": true,
-}
-</config>
-```
-
 
 ## Writing markdown
 The library `marked.js`[mdMarked] is used for parsing and compiling markdown. Thus all common markdown syntax is supported. The following sections show the apeareance of standard markdown elements. Have a look at the markdown documentation for the basic syntax here <https://www.markdownguide.org/cheat-sheet/>[mdCheatSheet].
 
 ### Headings
-Headlines are automatically enumerated by their level, with `#` for *H1*, `##` for *H2*, and so on.
-The heading `#` *H1* is special because it defines the title of the document and its's content.
+Headlines are automatically enumerated by their level, with `#` for *H1*, `##` for *H2*, and so on. The heading `#` *H1* is special because it defines the title of the document and its's content.
 
 ```
 # Heading 1
@@ -140,8 +122,7 @@ The heading `#` *H1* is special because it defines the title of the document and
 
 
 ### Paragraphs
-Paragraphs are separated by a blank line. The text will be wrapped automatically.
-Do not indent your text, otherwise it will be interpreted as a code block.
+Paragraphs are separated by a blank line. The text will be wrapped automatically. Do not indent your text, otherwise it will be interpreted as a code block.
 
 ```
 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat.
@@ -186,8 +167,7 @@ Lists should behave exactly as expected.
 1. Item
 
 ### Images
-Images can be included in the markdown file, and will be displayed in the HTML output.
-You can use the HTML image tag, or use the markdown syntax. All examples result in the same output.
+Images can be included in the markdown file, and will be displayed in the HTML output. You can use the HTML image tag, or use the markdown syntax. All examples result in the same output.
 
 ```
 [img]: ./.doc/sailboat.bmp
@@ -201,8 +181,7 @@ You can use the HTML image tag, or use the markdown syntax. All examples result 
 <img src="./.doc/sailboat.bmp"/>
 
 ### Links
-Links can be created using markdown syntax or HTML tags. Both will be rendered as clickable hyperlinks.
-They are always rendered italic, and without text or color decoration.
+Links can be created using markdown syntax or HTML tags. Both will be rendered as clickable hyperlinks. They are always rendered italic, and without text or color decoration.
 
 ```
 [Markdown Guide](https://www.markdownguide.org/)
@@ -262,9 +241,7 @@ Tables can be created using pipes (`|`) and hyphens (`-`). They will be rendered
 There are several tags and behaviours to extend the markdown definitions. You may want to created citings or sublines to Figures and formulars.
 
 #### Math formulas
-Math formulas can be included in the markdown file using the `$` syntax for inline formulas and `$$` for block formulas.
-The projects uses the `MathJax`[mathjax] library to render these formulas and the syntax is very simillar to LaTeX.
-Notherless there are some limitation, which can be read at their documentation, as well as the basic usage: <https://docs.mathjax.org/en/latest/>
+Math formulas can be included in the markdown file using the `$` syntax for inline formulas and `$$` for block formulas. The projects uses the `MathJax`[mathjax] library to render these formulas and the syntax is very simillar to LaTeX. Notherless there are some limitation, which can be read at their documentation, as well as the basic usage: <https://docs.mathjax.org/en/latest/>
 
 ```
 This is a line holding a nested formular, $a^2 * b^2 = c^2$, to show of the inlining.
@@ -278,8 +255,7 @@ $$\pi^* = v_{\pi^*}(s) = \max_{a \in A} \sum_{s',r} p(s',r|s,a) [r+\gamma v(s')]
 
 
 #### Header & Footer
-A global annotation for all pages, visible the very top and bottom of each page, can be defined anywhere with a `<header>` and `<footer>` tag.
-You can define them multiple times, but only the content of the very last will be used.
+A global annotation for all pages, visible the very top and bottom of each page, can be defined anywhere with a `<header>` and `<footer>` tag. You can define them multiple times, but only the content of the very last will be used.
 
 ```
 <header>
@@ -295,11 +271,9 @@ Look at the top and bottom of each page to see the result.
 
 
 #### References & sublines
-Images, formulars, quotes and tables often need additional context or a label to refer from the paragraphs.
-To encode the label, enumerate the references and attatch them propertly to the corresponding elements, the `<ref>` tag can be used.
+Images, formulars, quotes and tables often need additional context or a label to refer from the paragraphs. To encode the label, enumerate the references and attatch them propertly to the corresponding elements, the `<ref>` tag can be used.
 
-Write the `<ref>` tag directly after the element you want to label. Any element like lists, figures or tables can be labeled this way.
-The tag required two attributes to be configured:
+Write the `<ref>` tag directly after the element you want to label. Any element like lists, figures or tables can be labeled this way. The tag required two attributes to be configured:
 - **`id`** For the reference label, which can be used to refer to this subline.
 - **`type`** Specifies the display label of the referenced element.
 
@@ -330,8 +304,11 @@ TODO TODO
 #### Footnotes
 TODO TODO
 
-#### Force column & page
+#### Column & page break
 TODO TODO
 
 #### Table of contents
+TODO TODO
+
+### Layout configuration
 TODO TODO
