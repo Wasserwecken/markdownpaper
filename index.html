@@ -112,6 +112,16 @@
             display: inline;
         }
 
+        src {
+            margin: 1rem 0;
+            display: block;
+            font-size: var(--font-annotation-size);
+        }
+
+        src * {
+            display: inline;
+        }
+
         .refLabel {
             font-weight: bold;
         }
@@ -458,8 +468,9 @@
 
             // add references at the end
             for (const [srcId, srcLabel, srcRef] of srcReferences) {
-                srcRef.innerHTML = `<p>${srcLabel}:</p> ${marked.parse(srcRef.innerHTML)}`;
-                processedElements.push(srcRef);
+                srcItem = document.createElement('src');
+                srcItem.innerHTML = `<p>${srcLabel}:</p> ${marked.parse(srcRef.innerHTML)}`;
+                processedElements.push(srcItem);
             }
 
             // return [];
