@@ -1,3 +1,12 @@
+<header>
+This here defines the header content for all pages.
+</header>
+
+<footer>
+This here defines the footer content for all pages.
+</footer>
+
+
 <!-- REFERENCES -->
 [The19thcenturypostcards]: https://rarehistoricalphotos.com/french-postcards-futuristic-world-year-2000/
 [HyperloopHistory]: https://www.businessinsider.com/history-hyperloop-pneumatic-tubes-as-transportation-2017-8
@@ -20,6 +29,7 @@ Als Künstliche Intelligenz (KI) werden Systeme bezeichnet die Probleme und Aufg
 Das Thema der Künstlichen Intelligenz $a = b$ gibt es bereits seit den 50er Jahren. Allerdings waren das alles aber nur theoretische und mathematische Konzepte. Mit den 2000er Jahren kam das Internet in der Gesellschaft an, und die ersten Datenmengen. [sail] Auch die Leistung der Computerhardware wurde mit jedem Jahr leistungsstärker so dass die frühen Konzepte tatsächlich Anwendbar und Wirtschaftlich wurden. Das Interesse die Forschung, und die Ausbildungen dahin sind seit jeher angestiegen und es gab immer neue Durchbrüche, wie z.B. neuronale Netze. Und seit 2020 / 2021 hat es die Aufmerksamkeit der breiten Bevölkerung, angestoßen durch die Veröffentlichung von ChatGPT und DALLE durch OpenAI. Auf einmal konnte jeder ohne technischen Vorkenntnisse Text und Bilder generieren, nur durch die Eingabe von ganz normalem Text, auch natürliche Sprache genannt. Die Möglichkeit das System natürliche Sprache erst seit kurzem verarbeiten und verstehen können.
 
 $$\pi^* = v_{\pi^*}(s) = \max_{a \in A} \sum_{s',r} p(s',r|s,a) [r+\gamma v(s')]$$
+
 
 
 ## Bullshit Bingo

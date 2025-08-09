@@ -53,23 +53,63 @@
         }
 
         .page {
-            background: var(--paper-bg-color);
+            display: flex;
+            flex-direction: column;
+
             width: var(--paper-width);
             height: var(--paper-height);
             margin: 2rem auto;
-            padding: var(--paper-space);
+            padding: 0 var(--paper-space);
+
+            background: var(--paper-bg-color);
             box-shadow: 0px 0px 32px -8px #0008;
         }
 
-        .page-frame {
+        .page-header,
+        .page-footer {
+            position: relative;
+            flex: none;
             display: flex;
-            height: 100%;
+            justify-content: center;
+            height: var(--paper-space);
+            font-size: var(--font-annotation-size);
+            opacity: 66%;
+        }
+
+        .page-no {
+            position: absolute;
+            right: 0rem;
+        }
+
+        .page-header {
+            align-items: end;
+        }
+
+        .page-header .page-no {
+            bottom: 0rem;
+        }
+
+        .page-footer {
+            top: 0rem;
         }
 
         .page-grid {
+            min-height: 0;
+            height: 100%;
             display: grid;
             gap: 2rem;
             grid-template-columns: 1fr 1fr;
+        }
+
+        ref * {
+            font-size: var(--font-annotation-size);
+            opacity: 66%;
+            font-style: italic;
+            display: inline;
+        }
+
+        .refLabel {
+            font-weight: bold;
         }
 
         a {
@@ -92,17 +132,6 @@
             background-color: var(--content-bg-color);
             display: block;
             width: 100%;
-        }
-
-        ref * {
-            font-size: var(--font-annotation-size);
-            opacity: 80%;
-            font-style: italic;
-            display: inline;
-        }
-
-        .refLabel {
-            font-weight: bold;
         }
 
         code {
@@ -131,21 +160,13 @@
 
     <!-- Template for the page structure -->
     <div id="page-template" class="page">
-        <div class="page-frame">
-
-            <div class="page-header">
-                <!-- Header content will be dynamically filled -->
-            </div>
-            <div class="page-grid">
-                <div class="page-column">
-                    <!-- Content will be dynamically filled -->
-                </div>
-            </div>
-            <div class="page-footer">
-                <!-- Footer content will be dynamically filled -->
-            </div>
-
+        <div class="page-header"></div>
+        <div class="page-top"></div>
+        <div class="page-grid">
+            <div class="page-column"></div>
         </div>
+        <div class="page-bottom"></div>
+        <div class="page-footer"></div>
     </div>
 
 
@@ -198,13 +219,20 @@
         function AddPage() {
             const newPage = pageTemplate.cloneNode(true);
             pageList.push(newPage);
+
+            const pageNo = document.createElement('p');
+            pageNo.classList.add('page-no');
+            pageNo.innerText = `${pageList.length}`;
+            newPage.querySelector('.page-header').appendChild(pageNo);
+            newPage.querySelector('.page-footer').appendChild(pageNo.cloneNode(true));
+
             document.body.appendChild(newPage);
 
             const currentPage = {
-                Frame: newPage.querySelector('.page-frame'),
+                Content: newPage.querySelector('.page-content'),
                 Grid: newPage.querySelector('.page-grid'),
-                Header: newPage.querySelector('.page-header'),
-                Footer: newPage.querySelector('.page-footer'),
+                Header: newPage.querySelector('.page-top'),
+                Footer: newPage.querySelector('.page-bottom'),
                 Columns: [newPage.querySelector('.page-column')],
             }
 
@@ -243,8 +271,9 @@
          */
         async function PostProcessElements(markdownElements) {
             let headingLevels = [0, 0, 0, 0, 0, 0];
-            for (let element of markdownElements) {
 
+            // first iteration.
+            for (let element of markdownElements) {
                 // collect references, to link their usages in text and set their label.
                 if (element.tagName == 'REF') {
                     const refId = element.getAttribute('id');
@@ -291,9 +320,24 @@
             // render all math formulas.
             MathJax.typeset();
 
-
+            // second iteration.
             let processedElements = [];
             for (let element of markdownElements) {
+
+                // check if the element defines the page header or footer content.
+                if (element.tagName == 'HEADER') {
+                    const headerContent = document.createElement('div');
+                    headerContent.innerHTML = marked.parse(element.innerHTML);
+                    pageTemplate.querySelector('.page-header').appendChild(headerContent);
+                    continue;
+                }
+                else if (element.tagName == 'FOOTER') {
+                    const footerContent = document.createElement('div');
+                    footerContent.innerHTML = marked.parse(element.innerHTML);
+                    pageTemplate.querySelector('.page-footer').appendChild(footerContent);
+                    continue;
+                }
+
                 // replace the link ids with the labels and actual links.
                 for (const [type, refs] of Object.entries(linkReferences)) {
                     for (const [refId, refLabel] of refs) {
@@ -310,9 +354,11 @@
                     element = refDiv;
                 }
 
+                // accept processed element
                 processedElements.push(element);
             }
 
+            // return [];
             return processedElements;
         }
 
