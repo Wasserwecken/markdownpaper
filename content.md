@@ -36,27 +36,32 @@ Matt Cone,
 https://www.mathjax.org/
 </ref>
 
+<ref id="mdMarked" type="citation">
+Christopher Jeffrey, Josh Bruce, Steven, Jamie Davis, Tony Brix, Trevor Buckner
+*A markdown parser and compiler. Built for speed*,
+2025,
+https://marked.js.org/
+</ref>
+
 
 <!-- CONTENT -->
 # markdownpaper
-Use markdown[markdown] to create scientifc scripts or papers, through a single HTML file without runtime dependencies or build process.
+Use markdown[markdown] syntax to create beautiful documentations, scientific scripts or papers, through a single static HTML file without runtime dependencies or build processes.
 Its plain HTML, CSS and Javascript, which does all the workload.
 
 There is no need for NPM, Ruby, Python, Perl Envirnment, Docker container, Java runtime, online dependencies or subscription.
 It runs offline *(if your really want to)*, it runs anywhere without any installation, and uses a simple syntax *(markdown)* to define content.
 
-This aims to be as simple as possible for use on any computer at any time and with minimal dependencies as possible.
-
 ## Introduction
-Some common explanations about the project.
 
-### Intention
-I love the idear of LaTeX, writing content and do not care about the document layout. But the steep learning curve of LaTeX and the usage of another required runtime *(Perl)*, which installation is NOT straight forward at all, prevented me from using it.
+### Motivation
+Since I have a small lecture at my local university in addition to my full-time job as a software developer, I wanted to provide my students with an engaging script to follow throughout the course. I was looking for a simple stright forward tool.
 
-But as a software engineer I am used to markdown for writing readme's, taking personal notes of projects, todo's or meeting's. It always appeard to me like a LaTeX-Lite version.
+I love the idear of LaTeX, writing content and do not care about the document layout. But the steep learning curve of LaTeX and the usage of another required runtime *(Perl)*, which installation is NOT straight forward at all, prevented me from using it. But I am used to write markdown for readme's, personal notes, todo's or meeting's. It always appeard to me like a LaTeX-Lite version.
 
 I am sick of installing hundreds of megabytes just to complete a simple task. I don't want to get into another syntax, learn the build process or manage abstractions for content. Ever single tool I checked out for converting markdown to a pretty paper styled PDF had their own complexities.
 
+Thus I created this simple tool to write and edit my script easily and on any device or platform.
 
 ### Installation
 Requirements:
@@ -69,24 +74,47 @@ Quickstart:
 - Start writing markdown inside `content.md`
 - Load the `index.html` in your browser
 
-
-
-### Limitations
-Because this project aim's to be simple in code and use and runs within a limited environment *(your browser)*, there are some limitation what you can achive with this.
-
+### Customisation
 #### Styling
+#### Behaviour
+#### Content source
+
+### Printing
 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
 
-#### Printing
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+### Dependencies
+This projects stands on the following javascript libraries, they are required and loaded from CDN to handle your markdown content:
+- [marked.js](https://github.com/markedjs/marked) - A low-level markdown to HTML parser.
+- [MathJax](https://www.mathjax.org/) - For rendering mathematical notations.
+
+If you need to run this tool in a complete offline environment, you can download the required libraries and include them locally.
 
 ### Contributing
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+Feel free to make this tool valuable for your needs and other people. Please contribute your ideas, improvements, or fixes by pull requests.
+Please keep following guidelines for contributions:
+- The `index.html` should stay the only file required to run the tool, do not add additional files or folders as dependencies. I want this too to be as lightweight and accessable as possible.
+- Do not add a CSS framework. All styling made should be included in the `index.html` file. The formatting should be kept simple and minimal, everything else is the choice of the user and can be added by themself.
+
+### Layout configuration
+Use the tag `<config>` to configure the layout of the page and set some global settings. Set the attributes by writing a JSON object inside the tag.
+
+```
+<config>
+{
+    "columnCount": 2,
+    "columnGap": "2rem",
+    "paddingX": "20mm",
+    "paddingY": "20mm",
+    "hyphens": true,
+    "pageNoTop": true,
+    "pageNoBottom": true,
+}
+</config>
+```
 
 
 ## Writing markdown
-Using plain markdown will already work and alomst every feature is supported. THe following shows the usage of standard markdown elements and their apeareance.
-Have a look at the markdown documentation for the basic syntax here <https://www.markdownguide.org/cheat-sheet/>[mdCheatSheet].
+The library `marked.js`[mdMarked] is used for parsing and compiling markdown. Thus all common markdown syntax is supported. The following sections show the apeareance of standard markdown elements. Have a look at the markdown documentation for the basic syntax here <https://www.markdownguide.org/cheat-sheet/>[mdCheatSheet].
 
 ### Headings
 Headlines are automatically enumerated by their level, with `#` for *H1*, `##` for *H2*, and so on.
@@ -105,9 +133,9 @@ The heading `#` *H1* is special because it defines the title of the document and
 
 <div style="margin: 0; font-size: 3.0rem; font-weight: bold;">Heading 1</div>
 <div style="margin: 0; font-size: 1.8rem; font-weight: bold;">1. Heading 2</div>
-<div style="margin: 0; font-size: 1.6rem; font-weight: bold;">1. 1. Heading 3</div>
-<div style="margin: 0; font-size: 1.4rem; font-weight: bold;">1. 1. 1. Heading 4</div>
-<div style="margin: 0; font-size: 1.2rem; font-weight: bold;">1. 1. 1. 1. Heading 5</div>
+<div style="margin: 0; font-size: 1.5rem; font-weight: bold;">1. 1. Heading 3</div>
+<div style="margin: 0; font-size: 1.3rem; font-weight: bold;">1. 1. 1. Heading 4</div>
+<div style="margin: 0; font-size: 1.1rem; font-weight: bold;">1. 1. 1. 1. Heading 5</div>
 <div style="margin: 0; font-size: 1.0rem; font-weight: bold;">1. 1. 1. 1. 1. Heading 6</div>
 
 
@@ -235,7 +263,7 @@ There are several tags and behaviours to extend the markdown definitions. You ma
 
 #### Math formulas
 Math formulas can be included in the markdown file using the `$` syntax for inline formulas and `$$` for block formulas.
-The projects uses the existing MathJax[mathjax] library to render these formulas and the syntax is very simillar to LaTeX.
+The projects uses the `MathJax`[mathjax] library to render these formulas and the syntax is very simillar to LaTeX.
 Notherless there are some limitation, which can be read at their documentation, as well as the basic usage: <https://docs.mathjax.org/en/latest/>
 
 ```
@@ -271,10 +299,11 @@ Images, formulars, quotes and tables often need additional context or a label to
 To encode the label, enumerate the references and attatch them propertly to the corresponding elements, the `<ref>` tag can be used.
 
 Write the `<ref>` tag directly after the element you want to label. Any element like lists, figures or tables can be labeled this way.
-The `<ref>` tag should include an `id` attribute for the reference label, which can be used in the form of `[id]` from the paragraphs.
-The `<ref>` tag should also include a `type` attribute to specify the display label of the referenced element.
+The tag required two attributes to be configured:
+- **`id`** For the reference label, which can be used to refer to this subline.
+- **`type`** Specifies the display label of the referenced element.
 
-When parsed, a enumerated label of the specified type will be generated and all refers are replaced with that label.
+When parsed, a enumerated label of the specified type is generated and all refers are replaced with that label.
 
 ```
 > "This is my personal Quote, may stating something important!"
@@ -293,3 +322,16 @@ If there would be some important context to this quote, it could be included her
 </ref>
 
 Any paragraph can now refer to the quote[myQuote] by using the quote id.
+
+
+#### Wide content
+TODO TODO
+
+#### Footnotes
+TODO TODO
+
+#### Force column & page
+TODO TODO
+
+#### Table of contents
+TODO TODO
