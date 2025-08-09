@@ -162,16 +162,18 @@
         }
 
         a {
+            text-align: unset;
+            hyphens: unset;
             font-style: italic;
             color: inherit;
             text-decoration: inherit;
         }
 
-        ul, ol {
+        ul,
+        ol {
             padding-inline-start: 2rem;
             word-break: break-all;
         }
-
 
         img {
             object-fit: contain;
@@ -179,6 +181,24 @@
             width: 100%;
             max-width: 100%;
             border-radius: 0.25rem;
+        }
+
+        table {
+            margin: 0 auto;
+            border: none;
+            border-collapse: collapse;
+        }
+
+        td {
+            padding: 0 0.6rem;
+        }
+
+        table td {
+            border-left: 1px solid #000;
+        }
+
+        table td:first-child {
+            border-left: none;
         }
 
 

@@ -22,6 +22,20 @@ Eric Dolch,
 https://github.com/Wasserwecken/markdownpaper
 </src>
 
+<src id="mdCheatSheet">
+MathJax,
+*Everything you need to learn Markdown*,
+2025,
+https://www.markdownguide.org/
+</src>
+
+<src id="mathjax">
+Matt Cone,
+*Beautiful and accessible math in all browsers*,
+2025,
+https://www.mathjax.org/
+</src>
+
 
 <!-- CONTENT -->
 # markdownpaper
@@ -75,9 +89,10 @@ Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod 
 
 ## Writing markdown
 Using plain markdown will already work and alomst every feature is supported. THe following shows the usage of standard markdown elements and their apeareance.
+Have a look at the markdown documentation for the basic syntax here <https://www.markdownguide.org/cheat-sheet/>[mdCheatSheet].
 
 ### Headings
-Headlines are automatically enumerated by their level, with `#` for H1, `##` for H2, and so on.
+Headlines are automatically enumerated by their level, with `#` for *H1*, `##` for *H2*, and so on.
 The heading `#` *H1* is special because it defines the title of the document and its's content.
 
 ```
@@ -90,6 +105,7 @@ The heading `#` *H1* is special because it defines the title of the document and
 ###### Heading 6
 ```
 ---
+
 <div style="margin: 0; font-size: 3.0rem; font-weight: bold;">Heading 1</div>
 <div style="margin: 0; font-size: 1.8rem; font-weight: bold;">1. Heading 2</div>
 <div style="margin: 0; font-size: 1.6rem; font-weight: bold;">1. 1. Heading 3</div>
@@ -108,6 +124,7 @@ Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod 
 At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
 ```
 ---
+
 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat.
 
 At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
@@ -128,6 +145,7 @@ Lists should behave exactly as expected.
 1 Item
 ```
 ---
+
 - Item
 - Item
     1. Sub
@@ -150,19 +168,130 @@ You can use the HTML image tag, or use the markdown syntax. All examples result 
 <img src="./.doc/sailboat.bmp"/>
 ```
 ---
+
 <img src="./.doc/sailboat.bmp"/>
 
 ### Links
+Links can be created using markdown syntax or HTML tags. Both will be rendered as clickable hyperlinks.
+They are always rendered italic, and without text or color decoration.
 
+```
+[Markdown Guide](https://www.markdownguide.org/)
+
+<https://github.com/Wasserwecken/markdownpaper>
+
+<a href="https://daringfireball.net/projects/markdown/">Markdown Project</a>
+```
+---
+
+[Markdown Guide](https://www.markdownguide.org/)
+
+<a href="https://daringfireball.net/projects/markdown/">Markdown Paper</a>
+
+<https://github.com/Wasserwecken/markdownpaper>
 
 ### Quotes
+Quotes can be created using the `>` character at the beginning of a line. It will be rendered as a blockquote.
+
+```
+> "The only limit to our realization of tomorrow will be our doubts of today." - Franklin D. Roosevelt
+```
+---
+
+> "The only limit to our realization of tomorrow will be our doubts of today." - Franklin D. Roosevelt
+
 ### Code
+Code blocks can be created using triple backticks (```) or by indenting lines with four spaces. They will be rendered in a monospaced font.
+
+```
+function helloWorld() {
+    console.log("Hello, world!");
+}
+```
+
 ### Tables
+Tables can be created using pipes (`|`) and hyphens (`-`). They will be rendered as HTML tables.
+
+```
+| Tables   |      Are      |  Cool |
+|----------|:-------------:|------:|
+| col 1 is |  left-aligned | $1600 |
+| col 2 is |    centered   |   $12 |
+| col 3 is | right-aligned |    $1 |
+| this is just | just a very wide | column |
+```
+---
+
+| Tables   |      Are      |  Cool |
+|----------|:-------------:|------:|
+| col 1 is |  left-aligned | $1600 |
+| col 2 is |    centered   |   $12 |
+| col 3 is | right-aligned |    $1 |
+| this is just | just a very wide | column |
 
 ### Extensions
+There are several tags and behaviours to extend the markdown definitions. You may want to created citings or sublines to Figures and formulars.
+
 #### Math formulas
+Math formulas can be included in the markdown file using the `$` syntax for inline formulas and `$$` for block formulas.
+The projects uses the existing MathJax[mathjax] library to render these formulas and the syntax is very simillar to LaTeX.
+Notherless there are some limitation, which can be read at their documentation, as well as the basic usage: <https://docs.mathjax.org/en/latest/>
+
+```
+This is a line holding a nested formular, $a^2 * b^2 = c^2$, to show of the inlining.
+
+$$\pi^* = v_{\pi^*}(s) = \max_{a \in A} \sum_{s',r} p(s',r|s,a) [r+\gamma v(s')]$$
+```
+---
+This is a line holding, $a^2 * b^2 = c^2$, a nested formular to show of the inlining.
+
+$$\pi^* = v_{\pi^*}(s) = \max_{a \in A} \sum_{s',r} p(s',r|s,a) [r+\gamma v(s')]$$
+
+
 #### Header & Footer
-#### Internal References
+A global annotation for all pages, visible the very top and bottom of each page, can be defined anywhere with a `<header>` and `<footer>` tag.
+You can define them multiple times, but only the content of the very last will be used.
+
+```
+<header>
+This here defines the header content for all pages.
+</header>
+
+<footer>
+This here defines the footer content for all pages.
+</footer>
+```
+---
+Look at the top and bottom of each page to see the result.
+
+
+#### Internal References & sublines
+Images, formulars, quotes and tables often need additional context or a label to refer from the paragraphs.
+To encode the label, enumerate the references and attatch them propertly to the corresponding elements, the `<ref>` tag can be used.
+
+Write the `<ref>` tag directly after the element you want to label. Any element like lists, figures or tables can be labeled this way.
+The `<ref>` tag should include an `id` attribute for the reference label, which can be used in the form of `[id]` from the paragraphs.
+The `<ref>` tag should also include a `type` attribute to specify the display label of the referenced element.
+
+When parsed, a enumerated label of the specified type will be generated and all refers are replaced with that label.
+
+```
+> "This is my personal Quote, may stating something important!"
+<ref id="myQuote" type="quote">
+If there would be some important context to this quote, it could be included here.
+</ref>
+
+This paragraph can now refer to the quote[myQuote] by using the quote id.
+```
+---
+> "This is my personal Quote, may stating something important!"
+<ref id="myQuote" type="quote">
+If there would be some important context to this quote, it could be included here.
+</ref>
+
+This paragraph can now refer to the quote[myQuote] by using the quote id.
+
+
 #### External References
 #### Wide section
 
