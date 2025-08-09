@@ -8,33 +8,33 @@ This here defines the footer content for all pages.
 
 
 <!-- REFERENCES -->
-<src id="markdown">
+<ref id="markdown" type="citation">
 John Gruber,
 *Markdown is a text-to-HTML conversion tool for web writers.*,
 2004,
 https://daringfireball.net/projects/markdown/
-</src>
+</ref>
 
-<src id="markdownpaper">
+<ref id="markdownpaper" type="citation">
 Eric Dolch,
 *Display markdown into paper style HTML site*,
 2025,
 https://github.com/Wasserwecken/markdownpaper
-</src>
+</ref>
 
-<src id="mdCheatSheet">
+<ref id="mdCheatSheet" type="citation">
 MathJax,
 *Everything you need to learn Markdown*,
 2025,
 https://www.markdownguide.org/
-</src>
+</ref>
 
-<src id="mathjax">
+<ref id="mathjax" type="citation">
 Matt Cone,
 *Beautiful and accessible math in all browsers*,
 2025,
 https://www.mathjax.org/
-</src>
+</ref>
 
 
 <!-- CONTENT -->
@@ -137,10 +137,12 @@ Lists should behave exactly as expected.
 - Item
 - Item
     1. Sub
+    1. Sub
 - Item
 
 1 Item
 1 Item
+    - Sub
     - Sub
 1 Item
 ```
@@ -149,10 +151,12 @@ Lists should behave exactly as expected.
 - Item
 - Item
     1. Sub
+    1. Sub
 - Item
 
 1. Item
 1. Item
+    - Sub
     - Sub
 1. Item
 
@@ -265,7 +269,7 @@ This here defines the footer content for all pages.
 Look at the top and bottom of each page to see the result.
 
 
-#### Internal References & sublines
+#### References & sublines
 Images, formulars, quotes and tables often need additional context or a label to refer from the paragraphs.
 To encode the label, enumerate the references and attatch them propertly to the corresponding elements, the `<ref>` tag can be used.
 
@@ -277,30 +281,18 @@ When parsed, a enumerated label of the specified type will be generated and all 
 
 ```
 > "This is my personal Quote, may stating something important!"
+
 <ref id="myQuote" type="quote">
-If there would be some important context to this quote, it could be included here.
+If there is important context to this quote, it could be included here as subtext.
 </ref>
 
 This paragraph can now refer to the quote[myQuote] by using the quote id.
 ```
 ---
 > "This is my personal Quote, may stating something important!"
+
 <ref id="myQuote" type="quote">
 If there would be some important context to this quote, it could be included here.
 </ref>
 
-This paragraph can now refer to the quote[myQuote] by using the quote id.
-
-
-#### External References
-#### Wide section
-
-
-<img src="./.doc/sailboat.bmp"/>
-<ref id="sail" type="figure">
-Als Künstliche Intelligenz (KI) werden Systeme bezeichnet die Probleme und Aufgaben lösen können die menschliche Intelligenz benötigen oder diese sogar übersteigen.
-</ref>
-
-Das Thema der Künstlichen Intelligenz $a = b$ gibt es bereits seit den 50er Jahren. Allerdings waren das alles aber nur theoretische und mathematische Konzepte. Mit den 2000er Jahren kam das Internet in der Gesellschaft an, und die ersten Datenmengen. [sail] Auch die Leistung der Computerhardware wurde mit jedem Jahr leistungsstärker so dass die frühen Konzepte tatsächlich Anwendbar und Wirtschaftlich wurden. Das Interesse die Forschung, und die Ausbildungen dahin sind seit jeher angestiegen und es gab immer neue Durchbrüche, wie z.B. neuronale Netze. Und seit 2020 / 2021 hat es die Aufmerksamkeit der breiten Bevölkerung, angestoßen durch die Veröffentlichung von ChatGPT und DALLE durch OpenAI. Auf einmal konnte jeder ohne technischen Vorkenntnisse Text und Bilder generieren, nur durch die Eingabe von ganz normalem Text, auch natürliche Sprache genannt. Die Möglichkeit das System natürliche Sprache erst seit kurzem verarbeiten und verstehen können.
-
-$$\pi^* = v_{\pi^*}(s) = \max_{a \in A} \sum_{s',r} p(s',r|s,a) [r+\gamma v(s')]$$
+Any paragraph can now refer to the quote[myQuote] by using the quote id.

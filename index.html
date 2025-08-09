@@ -101,16 +101,6 @@
             grid-template-columns: 1fr 1fr;
         }
 
-        src {
-            margin: 1rem 0;
-            display: block;
-            font-size: var(--font-annotation-size);
-        }
-
-        src * {
-            display: inline;
-        }
-
         ref {
             display: block;
             font-size: var(--font-annotation-size);
@@ -365,28 +355,29 @@
             // first iteration.
             for (let element of markdownElements) {
 
-                // remember source reference
-                if (element.tagName == 'SRC') {
-                    const srcId = element.getAttribute('id');
-                    const srcLabel = `[${srcReferences.length + 1}]`;
-                    srcReferences.push([srcId, srcLabel, element]);
-                }
-
                 // collect references, to link their usages in text and set their label.
                 if (element.tagName == 'REF') {
                     const refId = element.getAttribute('id');
                     const refType = element.getAttribute('type');
-                    if (!(refType in linkReferences))
-                        linkReferences[refType] = [];
 
-                    const refCount = linkReferences[refType].length + 1;
-                    const refLabel = `${refType.charAt(0).toUpperCase()}${refType.slice(1)} ${refCount}`;
-                    const refContent = marked.parse(element.innerHTML);
+                    // if the reference is a citation, its rendered speratly!
+                    if (refType == 'citation') {
+                        const srcId = element.getAttribute('id');
+                        const srcLabel = `[${srcReferences.length + 1}]`;
+                        srcReferences.push([srcId, srcLabel, element]);
+                    }
+                    // any other reference is used as subtext and prepared here.
+                    else {
+                        if (!(refType in linkReferences))
+                            linkReferences[refType] = [];
 
-                    linkReferences[refType].push([refId, refLabel]);
-                    element.innerHTML = `<span class="refLabel">${refLabel}: </span>` + refContent;
+                        const refCount = linkReferences[refType].length + 1;
+                        const refLabel = `${refType.charAt(0).toUpperCase()}${refType.slice(1)} ${refCount}`;
+                        const refContent = marked.parse(element.innerHTML);
 
-                    markdownElements.pop(element); // remove the element from the list, as it is not needed anymore.
+                        linkReferences[refType].push([refId, refLabel]);
+                        element.innerHTML = `<span class="refLabel">${refLabel}: </span>` + refContent;
+                    }
                 }
 
                 // wait until images are loaded, otherwise their size is unknown.
@@ -451,6 +442,10 @@
 
                 // bundle the reference with the previous element to be one.
                 if (element.tagName == 'REF') {
+                    if (element.getAttribute('type') == 'citation') {
+                        continue;
+                    }
+
                     let refDiv = document.createElement('div');
                     refDiv.appendChild(processedElements.pop());
                     refDiv.appendChild(element);
