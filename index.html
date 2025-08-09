@@ -468,9 +468,10 @@
                 processedElements.push(element);
             }
 
-            // add references at the end
+            // add citing references at the end
             for (const [srcId, srcLabel, srcRef] of srcReferences) {
                 srcItem = document.createElement('src');
+                srcItem.setAttribute('id', srcId);
                 srcItem.innerHTML = `<p>${srcLabel}:</p> ${marked.parse(srcRef.innerHTML)}`;
                 processedElements.push(srcItem);
             }

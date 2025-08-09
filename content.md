@@ -9,6 +9,7 @@ This here defines the footer content for all pages.
 
 <!-- REFERENCES -->
 <ref id="markdown" type="citation">
+*Markdown syntax*,
 John Gruber,
 *Markdown is a text-to-HTML conversion tool for web writers.*,
 2004,
@@ -16,27 +17,23 @@ https://daringfireball.net/projects/markdown/
 </ref>
 
 <ref id="markdownpaper" type="citation">
+*markdownpaper*,
 Eric Dolch,
 *Display markdown into paper style HTML site*,
 2025,
 https://github.com/Wasserwecken/markdownpaper
 </ref>
 
-<ref id="mdCheatSheet" type="citation">
-MathJax,
-*Everything you need to learn Markdown*,
-2025,
-https://www.markdownguide.org/
-</ref>
-
 <ref id="mathjax" type="citation">
-Matt Cone,
+*MathJax*,
+MathJax Team,
 *Beautiful and accessible math in all browsers*,
 2025,
 https://www.mathjax.org/
 </ref>
 
 <ref id="mdMarked" type="citation">
+*Marked.js*
 Christopher Jeffrey, Josh Bruce, Steven, Jamie Davis, Tony Brix, Trevor Buckner
 *A markdown parser and compiler. Built for speed*,
 2025,
@@ -97,7 +94,7 @@ Please keep following guidelines for contributions:
 
 
 ## Writing markdown
-The library `marked.js`[mdMarked] is used for parsing and compiling markdown. Thus all common markdown syntax is supported. The following sections show the apeareance of standard markdown elements. Have a look at the markdown documentation for the basic syntax here <https://www.markdownguide.org/cheat-sheet/>[mdCheatSheet].
+The library `marked.js`[mdMarked] is used for parsing and compiling markdown. Thus all common markdown syntax is supported. The following sections show the apeareance of standard markdown elements. Have a look at the markdown documentation for the basic syntax here <https://www.markdownguide.org/cheat-sheet/>.
 
 ### Headings
 Headlines are automatically enumerated by their level, with `#` for *H1*, `##` for *H2*, and so on. The heading `#` *H1* is special because it defines the title of the document and its's content.
