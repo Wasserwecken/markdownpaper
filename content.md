@@ -41,11 +41,13 @@ https://marked.js.org/
 </ref>
 
 
+
 <!-- CONTENT -->
 # markdownpaper
 Use markdown[markdown] syntax to create beautiful documentations, scientific scripts or papers, through a single static HTML file without runtime dependencies or build processes. Its plain HTML, CSS and Javascript, which does all the workload.
 
 There is no need for NPM, Ruby, Python, Perl Envirnment, Docker container, Java runtime, online dependencies or subscription. It runs offline *(if your really want to)*, it runs anywhere without any installation, and uses a simple syntax *(markdown)* to define content.
+
 
 ## Introduction
 
@@ -91,7 +93,6 @@ Feel free to make this tool valuable for your needs and other people. Please con
 Please keep following guidelines for contributions:
 - The `index.html` should stay the only file required to run the tool, do not add additional files or folders as dependencies. I want this too to be as lightweight and accessable as possible.
 - Do not add a CSS framework. All styling made should be included in the `index.html` file. The formatting should be kept simple and minimal, everything else is the choice of the user and can be added by themself.
-
 
 ## Writing markdown
 The library `marked.js`[mdMarked] is used for parsing and compiling markdown. Thus all common markdown syntax is supported. The following sections show the apeareance of standard markdown elements. Have a look at the markdown documentation for the basic syntax here <https://www.markdownguide.org/cheat-sheet/>.
@@ -307,5 +308,5 @@ TODO TODO
 #### Table of contents
 TODO TODO
 
-### Layout configuration
+#### Layout configuration
 TODO TODO

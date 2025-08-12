@@ -217,7 +217,7 @@
 
             font-size: var(--font-annotation-size);
 
-            background-color: Gainsboro;
+            background-color: #eee;
             border-radius: 0.25rem;
         }
 
@@ -295,12 +295,14 @@
                 contentRoot = markdownSrc.substr(0, markdownSrc.lastIndexOf("/"));
             }
 
+            // parse and modify raw content
+            markdownContent = markdownContent.replace(/<PageBreak\s*.*\/>/, '<PageBreak></PageBreak>')
+            markdownContent = markdownContent.replace(/<ColumnBreak\s*.*\/>/, '<ColumnBreak></ColumnBreak>')
+
             // convert markdown to HTML elements
             let content = document.createElement('div');
-            content.style.display = 'none';
             content.innerHTML = marked.parse(markdownContent);
-            document.body.appendChild(content);
-            return [...content.children];
+            return content;
         }
 
 
@@ -361,138 +363,141 @@
          * Headings need to be enumerated, references collected, and images loaded, etc, etc.
          * @param {Element[]} markdownElements - The markdown elements to process.
          */
-        async function PostProcessElements(markdownElements) {
+        async function PostProcessElements(contentDiv) {
+
+            // set header note
+            for (const header of contentDiv.querySelectorAll('header')) {
+                const headerContent = document.createElement('div');
+                headerContent.innerHTML = marked.parse(header.innerHTML);
+                pageTemplate.querySelector('.page-header').appendChild(headerContent);
+                header.remove();
+            }
+
+            // set footer note
+            for (const footer of contentDiv.querySelectorAll('footer')) {
+                const footerContent = document.createElement('div');
+                footerContent.innerHTML = marked.parse(footer.innerHTML);
+                pageTemplate.querySelector('.page-footer').appendChild(footerContent);
+                footer.remove();
+            }
+
+            // enumerating headings by their order and level.
             let headingLevels = [0, 0, 0, 0, 0, 0];
-
-            // first iteration.
-            for (let element of markdownElements) {
-
-                // collect references, to link their usages in text and set their label.
-                if (element.tagName == 'REF') {
-                    const refId = element.getAttribute('id');
-                    const refType = element.getAttribute('type');
-
-                    // if the reference is a citation, its rendered speratly!
-                    if (refType == 'citation') {
-                        const srcId = element.getAttribute('id');
-                        const srcLabel = `[${srcReferences.length + 1}]`;
-                        srcReferences.push([srcId, srcLabel, element]);
-                    }
-                    // any other reference is used as subtext and prepared here.
-                    else {
-                        if (!(refType in linkReferences))
-                            linkReferences[refType] = [];
-
-                        const refCount = linkReferences[refType].length + 1;
-                        const refLabel = `${refType.charAt(0).toUpperCase()}${refType.slice(1)} ${refCount}`;
-                        const refContent = marked.parse(element.innerHTML);
-
-                        linkReferences[refType].push([refId, refLabel]);
-                        element.innerHTML = `<span class="refLabel">${refLabel}: </span>` + refContent;
-                    }
+            const headings = contentDiv.querySelectorAll('h2, h3, h4, h5, h6');
+            for (const heading of headings) {
+                const level = parseInt(heading.tagName[1]) - 1;
+                headingLevels[level - 1]++;
+                for (let i = level; i < headingLevels.length; i++) {
+                    headingLevels[i] = 0;
                 }
+                const prefix = headingLevels.map(e => Math.max(1, e)).slice(0, level).join(".");
+                heading.textContent = `${prefix}. ${heading.textContent}`;
+            }
 
-                // wait until images are loaded, otherwise their size is unknown.
-                const image = element.tagName == 'IMG' ? element : element.querySelector('img');
-                if (image && !image.complete) {
-                    await new Promise(resolve => {
-                        image.addEventListener('load', resolve, { once: true });
-                        image.addEventListener('error', resolve, { once: true });
-                    });
+            // check all references, collect their infos and prepare them.
+            for (const reference of contentDiv.querySelectorAll('ref')) {
+                const refId = reference.getAttribute('id');
+                const refType = reference.getAttribute('type');
+
+                // citation references are rendered in seperatly.
+                if (refType == 'citation') {
+                    const srcId = reference.getAttribute('id');
+                    const srcLabel = `[${srcReferences.length + 1}]`;
+                    srcReferences.push([srcId, srcLabel, reference]);
+                    reference.remove();
                 }
+                // any other reference are treated as subline.
+                else {
+                    if (!(refType in linkReferences))
+                        linkReferences[refType] = [];
 
-                // sets the title of the document by the main heading content.
-                if (element.tagName == 'H1') {
-                    document.title = element.innerHTML;
-                }
+                    // extract the ref infos and set a enumerated label.
+                    const refCount = linkReferences[refType].length + 1;
+                    const refLabel = `${refType.charAt(0).toUpperCase()}${refType.slice(1)} ${refCount}`;
+                    const refContent = marked.parse(reference.innerHTML);
 
-                // enumerating headings by their order and level.
-                if (/^H[2-6]$/.test(element.tagName)) {
-                    const level = parseInt(element.tagName[1]) - 1;
-                    headingLevels[level - 1]++;
-                    for (let i = level; i < headingLevels.length; i++) {
-                        headingLevels[i] = 0;
+                    linkReferences[refType].push([refId, refLabel]);
+                    reference.innerHTML = `<span class="refLabel">${refLabel}: </span>` + refContent;
+
+
+                    // bundle the previous element with the reference.
+                    let previousItem = reference.previousSibling;
+                    while (!previousItem) {
+                        previousItem = reference.parentNode.previousSibling;
                     }
-                    const prefix = headingLevels.map(e => Math.max(1, e)).slice(0, level).join(".");
-                    element.textContent = `${prefix}. ${element.textContent}`;
+
+                    const refDiv = document.createElement('div');
+                    reference.replaceWith(refDiv);
+                    refDiv.appendChild(previousItem);
+                    refDiv.appendChild(reference);
                 }
             }
 
-            // render all math formulas.
-            MathJax.typeset();
-
-            // second iteration.
-            let processedElements = [];
-            for (let element of markdownElements) {
-                // check if the element defines the page header or footer content.
-                if (element.tagName == 'HEADER') {
-                    const headerContent = document.createElement('div');
-                    headerContent.innerHTML = marked.parse(element.innerHTML);
-                    pageTemplate.querySelector('.page-header').appendChild(headerContent);
-                    continue;
-                }
-                else if (element.tagName == 'FOOTER') {
-                    const footerContent = document.createElement('div');
-                    footerContent.innerHTML = marked.parse(element.innerHTML);
-                    pageTemplate.querySelector('.page-footer').appendChild(footerContent);
-                    continue;
-                }
-
+            for (const item of contentDiv.querySelectorAll('*')) {
                 // replace the internal link ids with the labels and actual links.
                 for (const [type, refs] of Object.entries(linkReferences)) {
                     for (const [refId, refLabel] of refs) {
                         const linkLabel = `<a href="#${refId}">[${refLabel}]</a>`;
-                        element.innerHTML = element.innerHTML.replace(`[${refId}]`, linkLabel);
+                        item.innerHTML = item.innerHTML.replace(`[${refId}]`, linkLabel);
                     }
                 }
 
-                // replace the externsal source references with the actual links.
-                for (const [srcId, srcLabel, srcRef] of srcReferences) {
+                // replace the external source references with the actual links.
+                for (const [srcId, srcLabel, srcItem] of srcReferences) {
                     const linkLabel = `<a href="#${srcId}">${srcLabel}</a>`;
-                    element.innerHTML = element.innerHTML.replace(`[${srcId}]`, linkLabel);
+                    item.innerHTML = item.innerHTML.replace(`[${srcId}]`, linkLabel);
                 }
-
-                // bundle the reference with the previous element to be one.
-                if (element.tagName == 'REF') {
-                    if (element.getAttribute('type') == 'citation') {
-                        continue;
-                    }
-
-                    let refDiv = document.createElement('div');
-                    refDiv.appendChild(processedElements.pop());
-                    refDiv.appendChild(element);
-                    element = refDiv;
-                }
-
-                // accept processed element
-                processedElements.push(element);
             }
-
-            // add citing references at the end
-            for (const [srcId, srcLabel, srcRef] of srcReferences) {
-                srcItem = document.createElement('src');
-                srcItem.setAttribute('id', srcId);
-                srcItem.innerHTML = `<p>${srcLabel}:</p> ${marked.parse(srcRef.innerHTML)}`;
-                processedElements.push(srcItem);
-            }
-
-            // return [];
-            return processedElements;
         }
 
 
         /**
          * Places the markdown elements into the pages, creates new columns and pages as needed.
          */
-        async function PlaceElements(markdownElement) {
+        async function PlaceElements(contentDiv) {
+            document.body.appendChild(contentDiv);
+
+            // set the document title
+            const mainHeadline = contentDiv.querySelector('H1');
+            if (mainHeadline) {
+                document.title = mainHeadline.innerHTML;
+            }
+
+            // math rendering
+            MathJax.typeset();
+
+            // wait for images to be loaded to know their size.
+            for (let image of contentDiv.querySelectorAll('img')) {
+                if (!image.complete) {
+                    await new Promise(resolve => {
+                        image.addEventListener('load', resolve, { once: true });
+                        image.addEventListener('error', resolve, { once: true });
+                    });
+                }
+            }
+
+
             let currentPage = AddPage();
             let currentColumn = currentPage.Columns.at(-1);
             let previousHeading = null;
 
-            for (let item of markdownElement) {
+            for (let item of [...contentDiv.children]) {
 
+                // Add a new page or clolumn
+                if (item.tagName == 'PAGEBREAK' || item.querySelector('pagebreak')) {
+                    currentPage = AddPage();
+                    currentColumn = currentPage.Columns.at(-1);
+                }
+                else if (item.tagName == 'COLUMNBREAK' || item.querySelector('columnbreak')) {
+                    currentPage = AddColumn(currentPage);
+                    currentColumn = currentPage.Columns.at(-1);
+
+                }
                 // place the element in the current column
-                currentColumn.appendChild(item);
+                else {
+                    currentColumn.appendChild(item);
+                }
+
 
                 // check if the item is overflowing the page grid and move it to the next column.
                 gridBottom = currentPage.Grid.getBoundingClientRect();
@@ -514,9 +519,10 @@
          * Entry point of parsing the markdown and placing it on pages.
          */
         window.onload = async () => {
-            let markdownElements = await LoadMarkdown();
-            markdownElements = await PostProcessElements(markdownElements);
-            await PlaceElements(markdownElements);
+            let contentDiv = await LoadMarkdown();
+            await PostProcessElements(contentDiv);
+            await PlaceElements(contentDiv);
+            contentDiv.remove();
         };
     </script>
 </body>
