@@ -111,14 +111,14 @@
             display: inline;
         }
 
-        src {
+        .src {
             margin: 1rem 0;
-            display: block;
-            font-size: var(--font-annotation-size);
+            display: flex;
         }
 
-        src * {
-            display: inline;
+        .srcId {
+            flex: none;
+            width: 2rem;
         }
 
         .refLabel {
@@ -296,6 +296,7 @@
             }
 
             // parse and modify raw content
+            markdownContent = markdownContent.replace(/<References\s*.*\/>/, '<References></References>')
             markdownContent = markdownContent.replace(/<PageBreak\s*.*\/>/, '<PageBreak></PageBreak>')
             markdownContent = markdownContent.replace(/<ColumnBreak\s*.*\/>/, '<ColumnBreak></ColumnBreak>')
 
@@ -394,7 +395,13 @@
                 heading.textContent = `${prefix}. ${heading.textContent}`;
             }
 
-            // check all references, collect their infos and prepare them.
+            // prepare the reference list item.
+            const srcRefList = contentDiv.querySelector('references');
+            if (srcRefList) {
+                srcRefList.innerHTML = marked.parse(srcRefList.innerHTML);
+            }
+
+            // analyse all references.
             for (const reference of contentDiv.querySelectorAll('ref')) {
                 const refId = reference.getAttribute('id');
                 const refType = reference.getAttribute('type');
@@ -405,6 +412,14 @@
                     const srcLabel = `[${srcReferences.length + 1}]`;
                     srcReferences.push([srcId, srcLabel, reference]);
                     reference.remove();
+
+                    if (srcRefList) {
+                        const srcItem = document.createElement('div');
+                        const refContent = marked.parse(reference.innerHTML);
+                        reference.classList = "src"
+                        reference.innerHTML = `<div class="srcId">${srcLabel}</div><div>${refContent}</div>`
+                        srcRefList.appendChild(reference);
+                    }
                 }
                 // any other reference are treated as subline.
                 else {
@@ -433,8 +448,8 @@
                 }
             }
 
+            // replace the link ids with the labels and actual links.
             for (const item of contentDiv.querySelectorAll('*')) {
-                // replace the internal link ids with the labels and actual links.
                 for (const [type, refs] of Object.entries(linkReferences)) {
                     for (const [refId, refLabel] of refs) {
                         const linkLabel = `<a href="#${refId}">[${refLabel}]</a>`;
@@ -442,7 +457,6 @@
                     }
                 }
 
-                // replace the external source references with the actual links.
                 for (const [srcId, srcLabel, srcItem] of srcReferences) {
                     const linkLabel = `<a href="#${srcId}">${srcLabel}</a>`;
                     item.innerHTML = item.innerHTML.replace(`[${srcId}]`, linkLabel);
@@ -450,11 +464,10 @@
             }
         }
 
-
         /**
-         * Places the markdown elements into the pages, creates new columns and pages as needed.
+         *
          */
-        async function PlaceElements(contentDiv) {
+        async function PreRenderAndLoad(contentDiv) {
             document.body.appendChild(contentDiv);
 
             // set the document title
@@ -476,7 +489,13 @@
                 }
             }
 
+            contentDiv.remove();
+        }
 
+        /**
+         * Places the markdown elements into the pages, creates new columns and pages as needed.
+         */
+        async function PlaceElements(contentDiv) {
             let currentPage = AddPage();
             let currentColumn = currentPage.Columns.at(-1);
             let previousHeading = null;
@@ -521,8 +540,8 @@
         window.onload = async () => {
             let contentDiv = await LoadMarkdown();
             await PostProcessElements(contentDiv);
+            await PreRenderAndLoad(contentDiv);
             await PlaceElements(contentDiv);
-            contentDiv.remove();
         };
     </script>
 </body>
