@@ -125,6 +125,26 @@
             font-weight: bold;
         }
 
+        TableOfContents ul {
+            list-style-type: none;
+            padding-inline-start: 1rem;
+        }
+
+        TableOfContents a {
+            width: 100%;
+            display: inline-block;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        TableOfContents a span {
+            width: 100%;
+            display: inline-block;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
 
 
         h1,
@@ -258,23 +278,29 @@
         <div class="page-footer"></div>
     </div>
 
+    <!-- Template for the table of contents structure -->
+    <div id="toc-list-template" class="toc-list">
+        <ul>
+            <li>
+                <a>
+                    <span class="toc-list-id"></span>
+                    <span class="toc-list-dots"></span>
+                    <span class="toc-list-content"></span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Template for the external reference structure -->
+    <div id="ref-list-template" class="ref-list">
+        <div class="ref-list-item">
+            <span class="ref-list-id"></span>
+            <span class="ref-list-content"></span>
+        </div>
+    </div>
+
 
     <script>
-        // Holds all internal reference in the document.
-        const linkReferences = {};
-
-        // Holds all external reference sources.
-        const srcReferences = [];
-
-        // Holds all created page objects
-        const pageList = [];
-
-        // Template elements for cloning
-        const pageTemplate = document.querySelector('#page-template')
-        const columnTemplate = pageTemplate.querySelector('.page-column');
-        pageTemplate.remove();
-
-
         /**
          * Load markdown content from the script tag with id 'Markdown'.
          * If the 'src' attribute is defined, fetches the content from that URL,
@@ -296,9 +322,10 @@
             }
 
             // parse and modify raw content
-            markdownContent = markdownContent.replace(/<References\s*.*\/>/, '<References></References>')
-            markdownContent = markdownContent.replace(/<PageBreak\s*.*\/>/, '<PageBreak></PageBreak>')
-            markdownContent = markdownContent.replace(/<ColumnBreak\s*.*\/>/, '<ColumnBreak></ColumnBreak>')
+            markdownContent = markdownContent.replace(/<TableOfContents\s*.*\/>/i, '<TableOfContents></TableOfContents>')
+            markdownContent = markdownContent.replace(/<References\s*.*\/>/i, '<References></References>')
+            markdownContent = markdownContent.replace(/<PageBreak\s*.*\/>/i, '<PageBreak></PageBreak>')
+            markdownContent = markdownContent.replace(/<ColumnBreak\s*.*\/>/i, '<ColumnBreak></ColumnBreak>')
 
             // convert markdown to HTML elements
             let content = document.createElement('div');
@@ -358,15 +385,12 @@
             }
         }
 
-
         /**
-         * Iterates through the markdown elements and processes for special cases.
-         * Headings need to be enumerated, references collected, and images loaded, etc, etc.
-         * @param {Element[]} markdownElements - The markdown elements to process.
+         * Extracts the header and footer from the content div and sets the page title.
+         * Removes any <header> and <footer> elements from the content div.
+         * @param {Element} contentDiv - Element holding all markdown defined content.
          */
-        async function PostProcessElements(contentDiv) {
-
-            // set header note
+        async function ExtractHeaderFooterTitle(contentDiv) {
             for (const header of contentDiv.querySelectorAll('header')) {
                 const headerContent = document.createElement('div');
                 headerContent.innerHTML = marked.parse(header.innerHTML);
@@ -374,7 +398,6 @@
                 header.remove();
             }
 
-            // set footer note
             for (const footer of contentDiv.querySelectorAll('footer')) {
                 const footerContent = document.createElement('div');
                 footerContent.innerHTML = marked.parse(footer.innerHTML);
@@ -382,7 +405,24 @@
                 footer.remove();
             }
 
-            // enumerating headings by their order and level.
+            const mainHeadline = contentDiv.querySelector('H1');
+            if (mainHeadline) {
+                document.title = mainHeadline.innerHTML;
+            }
+        }
+
+
+
+        const tocListTemplate = document.querySelector('#toc-list-template');
+        const tocListItemTemplate = tocListTemplate.querySelector('li');
+        tocListTemplate.remove();
+
+        /**
+         * Enumerates the headings in the content div and adds a prefix based on their level.
+         * Also creates a table of contents if a <TableOfContents> element is present.
+         * @param {Element} contentDiv - Element holding all markdown defined content.
+         */
+        async function EnumerateHeadings(contentDiv) {
             let headingLevels = [0, 0, 0, 0, 0, 0];
             const headings = contentDiv.querySelectorAll('h2, h3, h4, h5, h6');
             for (const heading of headings) {
@@ -392,13 +432,60 @@
                     headingLevels[i] = 0;
                 }
                 const prefix = headingLevels.map(e => Math.max(1, e)).slice(0, level).join(".");
+                heading.id = `h${prefix.replaceAll('.', '-')}`;
                 heading.textContent = `${prefix}. ${heading.textContent}`;
             }
 
+            const tocDiv = contentDiv.querySelector('TableOfContents');
+            if (tocDiv) {
+                tocDiv.appendChild(document.createElement('ul'));
+                let levelList = tocDiv.lastChild;
+                let previousLevel = 1;
+
+                for (const heading of headings) {
+                    const tocItem = document.createElement('li');
+                    const level = parseInt(heading.tagName[1]) - 1;
+                    tocItem.innerHTML = `<a href="#${heading.id}">${heading.textContent}</a>`;
+
+                    if (previousLevel < level) {
+                        while (previousLevel != level && previousLevel < 6) {
+                            levelList.appendChild(document.createElement('ul'));
+                            levelList = levelList.lastChild;
+                            previousLevel += 1;
+                        }
+                    }
+                    else if (previousLevel > level) {
+                        while (previousLevel != level && previousLevel > 1) {
+                            levelList = levelList.parentNode;
+                            previousLevel -= 1;
+                        }
+                    }
+
+                    levelList.appendChild(tocItem);
+                }
+            }
+        }
+
+
+
+        const srcReferences = [];
+        const linkReferences = {};
+        const refListTemplate = document.querySelector('#ref-list-template');
+        const refListItemTemplate = refListTemplate.querySelector('ul');
+        tocListTemplate.remove();
+
+        /**
+         * Collect all reference information and create enumerated labels and reference list.
+         * @param {Element} contentDiv - Element holding all markdown defined content.
+         */
+        async function EvaluateReferences(contentDiv) {
+
             // prepare the reference list item.
-            const srcRefList = contentDiv.querySelector('references');
+            let srcRefList = contentDiv.querySelector('references');
             if (srcRefList) {
-                srcRefList.innerHTML = marked.parse(srcRefList.innerHTML);
+                refListTemplate.innerHTML = marked.parse(srcRefList.innerHTML);
+                srcRefList.replaceWith(refListTemplate);
+                srcRefList = refListTemplate;
             }
 
             // analyse all references.
@@ -414,6 +501,7 @@
                     reference.remove();
 
                     if (srcRefList) {
+                        const srcItem2 = refListTemplate.cloneNode();
                         const srcItem = document.createElement('div');
                         const refContent = marked.parse(reference.innerHTML);
                         reference.classList = "src"
@@ -421,6 +509,7 @@
                         srcRefList.appendChild(reference);
                     }
                 }
+
                 // any other reference are treated as subline.
                 else {
                     if (!(refType in linkReferences))
@@ -465,16 +554,11 @@
         }
 
         /**
-         *
+         * Pre-renders the content and waits for all resources to be loaded.
+         * @param {Element} contentDiv - Element holding all markdown defined content.
          */
-        async function PreRenderAndLoad(contentDiv) {
+        async function PreRenderAndWait(contentDiv) {
             document.body.appendChild(contentDiv);
-
-            // set the document title
-            const mainHeadline = contentDiv.querySelector('H1');
-            if (mainHeadline) {
-                document.title = mainHeadline.innerHTML;
-            }
 
             // math rendering
             MathJax.typeset();
@@ -492,10 +576,19 @@
             contentDiv.remove();
         }
 
+
+
+        const pageList = [];
+        const pageTemplate = document.querySelector('#page-template')
+        const columnTemplate = pageTemplate.querySelector('.page-column');
+        pageTemplate.remove();
+
         /**
          * Places the markdown elements into the pages, creates new columns and pages as needed.
+         * @param {Element} contentDiv - Element holding all markdown defined content.
          */
-        async function PlaceElements(contentDiv) {
+        async function BuildPages(contentDiv) {
+            let tocDiv = contentDiv.querySelector('TableOfContents');
             let currentPage = AddPage();
             let currentColumn = currentPage.Columns.at(-1);
             let previousHeading = null;
@@ -533,15 +626,43 @@
             }
         }
 
+        /**
+         *
+         */
+        async function EvaluatePageNo() {
+            let tocDiv = document.querySelector('TableOfContents');
+            if (tocDiv) {
+                for (const item of tocDiv.querySelectorAll('a')) {
+                    const href = item.getAttribute("href")
+                    if (href.startsWith('#')) {
+                        const target = document.querySelector(href);
+                        let page = target.parentNode;
+                        while (!page.classList.contains('page')) {
+                            page = page.parentNode;
+                        }
+                        const pageNo = pageList.indexOf(page) + 1;
+                        const dots = '.'.repeat(512);
+                        item.innerHTML = `<span>${item.innerHTML}</span><span>${pageNo}</span>`
+                    }
+                }
+            }
+        }
+
 
         /**
          * Entry point of parsing the markdown and placing it on pages.
          */
         window.onload = async () => {
             let contentDiv = await LoadMarkdown();
-            await PostProcessElements(contentDiv);
-            await PreRenderAndLoad(contentDiv);
-            await PlaceElements(contentDiv);
+
+            await ExtractHeaderFooterTitle(contentDiv);
+            await EnumerateHeadings(contentDiv);
+            await EvaluateReferences(contentDiv);
+            await PreRenderAndWait(contentDiv);
+
+            await BuildPages(contentDiv);
+
+            await EvaluatePageNo();
         };
     </script>
 </body>
