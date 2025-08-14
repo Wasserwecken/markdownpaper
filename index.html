@@ -19,7 +19,7 @@
     <script src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-    <style>
+    <style id="cssPageLayout">
         * {
             box-sizing: border-box;
         }
@@ -44,11 +44,6 @@
             font-family: 'Linux Libertine O', math, Georgia, serif;
             font-size: 9pt;
             --font-annotation-size: 0.8rem;
-        }
-
-        p {
-            hyphens: auto;
-            text-align: justify;
         }
 
         .page {
@@ -99,6 +94,14 @@
             gap: 2rem;
             grid-template-columns: 1fr 1fr;
         }
+    </style>
+
+    <style id="cssMarkdownStandard">
+        p {
+            hyphens: auto;
+            text-align: justify;
+        }
+
 
         ref {
             display: block;
@@ -263,11 +266,33 @@
             }
         }
     </style>
+
+    <style id="cssMarkdownExtensions">
+        .ref-list-item {
+            display: flex;
+            align-items: first baseline;
+            font-size: var(--font-annotation-size);
+        }
+
+        .ref-list-id {
+            flex: none;
+            display: inline-block;
+            width: 2rem;
+        }
+
+        .ref-list-item * {
+            text-align: unset;
+        }
+
+        .ref-link {
+            font-style: unset;
+        }
+    </style>
+
 </head>
 
 <body>
 
-    <!-- Template for the page structure -->
     <div id="page-template" class="page">
         <div class="page-header"></div>
         <div class="page-top"></div>
@@ -278,7 +303,6 @@
         <div class="page-footer"></div>
     </div>
 
-    <!-- Template for the table of contents structure -->
     <div id="toc-list-template" class="toc-list">
         <ul>
             <li>
@@ -291,11 +315,17 @@
         </ul>
     </div>
 
-    <!-- Template for the external reference structure -->
     <div id="ref-list-template" class="ref-list">
         <div class="ref-list-item">
-            <span class="ref-list-id"></span>
-            <span class="ref-list-content"></span>
+            <div class="ref-list-id"></div>
+            <div class="ref-list-content"></div>
+        </div>
+    </div>
+
+    <div id="ref-sub-template" class="ref-sub">
+        <div class="ref-sub-line">
+            <div class="ref-sub-label"></div>
+            <div class="ref-sub-content"></div>
         </div>
     </div>
 
@@ -471,8 +501,13 @@
         const srcReferences = [];
         const linkReferences = {};
         const refListTemplate = document.querySelector('#ref-list-template');
-        const refListItemTemplate = refListTemplate.querySelector('ul');
-        tocListTemplate.remove();
+        const refListItemTemplate = refListTemplate.querySelector('.ref-list-item');
+        const refSubTemplate = document.querySelector('#ref-sub-template');
+        refListTemplate.id = '';
+        refListTemplate.innerHTML = '';
+        refListTemplate.remove();
+        refSubTemplate.id = '';
+        refSubTemplate.remove();
 
         /**
          * Collect all reference information and create enumerated labels and reference list.
@@ -495,18 +530,17 @@
 
                 // citation references are rendered in seperatly.
                 if (refType == 'citation') {
-                    const srcId = reference.getAttribute('id');
-                    const srcLabel = `[${srcReferences.length + 1}]`;
-                    srcReferences.push([srcId, srcLabel, reference]);
+                    const refLabel = `[${srcReferences.length + 1}]`;
+                    srcReferences.push([refId, refLabel, reference]);
                     reference.remove();
 
                     if (srcRefList) {
-                        const srcItem2 = refListTemplate.cloneNode();
-                        const srcItem = document.createElement('div');
-                        const refContent = marked.parse(reference.innerHTML);
-                        reference.classList = "src"
-                        reference.innerHTML = `<div class="srcId">${srcLabel}</div><div>${refContent}</div>`
-                        srcRefList.appendChild(reference);
+                        const srcItem = refListItemTemplate.cloneNode(true);
+                        const srcContent = marked.parse(reference.innerHTML);
+                        srcItem.id = refId;
+                        srcItem.querySelector('.ref-list-id').innerHTML = refLabel;
+                        srcItem.querySelector('.ref-list-content').innerHTML = srcContent;
+                        srcRefList.appendChild(srcItem);
                     }
                 }
 
@@ -518,22 +552,22 @@
                     // extract the ref infos and set a enumerated label.
                     const refCount = linkReferences[refType].length + 1;
                     const refLabel = `${refType.charAt(0).toUpperCase()}${refType.slice(1)} ${refCount}`;
-                    const refContent = marked.parse(reference.innerHTML);
-
                     linkReferences[refType].push([refId, refLabel]);
-                    reference.innerHTML = `<span class="refLabel">${refLabel}: </span>` + refContent;
 
+                    const refContent = marked.parse(reference.innerHTML);
+                    const refSub = refSubTemplate.cloneNode(true);
+                    refSub.id = refId;
+                    refSub.querySelector('.ref-sub-label').innerHTML = refLabel;
+                    refSub.querySelector('.ref-sub-content').innerHTML = refContent;
 
                     // bundle the previous element with the reference.
-                    let previousItem = reference.previousSibling;
+                    let previousItem = reference.previousElementSibling;
                     while (!previousItem) {
-                        previousItem = reference.parentNode.previousSibling;
+                        previousItem = reference.parentNode.previousElementSibling;
                     }
 
-                    const refDiv = document.createElement('div');
-                    reference.replaceWith(refDiv);
-                    refDiv.appendChild(previousItem);
-                    refDiv.appendChild(reference);
+                    refSub.prepend(previousItem);
+                    reference.replaceWith(refSub);
                 }
             }
 
@@ -541,13 +575,13 @@
             for (const item of contentDiv.querySelectorAll('*')) {
                 for (const [type, refs] of Object.entries(linkReferences)) {
                     for (const [refId, refLabel] of refs) {
-                        const linkLabel = `<a href="#${refId}">[${refLabel}]</a>`;
+                        const linkLabel = `<a class="ref-link" href="#${refId}">[${refLabel}]</a>`;
                         item.innerHTML = item.innerHTML.replace(`[${refId}]`, linkLabel);
                     }
                 }
 
                 for (const [srcId, srcLabel, srcItem] of srcReferences) {
-                    const linkLabel = `<a href="#${srcId}">${srcLabel}</a>`;
+                    const linkLabel = `<a class="ref-link" href="#${srcId}">${srcLabel}</a>`;
                     item.innerHTML = item.innerHTML.replace(`[${srcId}]`, linkLabel);
                 }
             }
