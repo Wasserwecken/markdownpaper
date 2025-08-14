@@ -305,7 +305,7 @@ Any paragraph can now refer to the quote[myQuote] by using the quote id.
 #### Wide content
 TODO TODO
 
-#### Footnotes
+#### Layout setup
 TODO TODO
 
 #### Column & page break
