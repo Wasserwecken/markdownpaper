@@ -335,68 +335,6 @@
         }
 
 
-        /**
-         * Adds a new page to the document, with a initial column.
-         * @returns {Object} - A new page object.
-         */
-        function AddPage() {
-            const newPage = pageTemplate.cloneNode(true);
-            pageList.push(newPage);
-            newPage.id = `page-${pageList.length}`;
-
-            const pageNo = document.createElement('p');
-            pageNo.classList.add('page-no');
-            pageNo.innerText = `${pageList.length}`;
-            newPage.querySelector('.page-header').appendChild(pageNo);
-            newPage.querySelector('.page-footer').appendChild(pageNo.cloneNode(true));
-
-            document.body.appendChild(newPage);
-
-            const currentPage = {
-                Content: newPage.querySelector('.page-content'),
-                Grid: newPage.querySelector('.page-grid'),
-                Header: newPage.querySelector('.page-top'),
-                Footer: newPage.querySelector('.page-bottom'),
-                Columns: [newPage.querySelector('.page-column')],
-            }
-
-            return currentPage;
-        }
-
-        /**
-         * Adds a new column to the current page. If the grid is full, a new page is created.
-         * @param {Object} currentPage - The current page object.
-         * @returns {Object} - The the current or a new page object.
-         */
-        function AddColumn(currentPage) {
-            const currentColumn = currentPage.Columns.at(-1);
-            const newColumn = currentColumn.cloneNode(false);
-            currentColumn.parentElement.appendChild(newColumn);
-
-            // if the column has the same height, it was added next to the other one.
-            const currTop = currentColumn.getBoundingClientRect().top;
-            const newTop = newColumn.getBoundingClientRect().top;
-            if (currTop == newTop) {
-                currentPage.Columns.push(newColumn);
-                return currentPage;
-            }
-            // if not, there are more columns than definitions, thus a new page is required.
-            else {
-                newColumn.remove();
-                return AddPage();
-            }
-        }
-
-
-
-        let pageConfig = {
-            Columns: 2,
-            Padding: "20mm",
-            Hyphen: true,
-            FontSize: "9pt",
-            FontFamily: `'Linux Libertine O', math, Georgia, serif`,
-            TextAlign: "justify",
-        };
 
         /**
          * Extracts the header and footer from the content div and sets the page title.
@@ -404,6 +342,8 @@
          * @param {Element} contentDiv - Element holding all markdown defined content.
          */
         async function ExtractConfig(contentDiv) {
+            const pageTemplate = document.querySelector('#page-template');
+
             for (const header of contentDiv.querySelectorAll('header')) {
                 const headerContent = document.createElement('div');
                 headerContent.innerHTML = marked.parse(header.innerHTML);
@@ -423,32 +363,46 @@
                 document.title = mainHeadline.innerHTML;
             }
 
-            const mainConfig = contentDiv.querySelector('config');
-            if (mainConfig) {
-                pageConfig.Columns = mainConfig.getAttribute('Columns') ?? pageConfig.Columns;
-                pageConfig.Padding = mainConfig.getAttribute('Padding') ?? pageConfig.Padding;
-                pageConfig.Hyphens = mainConfig.getAttribute('Hyphens') ?? pageConfig.Hyphens;
-                pageConfig.FontSize = mainConfig.getAttribute('FontSize') ?? pageConfig.FontSize;
-                pageConfig.FontFamily = mainConfig.getAttribute('FontFamily') ?? pageConfig.FontFamily;
-                pageConfig.TextAlign = mainConfig.getAttribute('TextAlign') ?? pageConfig.TextAlign;
-                mainConfig.remove();
-
-                const customStyle = document.createElement('style');
-                customStyle.innerHTML += `\n:root { --paper-space: ${pageConfig.Padding}; }`;
-                customStyle.innerHTML += `\np { hyphens: ${pageConfig.Hyphens}; text-align: ${pageConfig.TextAlign}; }`;
-                customStyle.innerHTML += `\nbody { font-size: ${pageConfig.FontSize}; font-family: ${pageConfig.FontFamily}; }`;
-                customStyle.innerHTML += `\n.page-grid { grid-template-columns: ${'1fr'.repeat(pageConfig.Columns)}; }`;
-                document.head.appendChild(customStyle);
+            let config = {
+                Columns: 2,
+                Padding: "20mm",
+                Hyphen: true,
+                FontSize: "9pt",
+                FontFamily: `'Linux Libertine O', math, Georgia, serif`,
+                TextAlign: "justify",
+            };
+            const contentConfig = contentDiv.querySelector('config');
+            if (contentConfig) {
+                config.Columns = contentConfig.getAttribute('Columns') ?? config.Columns;
+                config.Padding = contentConfig.getAttribute('Padding') ?? config.Padding;
+                config.Hyphens = contentConfig.getAttribute('Hyphens') ?? config.Hyphens;
+                config.FontSize = contentConfig.getAttribute('FontSize') ?? config.FontSize;
+                config.FontFamily = contentConfig.getAttribute('FontFamily') ?? config.FontFamily;
+                config.TextAlign = contentConfig.getAttribute('TextAlign') ?? config.TextAlign;
+                contentConfig.remove();
+                ApplyConfig(config);
             }
+
+            return config;
+        }
+
+        /**
+         * Adds custom styles based on the provided configuration for the whole document.
+         * If the currentPage is defined, the styles will be scoped to that page.
+         * @param {Object} config - The configuration object containing style properties.
+         * @param {Object} currentPage - The current page object (if available).
+         */
+        function ApplyConfig(config, currentPage) {
+            const customStyle = document.createElement('style');
+            const pageId = currentPage ? `#${currentPage.Page.id}` : ``;
+            customStyle.innerHTML += `\n${pageId} :root { --paper-space: ${config.Padding}; }`;
+            customStyle.innerHTML += `\n${pageId} p { hyphens: ${config.Hyphens}; text-align: ${config.TextAlign}; }`;
+            customStyle.innerHTML += `\n${pageId} body { font-size: ${config.FontSize}; font-family: ${config.FontFamily}; }`;
+            customStyle.innerHTML += `\n${pageId} .page-grid { grid-template-columns: ${'1fr'.repeat(config.Columns)}; }`;
+            document.head.appendChild(customStyle);
         }
 
 
-
-        const tocListTemplate = document.querySelector('#toc-list-template');
-        const tocListItemTemplate = tocListTemplate.querySelector('.toc-list-item');
-        tocListTemplate.id = '';
-        tocListTemplate.innerHTML = '';
-        tocListTemplate.remove();
 
         /**
          * Enumerates the headings in the content div and adds a prefix based on their level.
@@ -456,6 +410,15 @@
          * @param {Element} contentDiv - Element holding all markdown defined content.
          */
         async function EnumerateHeadings(contentDiv) {
+
+            // get the templates from the DOM.
+            const tocListTemplate = document.querySelector('#toc-list-template');
+            const tocListItemTemplate = tocListTemplate.querySelector('.toc-list-item');
+            tocListTemplate.id = '';
+            tocListTemplate.innerHTML = '';
+            tocListTemplate.remove();
+
+            // enumerate and collect defined headings.
             let headingLevels = [0, 0, 0, 0, 0, 0];
             const headings = contentDiv.querySelectorAll('h2, h3, h4, h5, h6');
             for (const heading of headings) {
@@ -469,6 +432,7 @@
                 heading.textContent = `${prefix}. ${heading.textContent}`;
             }
 
+            // build the table of contens if defined.
             let tocDiv = contentDiv.querySelector('TableOfContents');
             if (tocDiv) {
                 tocDivReplacement = document.createElement('div');
@@ -508,22 +472,23 @@
 
 
 
-        const srcReferences = [];
-        const linkReferences = {};
-        const refListTemplate = document.querySelector('#ref-list-template');
-        const refListItemTemplate = refListTemplate.querySelector('.ref-list-item');
-        const refSubTemplate = document.querySelector('#ref-sub-template');
-        refListTemplate.id = '';
-        refListTemplate.innerHTML = '';
-        refListTemplate.remove();
-        refSubTemplate.id = '';
-        refSubTemplate.remove();
-
         /**
          * Collect all reference information and create enumerated labels and reference list.
          * @param {Element} contentDiv - Element holding all markdown defined content.
          */
         async function EvaluateReferences(contentDiv) {
+
+            // get the templates from the DOM.
+            const srcReferences = [];
+            const linkReferences = {};
+            const refListTemplate = document.querySelector('#ref-list-template');
+            const refListItemTemplate = refListTemplate.querySelector('.ref-list-item');
+            const refSubTemplate = document.querySelector('#ref-sub-template');
+            refListTemplate.id = '';
+            refListTemplate.innerHTML = '';
+            refListTemplate.remove();
+            refSubTemplate.id = '';
+            refSubTemplate.remove();
 
             // prepare the reference list item.
             let srcRefList = contentDiv.querySelector('references');
@@ -597,6 +562,8 @@
             }
         }
 
+
+
         /**
          * Pre-renders the content and waits for all resources to be loaded.
          * @param {Element} contentDiv - Element holding all markdown defined content.
@@ -622,29 +589,93 @@
 
 
 
-        const pageList = [];
-        const pageTemplate = document.querySelector('#page-template')
-        const columnTemplate = pageTemplate.querySelector('.page-column');
-        pageTemplate.remove();
+        /**
+         * Adds a new page to the document, with a initial column.
+         * @returns {Object} - A new page object.
+         */
+        function AddPage(config, pageList, pageTemplate) {
+            const newPage = pageTemplate.cloneNode(true);
+            pageList.push(newPage);
+            newPage.id = `page-${pageList.length}`;
+
+            const pageNo = document.createElement('p');
+            pageNo.classList.add('page-no');
+            pageNo.innerText = `${pageList.length}`;
+            newPage.querySelector('.page-header').appendChild(pageNo);
+            newPage.querySelector('.page-footer').appendChild(pageNo.cloneNode(true));
+
+            document.body.appendChild(newPage);
+
+            const currentPage = {
+                Page: newPage,
+                Content: newPage.querySelector('.page-content'),
+                Grid: newPage.querySelector('.page-grid'),
+                Header: newPage.querySelector('.page-top'),
+                Footer: newPage.querySelector('.page-bottom'),
+                Columns: [newPage.querySelector('.page-column')],
+            }
+            ApplyConfig(config, currentPage);
+
+            return currentPage;
+        }
+
+        /**
+         * Adds a new column to the current page. If the grid is full, a new page is created.
+         * @param {Object} currentPage - The current page object.
+         * @returns {Object} - The the current or a new page object.
+         */
+        function AddColumn(config, pageList, pageTemplate, currentPage) {
+            const currentColumn = currentPage.Columns.at(-1);
+            const newColumn = currentColumn.cloneNode(false);
+            currentColumn.parentElement.appendChild(newColumn);
+
+            // if the column has the same height, it was added next to the other one.
+            const currTop = currentColumn.getBoundingClientRect().top;
+            const newTop = newColumn.getBoundingClientRect().top;
+            if (currTop == newTop) {
+                currentPage.Columns.push(newColumn);
+                return currentPage;
+            }
+            // if not, there are more columns than definitions, thus a new page is required.
+            else {
+                newColumn.remove();
+                return AddPage(config, pageList, pageTemplate);
+            }
+        }
 
         /**
          * Places the markdown elements into the pages, creates new columns and pages as needed.
          * @param {Element} contentDiv - Element holding all markdown defined content.
          */
-        async function BuildPages(contentDiv) {
-            let currentPage = AddPage();
+        async function BuildPages(config, contentDiv) {
+
+            // get the templates from the DOM.
+            const pageList = [];
+            const pageTemplate = document.querySelector('#page-template');
+            const columnTemplate = pageTemplate.querySelector('.page-column');
+            pageTemplate.remove();
+
+            // adds the first page
+            let currentPage = AddPage(config, pageList, pageTemplate);
             let currentColumn = currentPage.Columns.at(-1);
             let previousHeading = null;
 
             for (let item of [...contentDiv.children]) {
 
                 // Add a new page or clolumn
-                if (item.tagName == 'PAGEBREAK' || item.querySelector('pagebreak')) {
-                    currentPage = AddPage();
+                const pageBreak = item.querySelector('pagebreak');
+                if (pageBreak) {
+                    config.Columns = pageBreak.getAttribute('Columns') ?? config.Columns;
+                    config.Padding = pageBreak.getAttribute('Padding') ?? config.Padding;
+                    config.Hyphens = pageBreak.getAttribute('Hyphens') ?? config.Hyphens;
+                    config.FontSize = pageBreak.getAttribute('FontSize') ?? config.FontSize;
+                    config.FontFamily = pageBreak.getAttribute('FontFamily') ?? config.FontFamily;
+                    config.TextAlign = pageBreak.getAttribute('TextAlign') ?? config.TextAlign;
+                    currentPage = AddPage(config, pageList, pageTemplate);
                     currentColumn = currentPage.Columns.at(-1);
                 }
                 else if (item.tagName == 'COLUMNBREAK' || item.querySelector('columnbreak')) {
-                    currentPage = AddColumn(currentPage);
+                    currentPage = AddColumn(config, pageList, pageTemplate, currentPage);
                     currentColumn = currentPage.Columns.at(-1);
 
                 }
@@ -658,7 +689,7 @@
                 gridBottom = currentPage.Grid.getBoundingClientRect();
                 itemBottom = item.getBoundingClientRect();
                 if (itemBottom.bottom > gridBottom.bottom) {
-                    currentPage = AddColumn(currentPage);
+                    currentPage = AddColumn(config, pageList, pageTemplate, currentPage);
                     currentColumn = currentPage.Columns.at(-1);
                     if (previousHeading)
                         currentColumn.appendChild(previousHeading);
@@ -667,12 +698,16 @@
 
                 previousHeading = /^H[1-6]$/.test(item.tagName) ? item : null;
             }
+
+            return pageList;
         }
+
+
 
         /**
          *
          */
-        async function EvaluatePageNo() {
+        async function EvaluatePageNo(pageList) {
             let tocDiv = document.querySelector('.toc-list');
             if (tocDiv) {
                 for (const item of tocDiv.querySelectorAll('a')) {
@@ -691,20 +726,20 @@
         }
 
 
+
         /**
          * Entry point of parsing the markdown and placing it on pages.
          */
         window.onload = async () => {
-            let contentDiv = await LoadMarkdown();
+            const contentDiv = await LoadMarkdown();
+            const config = await ExtractConfig(contentDiv);
 
-            await ExtractConfig(contentDiv);
             await EnumerateHeadings(contentDiv);
             await EvaluateReferences(contentDiv);
             await PreRenderAndWait(contentDiv);
 
-            await BuildPages(contentDiv);
-
-            await EvaluatePageNo();
+            const pageList = await BuildPages(config, contentDiv);
+            await EvaluatePageNo(pageList);
         };
     </script>
 </body>

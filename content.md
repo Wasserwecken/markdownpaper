@@ -1,4 +1,4 @@
-<Config columns="2" padding="16mm" fontSize="9pt" hyphens="auto" textAlign="justify" />
+<Config columns=2 padding="16mm" fontSize="9pt" hyphens="auto" textAlign="justify" />
 
 <header>
 This here defines the header content for all pages.
@@ -99,6 +99,8 @@ Feel free to make this tool valuable for your needs and other people. Please con
 Please keep following guidelines for contributions:
 - The `index.html` should stay the only file required to run the tool, do not add additional files or folders as dependencies. I want this too to be as lightweight and accessable as possible.
 - Do not add a CSS framework. All styling made should be included in the `index.html` file. The formatting should be kept simple and minimal, everything else is the choice of the user and can be added by themself.
+
+<PageBreak Columns=1 />
 
 ## Writing markdown
 The library `marked.js`[mdMarked] is used for parsing and compiling markdown. Thus all common markdown syntax is supported. The following sections show the apeareance of standard markdown elements. Have a look at the markdown documentation for the basic syntax here <https://www.markdownguide.org/cheat-sheet/>.
