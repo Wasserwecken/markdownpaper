@@ -48,7 +48,9 @@ Use markdown[markdown] syntax to create beautiful documentations, scientific scr
 
 There is no need for NPM, Ruby, Python, Perl Envirnment, Docker container, Java runtime, online dependencies or subscription. It runs offline *(if your really want to)*, it runs anywhere without any installation, and uses a simple syntax *(markdown)* to define content.
 
-<TableOfContents/>
+<TableOfContents>
+## Content
+</TableOfContents>
 
 <ColumnBreak />
 
