@@ -245,11 +245,16 @@
             margin-left: 1rem;
         }
 
+        .toc-list-root {
+            margin-left: unset;
+        }
+
         .toc-list-item {
             width: 100%;
             display: flex;
             gap: .5rem;
             align-items: baseline;
+            margin: 0.125rem 0rem;
         }
 
         .toc-list-item-dots {
@@ -317,10 +322,11 @@
             }
 
             // parse and modify raw content
-            markdownContent = markdownContent.replace(/<TableOfContents\s*.*\/>/i, '<TableOfContents></TableOfContents>')
-            markdownContent = markdownContent.replace(/<References\s*.*\/>/i, '<References></References>')
-            markdownContent = markdownContent.replace(/<PageBreak\s*.*\/>/i, '<PageBreak></PageBreak>')
-            markdownContent = markdownContent.replace(/<ColumnBreak\s*.*\/>/i, '<ColumnBreak></ColumnBreak>')
+            markdownContent = markdownContent.replace(/(<Config\s*.*)(\/>)/i, '$1></Config>')
+            markdownContent = markdownContent.replace(/(<TableOfContents\s*.*)(\/>)/i, '$1></TableOfContents>')
+            markdownContent = markdownContent.replace(/(<References\s*.*)(\/>)/i, '$1></References>')
+            markdownContent = markdownContent.replace(/(<PageBreak\s*.*)(\/>)/i, '$1></PageBreak>')
+            markdownContent = markdownContent.replace(/(<ColumnBreak\s*.*)(\/>)/i, '$1></ColumnBreak>')
 
             // convert markdown to HTML elements
             let content = document.createElement('div');
@@ -336,6 +342,7 @@
         function AddPage() {
             const newPage = pageTemplate.cloneNode(true);
             pageList.push(newPage);
+            newPage.id = `page-${pageList.length}`;
 
             const pageNo = document.createElement('p');
             pageNo.classList.add('page-no');
@@ -380,12 +387,23 @@
             }
         }
 
+
+
+        let pageConfig = {
+            Columns: 2,
+            Padding: "20mm",
+            Hyphen: true,
+            FontSize: "9pt",
+            FontFamily: `'Linux Libertine O', math, Georgia, serif`,
+            TextAlign: "justify",
+        };
+
         /**
          * Extracts the header and footer from the content div and sets the page title.
          * Removes any <header> and <footer> elements from the content div.
          * @param {Element} contentDiv - Element holding all markdown defined content.
          */
-        async function ExtractHeaderFooterTitle(contentDiv) {
+        async function ExtractConfig(contentDiv) {
             for (const header of contentDiv.querySelectorAll('header')) {
                 const headerContent = document.createElement('div');
                 headerContent.innerHTML = marked.parse(header.innerHTML);
@@ -403,6 +421,24 @@
             const mainHeadline = contentDiv.querySelector('H1');
             if (mainHeadline) {
                 document.title = mainHeadline.innerHTML;
+            }
+
+            const mainConfig = contentDiv.querySelector('config');
+            if (mainConfig) {
+                pageConfig.Columns = mainConfig.getAttribute('Columns') ?? pageConfig.Columns;
+                pageConfig.Padding = mainConfig.getAttribute('Padding') ?? pageConfig.Padding;
+                pageConfig.Hyphens = mainConfig.getAttribute('Hyphens') ?? pageConfig.Hyphens;
+                pageConfig.FontSize = mainConfig.getAttribute('FontSize') ?? pageConfig.FontSize;
+                pageConfig.FontFamily = mainConfig.getAttribute('FontFamily') ?? pageConfig.FontFamily;
+                pageConfig.TextAlign = mainConfig.getAttribute('TextAlign') ?? pageConfig.TextAlign;
+                mainConfig.remove();
+
+                const customStyle = document.createElement('style');
+                customStyle.innerHTML += `\n:root { --paper-space: ${pageConfig.Padding}; }`;
+                customStyle.innerHTML += `\np { hyphens: ${pageConfig.Hyphens}; text-align: ${pageConfig.TextAlign}; }`;
+                customStyle.innerHTML += `\nbody { font-size: ${pageConfig.FontSize}; font-family: ${pageConfig.FontFamily}; }`;
+                customStyle.innerHTML += `\n.page-grid { grid-template-columns: ${'1fr'.repeat(pageConfig.Columns)}; }`;
+                document.head.appendChild(customStyle);
             }
         }
 
@@ -443,6 +479,7 @@
                 tocDiv.appendChild(tocListTemplate.cloneNode(false));
                 let levelList = tocDiv.lastChild;
                 let previousLevel = 1;
+                levelList.classList.add('toc-list-root');
 
                 for (const heading of headings) {
                     const tocItem = tocListItemTemplate.cloneNode(true);
@@ -660,7 +697,7 @@
         window.onload = async () => {
             let contentDiv = await LoadMarkdown();
 
-            await ExtractHeaderFooterTitle(contentDiv);
+            await ExtractConfig(contentDiv);
             await EnumerateHeadings(contentDiv);
             await EvaluateReferences(contentDiv);
             await PreRenderAndWait(contentDiv);

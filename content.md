@@ -1,3 +1,5 @@
+<Config columns="2" padding="16mm" fontSize="9pt" hyphens="auto" textAlign="justify" />
+
 <header>
 This here defines the header content for all pages.
 </header>
@@ -41,7 +43,6 @@ https://marked.js.org/
 </ref>
 
 
-
 <!-- CONTENT -->
 # markdownpaper
 Use markdown[markdown] syntax to create beautiful documentations, scientific scripts or papers, through a single static HTML file without runtime dependencies or build processes. Its plain HTML, CSS and Javascript, which does all the workload.
@@ -54,20 +55,7 @@ There is no need for NPM, Ruby, Python, Perl Envirnment, Docker container, Java 
 
 <ColumnBreak />
 
-<references>
-## References
-</references>
-
 ## Introduction
-
-### Motivation
-Since I have a small lecture at my local university in addition to my full-time job as a software developer, I wanted to provide my students with an engaging script to follow throughout the course. I was looking for a simple stright forward tool.
-
-I love the idear of LaTeX, writing content and do not care about the document layout. But the steep learning curve of LaTeX and the usage of another required runtime *(Perl)*, which installation is NOT straight forward at all, prevented me from using it. But I am used to write markdown for readme's, personal notes, todo's or meeting's. It always appeard to me like a LaTeX-Lite version.
-
-I am sick of installing hundreds of megabytes just to complete a simple task. I don't want to get into another syntax, learn the build process or manage abstractions for content. Ever single tool I checked out for converting markdown to a pretty paper styled PDF had their own complexities.
-
-Thus I created this simple tool to write and edit my script easily and on any device or platform.
 
 ### Installation
 Requirements:
@@ -96,6 +84,15 @@ This projects stands on the following javascript libraries, they are required an
 - [MathJax](https://www.mathjax.org/) - For rendering mathematical notations.
 
 If you need to run this tool in a complete offline environment, you can download the required libraries and include them locally.
+
+### Motivation
+Since I have a small lecture at my local university in addition to my full-time job as a software developer, I wanted to provide my students with an engaging script to follow throughout the course. I was looking for a simple stright forward tool.
+
+I love the idear of LaTeX, writing content and do not care about the document layout. But the steep learning curve of LaTeX and the usage of another required runtime *(Perl)*, which installation is NOT straight forward at all, prevented me from using it. But I am used to write markdown for readme's, personal notes, todo's or meeting's. It always appeard to me like a LaTeX-Lite version.
+
+I am sick of installing hundreds of megabytes just to complete a simple task. I don't want to get into another syntax, learn the build process or manage abstractions for content. Ever single tool I checked out for converting markdown to a pretty paper styled PDF had their own complexities.
+
+Thus I created this simple tool to write and edit my script easily and on any device or platform.
 
 ### Contributing
 Feel free to make this tool valuable for your needs and other people. Please contribute your ideas, improvements, or fixes by pull requests.
@@ -319,3 +316,10 @@ TODO TODO
 
 #### Layout configuration
 TODO TODO
+
+
+<ColumnBreak />
+
+<References>
+## References
+</References>
