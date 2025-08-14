@@ -1,61 +1,33 @@
-<Config columns=2 padding="16mm" fontSize="9pt" hyphens="auto" textAlign="justify" />
+<Config columns=2 padding="16mm" fontSize="9pt" hyphens="auto" textAlign="justify"></Config>
 
-<header>
+<Header>
 This here defines the header content for all pages.
-</header>
+</Header>
 
-<footer>
+<Footer>
 This here defines the footer content for all pages.
-</footer>
+</Footer>
 
 
-<!-- REFERENCES -->
-<ref id="markdown" type="citation">
-*Markdown syntax*,
-John Gruber,
-*Markdown is a text-to-HTML conversion tool for web writers.*,
-2004,
-https://daringfireball.net/projects/markdown/
-</ref>
-
-<ref id="markdownpaper" type="citation">
-*markdownpaper*,
-Eric Dolch,
-*Display markdown into paper style HTML site*,
-2025,
-https://github.com/Wasserwecken/markdownpaper
-</ref>
-
-<ref id="mathjax" type="citation">
-*MathJax*,
-MathJax Team,
-*Beautiful and accessible math in all browsers*,
-2025,
-https://www.mathjax.org/
-</ref>
-
-<ref id="mdMarked" type="citation">
-*Marked.js*
-Christopher Jeffrey, Josh Bruce, Steven, Jamie Davis, Tony Brix, Trevor Buckner
-*A markdown parser and compiler. Built for speed*,
-2025,
-https://marked.js.org/
-</ref>
-
-
-<!-- CONTENT -->
 # markdownpaper
-Use markdown[markdown] syntax to create beautiful documentations, scientific scripts or papers, through a single static HTML file without runtime dependencies or build processes. Its plain HTML, CSS and Javascript, which does all the workload.
+Use markdown[markdown] syntax to create beautiful documentations, scientific scripts or papers, through a single static HTML file without runtime dependencies or build processes.
 
-There is no need for NPM, Ruby, Python, Perl Envirnment, Docker container, Java runtime, online dependencies or subscription. It runs offline *(if your really want to)*, it runs anywhere without any installation, and uses a simple syntax *(markdown)* to define content.
+There is no need for NPM, Ruby, Python, Perl Envirnment, Docker container, Java runtime, online services or subscription. It runs offline *(if your really want to)*, it runs anywhere without any installation, and uses a simple syntax *(markdown)* to define content.
+
+
 
 <TableOfContents>
 ## Content
 </TableOfContents>
 
-<ColumnBreak />
+
+
+<ColumnBreak></ColumnBreak>
 
 ## Introduction
+This is the documentation about *markdownpaper* and its usage. It should cover any configuration options as well as the extended markdown syntax for important feature support.
+
+
 
 ### Installation
 Requirements:
@@ -63,20 +35,39 @@ Requirements:
 - Any text editor of your choice
 
 Quickstart:
-- Download the `index.html` from the repository
+- Download the `render.html` from the repository
 - Create a file `content.md` in the same directory
 - Start writing markdown inside `content.md`
-- Load the `index.html` in your browser
+- Load the `render.html` in your browser
+
+
+
+### Content source
+By default the `render.html` expects a `content.md` in the same directory. This is defined in the header by the line `<script id="mdContent" type="text/plain" src="content.md">`.
+
+The markdown content can be provided by an URL and can be changed by setting the `src` attribute to you path of needs. The root path of any media defined in the markdown will be the location of the `render.html`. The actual location of the content is NOT respected.
+
+There is also the option to embedded the markdown content directly into the `render.html` by removing the `src` attribute entirely and adding the content directly in the tag.
+
+
 
 ### Customisation
-If you dont like the current styling or choice for font, feel free to edit the embedded stylsheets. If you want to use a CSS framework of your choice for special formatting, just add their CDN link.
+Because the tool is just a static HTMl file, any customisations can be made immidiatly. The default paper style and behaviour is embedded directly in the `render.html`. There are options to define basic layout and appearance by the `<Config>` tag, which is documented in detail in the section '<a href="#h3-8">3.8. Layout configuration</a>'.
 
-If you want to embedd more complex objects or renderning, add your JavaScript library of choice to the header. If you want to change the behaviour of how markdown elements are processed, have a look at the embedded JavaScript code. Its is not minified and should be well documented through comments.
+If the standard or extended markdown elements do not fit your needs, any almost any CSS framework and JavaScript library can be added to the `render.html`. The only restriction is the use of static resources, there is no support for NPM modules or TypeScript out of the box.
 
 The restriction is that you can use only static compiled resources libraries, there is no support for NPM modules or TypeScript, except you are adding this support by yourself.
 
+
+
 ### Printing
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+The main purpose of this tool is to create a PDF through the browsers print option. Thus all pages are exactly shaped as A4 in portrait orientation, because this is the common format for documentations or papers. This trick and the browser printing have some limitations that cannot be avoided, because JavaScipt is not allowed to modify printing options.
+
+If there is the need of another paper size like A5, the sizes has to be edited in the embedded style sheets of the `render.html`. When printing the document, the custom page size should also be set in the printing options again, this can be done automatically.
+
+When printing, any padding of the page should be removed. The printing border is already handled by the page layout, allowing for indivdual configuration.
+
+
 
 ### Dependencies
 This projects stands on the following javascript libraries, they are required and loaded from CDN to handle your markdown content:
@@ -84,6 +75,8 @@ This projects stands on the following javascript libraries, they are required an
 - [MathJax](https://www.mathjax.org/) - For rendering mathematical notations.
 
 If you need to run this tool in a complete offline environment, you can download the required libraries and include them locally.
+
+
 
 ### Motivation
 Since I have a small lecture at my local university in addition to my full-time job as a software developer, I wanted to provide my students with an engaging script to follow throughout the course. I was looking for a simple stright forward tool.
@@ -94,16 +87,22 @@ I am sick of installing hundreds of megabytes just to complete a simple task. I 
 
 Thus I created this simple tool to write and edit my script easily and on any device or platform.
 
+
+
 ### Contributing
 Feel free to make this tool valuable for your needs and other people. Please contribute your ideas, improvements, or fixes by pull requests.
 Please keep following guidelines for contributions:
-- The `index.html` should stay the only file required to run the tool, do not add additional files or folders as dependencies. I want this too to be as lightweight and accessable as possible.
-- Do not add a CSS framework. All styling made should be included in the `index.html` file. The formatting should be kept simple and minimal, everything else is the choice of the user and can be added by themself.
+- The `render.html` should stay the only file required to run the tool, do not add additional files or folders as dependencies. I want this too to be as lightweight and accessable as possible.
+- Do not add a CSS framework. All styling made should be included in the `render.html` file. The formatting should be kept simple and minimal, everything else is the choice of the user and can be added by themself.
 
-<PageBreak Columns=1 />
+
 
 ## Writing markdown
-The library `marked.js`[mdMarked] is used for parsing and compiling markdown. Thus all common markdown syntax is supported. The following sections show the apeareance of standard markdown elements. Have a look at the markdown documentation for the basic syntax here <https://www.markdownguide.org/cheat-sheet/>.
+The library marked.js[mdMarked] is used for parsing and compiling markdown. Thus all common markdown syntax is supported. The following sections show the apeareance of standard markdown elements.
+
+<div>
+
+
 
 ### Headings
 Headlines are automatically enumerated by their level, with `#` for *H1*, `##` for *H2*, and so on. The heading `#` *H1* is special because it defines the title of the document and its's content.
@@ -126,6 +125,11 @@ Headlines are automatically enumerated by their level, with `#` for *H1*, `##` f
 <div style="margin: 0; font-size: 1.1rem; font-weight: bold;">1. 1. 1. 1. Heading 5</div>
 <div style="margin: 0; font-size: 1.0rem; font-weight: bold;">1. 1. 1. 1. 1. Heading 6</div>
 
+</div>
+
+
+
+<div>
 
 ### Paragraphs
 Paragraphs are separated by a blank line. The text will be wrapped automatically. Do not indent your text, otherwise it will be interpreted as a code block.
@@ -141,9 +145,14 @@ Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod 
 
 At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
 
+</div>
+
+
+
+<div>
 
 ### Lists
-Lists should behave exactly as expected.
+Lists can be created using the `-` or `1.` characters for unordered lists, and numbers followed by a period for ordered lists. Sub-items are supported as well and can be created by indenting the sub-items.
 
 ```
 - Item
@@ -152,11 +161,11 @@ Lists should behave exactly as expected.
     1. Sub
 - Item
 
-1 Item
-1 Item
+1. Item
+1. Item
     - Sub
     - Sub
-1 Item
+1. Item
 ```
 ---
 
@@ -171,6 +180,12 @@ Lists should behave exactly as expected.
     - Sub
     - Sub
 1. Item
+
+</div>
+
+
+
+<div>
 
 ### Images
 Images can be included in the markdown file, and will be displayed in the HTML output. You can use the HTML image tag, or use the markdown syntax. All examples result in the same output.
@@ -186,6 +201,12 @@ Images can be included in the markdown file, and will be displayed in the HTML o
 
 <img src="./.doc/sailboat.bmp"/>
 
+</div>
+
+
+
+<div>
+
 ### Links
 Links can be created using markdown syntax or HTML tags. Both will be rendered as clickable hyperlinks. They are always rendered italic, and without text or color decoration.
 
@@ -200,9 +221,15 @@ Links can be created using markdown syntax or HTML tags. Both will be rendered a
 
 [Markdown Guide](https://www.markdownguide.org/)
 
-<a href="https://daringfireball.net/projects/markdown/">Markdown Paper</a>
+<a href="https://daringfireball.net/projects/markdown/">Markdown Source</a>
 
 <https://github.com/Wasserwecken/markdownpaper>
+
+</div>
+
+
+
+<div>
 
 ### Quotes
 Quotes can be created using the `>` character at the beginning of a line. It will be rendered as a blockquote.
@@ -214,14 +241,26 @@ Quotes can be created using the `>` character at the beginning of a line. It wil
 
 > "The only limit to our realization of tomorrow will be our doubts of today." - Franklin D. Roosevelt
 
+</div>
+
+
+
+<div>
+
 ### Code
-Code blocks can be created using triple backticks (```) or by indenting lines with four spaces. They will be rendered in a monospaced font.
+Code blocks can be created using triple backticks (```) or by indenting lines with four spaces. They will be rendered in a monospaced font with a gray background.
 
 ```
 function helloWorld() {
     console.log("Hello, world!");
 }
 ```
+
+</div>
+
+
+
+<div>
 
 ### Tables
 Tables can be created using pipes (`|`) and hyphens (`-`). They will be rendered as HTML tables.
@@ -243,11 +282,19 @@ Tables can be created using pipes (`|`) and hyphens (`-`). They will be rendered
 | col 3 is | right-aligned |    $1 |
 | this is just | just a very wide | column |
 
-### Extensions
-There are several tags and behaviours to extend the markdown definitions. You may want to created citings or sublines to Figures and formulars.
+</div>
 
-#### Math formulas
-Math formulas can be included in the markdown file using the `$` syntax for inline formulas and `$$` for block formulas. The projects uses the `MathJax`[mathjax] library to render these formulas and the syntax is very simillar to LaTeX. Notherless there are some limitation, which can be read at their documentation, as well as the basic usage: <https://docs.mathjax.org/en/latest/>
+
+
+## Markdown Extensions
+There are several tags and behaviours to extend the markdown definitions. These extensions are the key of writing serious scripts with proper citations, sublines or table of contents.
+
+
+
+<div>
+
+### Math formulas
+Math formulas can be included in the markdown file using the `$` syntax for inline formulas and `$$` for block formulas. The projects uses the MathJax[mathjax] library to render these formulas and the syntax is very simillar to LaTeX. Notherless there are some limitation, which can be read at their documentation, as well as the basic usage: <https://docs.mathjax.org/en/latest/>
 
 ```
 This is a line holding a nested formular, $a^2 * b^2 = c^2$, to show of the inlining.
@@ -259,8 +306,13 @@ This is a line holding, $a^2 * b^2 = c^2$, a nested formular to show of the inli
 
 $$\pi^* = v_{\pi^*}(s) = \max_{a \in A} \sum_{s',r} p(s',r|s,a) [r+\gamma v(s')]$$
 
+</div>
 
-#### Header & Footer
+
+
+<div>
+
+### Header & Footer
 A global annotation for all pages, visible the very top and bottom of each page, can be defined anywhere with a `<header>` and `<footer>` tag. You can define them multiple times, but only the content of the very last will be used.
 
 ```
@@ -275,8 +327,18 @@ This here defines the footer content for all pages.
 ---
 Look at the top and bottom of each page to see the result.
 
+</div>
 
-#### References & sublines
+
+
+### Grouping
+TODO TODO
+
+
+
+<div>
+
+### References & Sublines
 Images, formulars, quotes and tables often need additional context or a label to refer from the paragraphs. To encode the label, enumerate the references and attatch them propertly to the corresponding elements, the `<ref>` tag can be used.
 
 Write the `<ref>` tag directly after the element you want to label. Any element like lists, figures or tables can be labeled this way. The tag required two attributes to be configured:
@@ -303,25 +365,56 @@ If there would be some important context to this quote, it could be included her
 
 Any paragraph can now refer to the quote[myQuote] by using the quote id.
 
+</div>
 
-#### Wide content
+### Wide content
 TODO TODO
 
-#### Layout setup
+### Column & Page break
 TODO TODO
 
-#### Column & page break
+### Table of contents
 TODO TODO
 
-#### Table of contents
-TODO TODO
-
-#### Layout configuration
+### Layout configuration
 TODO TODO
 
 
-<ColumnBreak />
+<ColumnBreak></ColumnBreak>
 
 <References>
 ## References
 </References>
+
+
+<Ref id="markdown" type="citation">
+*Markdown syntax*,
+John Gruber,
+*Markdown is a text-to-HTML conversion tool for web writers.*,
+2004,
+https://daringfireball.net/projects/markdown/
+</Ref>
+
+<Ref id="markdownpaper" type="citation">
+*markdownpaper*,
+Eric Dolch,
+*Display markdown into paper style HTML site*,
+2025,
+https://github.com/Wasserwecken/markdownpaper
+</Ref>
+
+<Ref id="mathjax" type="citation">
+*MathJax*,
+MathJax Team,
+*Beautiful and accessible math in all browsers*,
+2025,
+https://www.mathjax.org/
+</Ref>
+
+<Ref id="mdMarked" type="citation">
+*Marked.js*
+Christopher Jeffrey, Josh Bruce, Steven, Jamie Davis, Tony Brix, Trevor Buckner
+*A markdown parser and compiler. Built for speed*,
+2025,
+https://marked.js.org/
+</Ref>

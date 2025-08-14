@@ -321,13 +321,6 @@
                 contentRoot = markdownSrc.substr(0, markdownSrc.lastIndexOf("/"));
             }
 
-            // parse and modify raw content
-            markdownContent = markdownContent.replace(/(<Config\s*.*)(\/>)/i, '$1></Config>')
-            markdownContent = markdownContent.replace(/(<TableOfContents\s*.*)(\/>)/i, '$1></TableOfContents>')
-            markdownContent = markdownContent.replace(/(<References\s*.*)(\/>)/i, '$1></References>')
-            markdownContent = markdownContent.replace(/(<PageBreak\s*.*)(\/>)/i, '$1></PageBreak>')
-            markdownContent = markdownContent.replace(/(<ColumnBreak\s*.*)(\/>)/i, '$1></ColumnBreak>')
-
             // convert markdown to HTML elements
             let content = document.createElement('div');
             content.innerHTML = marked.parse(markdownContent);
@@ -392,13 +385,13 @@
          * @param {Object} config - The configuration object containing style properties.
          * @param {Object} currentPage - The current page object (if available).
          */
-        function ApplyConfig(config, currentPage) {
+        function ApplyConfig(config, pageId) {
             const customStyle = document.createElement('style');
-            const pageId = currentPage ? `#${currentPage.Page.id}` : ``;
-            customStyle.innerHTML += `\n${pageId} :root { --paper-space: ${config.Padding}; }`;
-            customStyle.innerHTML += `\n${pageId} p { hyphens: ${config.Hyphens}; text-align: ${config.TextAlign}; }`;
-            customStyle.innerHTML += `\n${pageId} body { font-size: ${config.FontSize}; font-family: ${config.FontFamily}; }`;
-            customStyle.innerHTML += `\n${pageId} .page-grid { grid-template-columns: ${'1fr'.repeat(config.Columns)}; }`;
+            const pageIdName = pageId ? `#${pageId}` : ``;
+            customStyle.innerHTML += `\n${pageIdName} :root { --paper-space: ${config.Padding}; }`;
+            customStyle.innerHTML += `\n${pageIdName} p { hyphens: ${config.Hyphens}; text-align: ${config.TextAlign}; }`;
+            customStyle.innerHTML += `\n${pageIdName} body { font-size: ${config.FontSize}; font-family: ${config.FontFamily}; }`;
+            customStyle.innerHTML += `\n${pageIdName} .page-grid { grid-template-columns: ${'1fr'.repeat(config.Columns)}; }`;
             document.head.appendChild(customStyle);
         }
 
@@ -591,40 +584,38 @@
 
         /**
          * Adds a new page to the document, with a initial column.
-         * @returns {Object} - A new page object.
+         * @returns {Element} - The column of the newly created page element.
          */
         function AddPage(config, pageList, pageTemplate) {
-            const newPage = pageTemplate.cloneNode(true);
+            const newPageDiv = pageTemplate.cloneNode(true);
+            const newPage = {
+                Page: newPageDiv,
+                Grid: newPageDiv.querySelector('.page-grid'),
+                Header: newPageDiv.querySelector('.page-top'),
+                Footer: newPageDiv.querySelector('.page-bottom'),
+                Columns: [newPageDiv.querySelector('.page-column')],
+            }
             pageList.push(newPage);
-            newPage.id = `page-${pageList.length}`;
 
             const pageNo = document.createElement('p');
             pageNo.classList.add('page-no');
             pageNo.innerText = `${pageList.length}`;
-            newPage.querySelector('.page-header').appendChild(pageNo);
-            newPage.querySelector('.page-footer').appendChild(pageNo.cloneNode(true));
+            newPageDiv.id = `page-${pageList.length}`;
+            newPageDiv.querySelector('.page-header').appendChild(pageNo);
+            newPageDiv.querySelector('.page-footer').appendChild(pageNo.cloneNode(true));
 
-            document.body.appendChild(newPage);
-
-            const currentPage = {
-                Page: newPage,
-                Content: newPage.querySelector('.page-content'),
-                Grid: newPage.querySelector('.page-grid'),
-                Header: newPage.querySelector('.page-top'),
-                Footer: newPage.querySelector('.page-bottom'),
-                Columns: [newPage.querySelector('.page-column')],
-            }
-            ApplyConfig(config, currentPage);
-
-            return currentPage;
+            document.body.appendChild(newPageDiv);
+            ApplyConfig(config, newPageDiv.id);
+            return pageList.at(-1).Columns.at(-1);
         }
 
         /**
          * Adds a new column to the current page. If the grid is full, a new page is created.
          * @param {Object} currentPage - The current page object.
-         * @returns {Object} - The the current or a new page object.
+         * @returns {Element} - The newly created column element.
          */
-        function AddColumn(config, pageList, pageTemplate, currentPage) {
+        function AddColumn(config, pageList, pageTemplate) {
+            const currentPage = pageList.at(-1);
             const currentColumn = currentPage.Columns.at(-1);
             const newColumn = currentColumn.cloneNode(false);
             currentColumn.parentElement.appendChild(newColumn);
@@ -634,7 +625,7 @@
             const newTop = newColumn.getBoundingClientRect().top;
             if (currTop == newTop) {
                 currentPage.Columns.push(newColumn);
-                return currentPage;
+                return newColumn;
             }
             // if not, there are more columns than definitions, thus a new page is required.
             else {
@@ -652,18 +643,16 @@
             // get the templates from the DOM.
             const pageList = [];
             const pageTemplate = document.querySelector('#page-template');
-            const columnTemplate = pageTemplate.querySelector('.page-column');
             pageTemplate.remove();
 
             // adds the first page
-            let currentPage = AddPage(config, pageList, pageTemplate);
-            let currentColumn = currentPage.Columns.at(-1);
+            let currentColumn = AddPage(config, pageList, pageTemplate);
             let previousHeading = null;
 
             for (let item of [...contentDiv.children]) {
 
                 // Add a new page or clolumn
-                const pageBreak = item.querySelector('pagebreak');
+                const pageBreak = item.querySelector('PageBreak');
                 if (pageBreak) {
                     config.Columns = pageBreak.getAttribute('Columns') ?? config.Columns;
                     config.Padding = pageBreak.getAttribute('Padding') ?? config.Padding;
@@ -671,13 +660,10 @@
                     config.FontSize = pageBreak.getAttribute('FontSize') ?? config.FontSize;
                     config.FontFamily = pageBreak.getAttribute('FontFamily') ?? config.FontFamily;
                     config.TextAlign = pageBreak.getAttribute('TextAlign') ?? config.TextAlign;
-                    currentPage = AddPage(config, pageList, pageTemplate);
-                    currentColumn = currentPage.Columns.at(-1);
+                    currentColumn = AddPage(config, pageList, pageTemplate);
                 }
-                else if (item.tagName == 'COLUMNBREAK' || item.querySelector('columnbreak')) {
-                    currentPage = AddColumn(config, pageList, pageTemplate, currentPage);
-                    currentColumn = currentPage.Columns.at(-1);
-
+                else if (item.querySelector('ColumnBreak')) {
+                    currentColumn = AddColumn(config, pageList, pageTemplate);
                 }
                 // place the element in the current column
                 else {
@@ -686,11 +672,10 @@
 
 
                 // check if the item is overflowing the page grid and move it to the next column.
-                gridBottom = currentPage.Grid.getBoundingClientRect();
+                gridBottom = pageList.at(-1).Grid.getBoundingClientRect();
                 itemBottom = item.getBoundingClientRect();
                 if (itemBottom.bottom > gridBottom.bottom) {
-                    currentPage = AddColumn(config, pageList, pageTemplate, currentPage);
-                    currentColumn = currentPage.Columns.at(-1);
+                    currentColumn = AddColumn(config, pageList, pageTemplate);
                     if (previousHeading)
                         currentColumn.appendChild(previousHeading);
                     currentColumn.appendChild(item);
@@ -708,6 +693,7 @@
          *
          */
         async function EvaluatePageNo(pageList) {
+            const pageDivList = pageList.map(e => e.Page);
             let tocDiv = document.querySelector('.toc-list');
             if (tocDiv) {
                 for (const item of tocDiv.querySelectorAll('a')) {
@@ -718,7 +704,7 @@
                         while (!page.classList.contains('page')) {
                             page = page.parentNode;
                         }
-                        const pageNo = pageList.indexOf(page) + 1;
+                        const pageNo = pageDivList.indexOf(page) + 1;
                         item.querySelector('.toc-list-item-page').innerHTML = pageNo;
                     }
                 }
