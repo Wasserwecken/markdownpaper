@@ -12,7 +12,7 @@ This here defines the footer content for all pages.
 # markdownpaper
 Use markdown[markdown] syntax to create beautiful documentations, scientific scripts or papers, through a single static HTML file without runtime dependencies or build processes.
 
-There is no need for NPM, Ruby, Python, Perl Envirnment, Docker container, Java runtime, online services or subscription. It runs offline *(if your really want to)*, it runs anywhere without any installation, and uses a simple syntax *(markdown)* to define content.
+There is no need for NPM, Ruby, Python, Perl Environment, Docker container, Java runtime, online services or subscription. It runs offline *(if your really want to)*, it runs anywhere without any installation, and uses a simple syntax *(markdown)* to define content.
 
 
 
@@ -34,7 +34,7 @@ Requirements:
 - Any modern browser of your choice
 - Any text editor of your choice
 
-Quickstart:
+QuickStart:
 - Download the `render.html` from the repository
 - Create a file `content.md` in the same directory
 - Start writing markdown inside `content.md`
@@ -47,14 +47,12 @@ By default the `render.html` expects a `content.md` in the same directory. This 
 
 The markdown content can be provided by an URL and can be changed by setting the `src` attribute to you path of needs. The root path of any media defined in the markdown will be the location of the `render.html`. The actual location of the content is NOT respected.
 
-This is shown in [people] where the process is vidusalized.
-
 There is also the option to embedded the markdown content directly into the `render.html` by removing the `src` attribute entirely and adding the content directly in the tag.
 
 
 
-### Customisation
-Because the tool is just a static HTMl file, any customisations can be made immidiatly. The default paper style and behaviour is embedded directly in the `render.html`. There are options to define basic layout and appearance by the `<Config>` tag, which is documented in detail in the section '<a href="#h3-8">3.8. Layout configuration</a>'.
+### Customization
+Because the tool is just a static HTML file, any customizations can be made immediately. The default paper style and behavior is embedded directly in the `render.html`. There are options to define basic layout and appearance by the `<Config>` tag, which is documented in detail in the section '<a href="#h3-8">3.8. Layout configuration</a>'.
 
 If the standard or extended markdown elements do not fit your needs, any almost any CSS framework and JavaScript library can be added to the `render.html`. The only restriction is the use of static resources, there is no support for NPM modules or TypeScript out of the box.
 
@@ -63,16 +61,16 @@ The restriction is that you can use only static compiled resources libraries, th
 
 
 ### Printing
-The main purpose of this tool is to create a PDF through the browsers print option. Thus all pages are exactly shaped as A4 in portrait orientation, because this is the common format for documentations or papers. This trick and the browser printing have some limitations that cannot be avoided, because JavaScipt is not allowed to modify printing options.
+The main purpose of this tool is to create a PDF through the browsers print option. Thus all pages are exactly shaped as A4 in portrait orientation, because this is the common format for documentations or papers. This trick and the browser printing have some limitations that cannot be avoided, because JavaScript is not allowed to modify printing options.
 
-If there is the need of another paper size like A5, the sizes has to be edited in the embedded style sheets of the `render.html`. When printing the document, the custom page size should also be set in the printing options again, this can be done automatically.
+If there is the need of another paper size like A5, the sizes has to be edited in the embedded style sheets of the `render.html`. When printing the document, the custom page size should also be set in the printing options again, this can be done automatically as well as enabling printing background images and colors!
 
-When printing, any padding of the page should be removed. The printing border is already handled by the page layout, allowing for indivdual configuration.
+When printing, any padding of the page should be removed. The printing border is already handled by the page layout, allowing for individual configuration.
 
 
 
 ### Dependencies
-This projects stands on the following javascript libraries, they are required and loaded from CDN to handle your markdown content:
+This projects stands on the following JavaScript libraries, they are required and loaded from CDN to handle your markdown content:
 - [marked.js](https://github.com/markedjs/marked) - A low-level markdown to HTML parser.
 - [MathJax](https://www.mathjax.org/) - For rendering mathematical notations.
 
@@ -81,9 +79,9 @@ If you need to run this tool in a complete offline environment, you can download
 
 
 ### Motivation
-Since I have a small lecture at my local university in addition to my full-time job as a software developer, I wanted to provide my students with an engaging script to follow throughout the course. I was looking for a simple stright forward tool.
+Since I have a small lecture at my local university in addition to my full-time job as a software developer, I wanted to provide my students with an engaging script to follow throughout the course. I was looking for a simple straight forward tool.
 
-I love the idear of LaTeX, writing content and do not care about the document layout. But the steep learning curve of LaTeX and the usage of another required runtime *(Perl)*, which installation is NOT straight forward at all, prevented me from using it. But I am used to write markdown for readme's, personal notes, todo's or meeting's. It always appeard to me like a LaTeX-Lite version.
+I love the idea of LaTeX, writing content and do not care about the document layout. But the steep learning curve of LaTeX and the usage of another required runtime *(Perl)*, which installation is NOT straight forward at all, prevented me from using it. But I am used to write markdown for readme's, personal notes, todo's or meeting's. It always appeared to me like a LaTeX-Lite version.
 
 I am sick of installing hundreds of megabytes just to complete a simple task. I don't want to get into another syntax, learn the build process or manage abstractions for content. Ever single tool I checked out for converting markdown to a pretty paper styled PDF had their own complexities.
 
@@ -94,10 +92,12 @@ Thus I created this simple tool to write and edit my script easily and on any de
 ### Contributing
 Feel free to make this tool valuable for your needs and other people. Please contribute your ideas, improvements, or fixes by pull requests.
 Please keep following guidelines for contributions:
-- The `render.html` should stay the only file required to run the tool, do not add additional files or folders as dependencies. I want this too to be as lightweight and accessable as possible.
+- The `render.html` should stay the only file required to run the tool, do not add additional files or folders as dependencies. I want this too to be as lightweight and accessible as possible.
 - Do not add a CSS framework. All styling made should be included in the `render.html` file. The formatting should be kept simple and minimal, everything else is the choice of the user and can be added by themself.
 
 
+
+<ColumnBreak></ColumnBreak>
 
 ## Writing markdown
 The library marked.js[mdMarked] is used for parsing and compiling markdown. Thus all common markdown syntax is supported. The following sections show the apeareance of standard markdown elements.
@@ -107,7 +107,7 @@ The library marked.js[mdMarked] is used for parsing and compiling markdown. Thus
 
 
 ### Headings
-Headlines are automatically enumerated by their level, with `#` for *H1*, `##` for *H2*, and so on. The heading `#` *H1* is special because it defines the title of the document and its's content.
+Headlines are automatically enumerated by their level, with `#` for *H1*, `##` for *H2*, and so on. The heading `#` *H1* is special because it defines the title of the document and its's content, it is not enumerated and will not appear in the table of contents.
 
 ```
 # Heading 1
@@ -194,7 +194,6 @@ Images can be included in the markdown file, and will be displayed in the HTML o
 
 ```
 [img]: ./.doc/sailboat.bmp
-
 ![img]
 ![](./.doc/sailboat.bmp)
 <img src="./.doc/sailboat.bmp"/>
@@ -391,15 +390,64 @@ Any paragraph can now refer to the quote[myQuote] by using the quote id.
 <div>
 
 ### Layout configuration
-The markdown content can define the layout of the document using the `<Config>` tag.
+The general look and feel of the renderer can be adjusted with ease by using the `<Config>` tag. Several attributes are supported:
+- **Columns**: Defines the columns per page as integer. Recommended is 2 or 1.
+- **Padding**: Defines the print border of each page. Any CSS value can be used like '2rem' or '1.5cm'.
+- **Hyphens**: Specifies how words should be hyphenated when text wraps across multiple lines. [Use any valid CSS hyphens value](https://developer.mozilla.org/en-US/docs/Web/CSS/hyphens).
+- **TextAlign**: Sets the horizontal alignment of the inline-level content. [Use any valid CSS text-align value](https://developer.mozilla.org/en-US/docs/Web/CSS/text-align).
+- **FontFamily**: Specifies a prioritized list of one or more font family names and/or generic family names. [Use any valid CSS font-family value](https://developer.mozilla.org/en-US/docs/Web/CSS/font-family).
+- **FontSize**: Sets the base size of the font, headings and other special elements are in relation to this size. [Use any valid CSS font-size value](https://developer.mozilla.org/en-US/docs/Web/CSS/font-size).
+
+
+```
+
+<Config columns=2 padding="16mm" fontSize="9pt" hyphens="auto" textAlign="justify" fontFamily="'Linux Libertine O', math, Georgia, serif"></Config>
+
+```
+---
+The look and feel of this document is equivalent to the shown config.
 
 </div>
 
+
+
+<div>
+
 ### Column & Page break
-TODO TODO
+Sometimes it is required to control the flow and content seperation by column or page breaks. Us the tags `<PageBreak>` or `<ColumnBreak>` to force a new page or column for the following content.
+
+If the layout specifies only a single column for each page, tjhe behaviour of `<ColumnBreak>` is equivalent to `<PageBreak>`.
+
+The `<PageBreak>` does not only force a new page, but can also later the look and feel for all following pages, enabling for alternating styles within a single document. All attributes of `<Config>` are supported.
+
+```
+<ColumnBreak></ColumnBreak>
+
+<PageBreak></PageBreak>
+
+<PageBreak Columns=1></PageBreak>
+```
+
+
+</div>
+
+
+
+<div>
 
 ### Table of contents
-TODO TODO
+To render a table of contents, place the `<TableOfContents>` tag anywhere it is desired. Only enumerated headings of h2 or lower are included. Any markdown content provided within the tag is placed before any content list item.
+
+```
+<TableOfContents>
+## Content
+</TableOfContents>
+```
+---
+The table of contents at the beginning of this document is renderd by the shown example.
+
+</div>
+
 
 ### Wide content
 TODO TODO
@@ -411,21 +459,22 @@ TODO TODO
 Because markdown is converted to HTML elements, any HTML structure can be embedded into the markdown. Almost any content style can be created this way.
 
 ```
-<div style="position: relative;">
-    <iframe src="https://www.example.com" style="position: absolute; transform: rotate(-15deg); border: 5px dashed #1C6EA4;" ></iframe>
+<div style="position: relative; height: 16rem;">
+    <div style="background-color: white; position: absolute; transform: rotate(-15deg);">
+        <iframe src="https://www.example.com" style="border: 5px dashed #1C6EA4; overflow: hidden; height: 14rem;"></iframe>
+    </div>
 </div>
 ```
 ---
-<div style="position: relative;">
+<div style="position: relative; height: 16rem;">
     <div style="background-color: white; position: absolute; transform: rotate(-15deg);">
-        <iframe src="https://www.example.com" style="border: 5px dashed #1C6EA4; overflow: hidden;"></iframe>
+        <iframe src="https://www.example.com" style="border: 5px dashed #1C6EA4; overflow: hidden; height: 14rem;"></iframe>
     </div>
 </div>
 
 </div>
 
 
-<ColumnBreak></ColumnBreak>
 
 <References>
 ## References
