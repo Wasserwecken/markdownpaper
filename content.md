@@ -452,7 +452,7 @@ The table of contents at the beginning of this document is renderd by the shown 
 ### Wide content
 TODO TODO
 
-### Left space
+### Cornell method
 TODO TODO
 
 
