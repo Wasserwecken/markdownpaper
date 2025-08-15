@@ -96,6 +96,16 @@
             grid-template-columns: 1fr 1fr;
             padding-right: var(--cornell-space);
         }
+
+        #page-template {
+            display: none;
+        }
+
+        #file-picker {
+            border: 5px dashed #1C6EA4;
+            border-radius: 2rem;
+            cursor: pointer;
+        }
     </style>
 
     <style id="cssMarkdownStandard">
@@ -295,6 +305,13 @@
 </head>
 
 <body>
+    <div id="file-picker" class="page">
+        <div style="margin: auto; opacity: 66%;">
+            <h2>Drag your markdown file here or click to pick</h2>
+            <input id="file-picker-input" style="display: none;" type="file" accept=".md,text/markdown,text/plain" />
+        </div>
+    </div>
+
     <div id="page-template" class="page">
         <div class="page-header"></div>
         <div class="page-top"></div>
@@ -329,34 +346,6 @@
 
 
     <script>
-        /**
-         * Load markdown content from the script tag with id 'Markdown'.
-         * If the 'src' attribute is defined, fetches the content from that URL,
-         * otherwise the inner HTML of the tag is used.
-         * @returns {Element[]} A list of HTML elements, defined my markdown.
-         */
-        async function LoadMarkdown() {
-            const markdown = document.getElementById('mdContent');
-            const markdownSrc = markdown.getAttribute('src');
-
-            // get the raw markdown content
-            let markdownContent = markdown.innerHTML;
-
-            // fetch if src is defined
-            if (markdownSrc) {
-                const response = await fetch(markdownSrc);
-                markdownContent = await response.text();
-                contentRoot = markdownSrc.substr(0, markdownSrc.lastIndexOf("/"));
-            }
-
-            // convert markdown to HTML elements
-            let content = document.createElement('div');
-            content.innerHTML = marked.parse(markdownContent);
-            return content;
-        }
-
-
-
         /**
          * Extracts the header and footer from the content div and sets the page title.
          * Removes any <header> and <footer> elements from the content div.
@@ -752,12 +741,36 @@
         }
 
 
+        /**
+         * Load markdown content from the script tag with id 'Markdown'.
+         * If the 'src' attribute is defined, fetches the content from that URL,
+         * otherwise the inner HTML of the tag is used.
+         * @returns {Element[]} A list of HTML elements, defined my markdown.
+         */
+        async function LoadLocalMarkdown() {
+            const markdownBlock = document.getElementById('mdContent');
+            const markdownSrc = markdownBlock.getAttribute('src');
+
+            let markdownContent = markdownBlock.innerHTML;
+            if (markdownSrc) {
+                try {
+                    const response = await fetch(markdownSrc);
+                    markdownContent = await response.text();
+                } catch {
+                    markdownContent = undefined;
+                }
+            }
+
+            return markdownContent;
+        }
 
         /**
-         * Entry point of parsing the markdown and placing it on pages.
+         *
          */
-        window.onload = async () => {
-            const contentDiv = await LoadMarkdown();
+        async function Render(markdownContent) {
+            let contentDiv = document.createElement('div');
+            contentDiv.innerHTML = marked.parse(markdownContent);
+
             const config = await ExtractConfig(contentDiv);
 
             await EnumerateHeadings(contentDiv);
@@ -766,6 +779,50 @@
 
             const pageList = await BuildPages(config, contentDiv);
             await EvaluatePageNo(pageList);
+        }
+
+        /**
+         * Entry point of parsing the markdown and placing it on pages.
+         */
+        window.onload = async () => {
+            const filePicker = document.querySelector('#file-picker');
+
+            let markdownContent = await LoadLocalMarkdown();
+            if (markdownContent) {
+                filePicker.remove();
+                Render(markdownContent);
+            } else {
+                filePicker.addEventListener("dragover", dragOverHandler);
+                filePicker.addEventListener("drop", dropHandler);
+                filePicker.addEventListener("click", pickContent);
+            }
+        };
+
+        function dragOverHandler(e) {
+            e.preventDefault();
+        }
+
+        function dropHandler(e) {
+            e.preventDefault();
+            handleFileUpload(e.dataTransfer.files[0]);
+        }
+
+        function pickContent() {
+            const input = document.querySelector('#file-picker-input');
+            input.addEventListener('change', function (e) {
+                handleFileUpload(e.target.files[0]);
+            });
+
+            input.click();
+        }
+
+        function handleFileUpload(file) {
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                document.querySelector('#file-picker').remove();
+                Render(event.target.result);
+            };
+            reader.readAsText(file);
         };
     </script>
 </body>

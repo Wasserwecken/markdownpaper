@@ -35,26 +35,26 @@ Requirements:
 - Any text editor of your choice
 
 QuickStart:
-- Download the `render.html` from the repository
-- Create a file `content.md` in the same directory
-- Start writing markdown inside `content.md`
-- Load the `render.html` in your browser
+- Download the `index.html` from the repository
+- Load the `index.html` locally in your browser
+- Drag & Drop your markdown file
 
 
 
 ### Content source
-By default the `render.html` expects a `content.md` in the same directory. This is defined in the header by the line `<script id="mdContent" type="text/plain" src="content.md">`.
+There are three approaches to render markdown content:
+1. Open the `index.html` locally and drag & drop or pick your markdown file to render
+1. Host the `index.html` and provide a markdown file on the webserver. The default path is `./contend.md`
+1. Embed markdown content directly into `index.html` by editing the first script tag with the id `mdContent` and removing the `src` attribute
 
-The markdown content can be provided by an URL and can be changed by setting the `src` attribute to you path of needs. The root path of any media defined in the markdown will be the location of the `render.html`. The actual location of the content is NOT respected.
-
-There is also the option to embedded the markdown content directly into the `render.html` by removing the `src` attribute entirely and adding the content directly in the tag.
+TThe root path of any media defined in the markdown will be the location of the `index.html`. The actual location of the content is NOT respected. Make sure that all resources, like images, use the root path of the `index.html`.
 
 
 
 ### Customization
-Because the tool is just a static HTML file, any customizations can be made immediately. The default paper style and behavior is embedded directly in the `render.html`. There are options to define basic layout and appearance by the `<Config>` tag, which is documented in detail in the section '<a href="#h3-5">3.5. Layout configuration</a>'.
+Because the tool is just a static HTML file, any customizations can be made immediately. The default paper style and behavior is embedded directly in the `index.html`. There are options to define basic layout and appearance by the `<Config>` tag, which is documented in detail in the section '<a href="#h3-5">3.5. Layout configuration</a>'.
 
-If the standard or extended markdown elements do not fit your needs, any almost any CSS framework and JavaScript library can be added to the `render.html`. The only restriction is the use of static resources, there is no support for NPM modules or TypeScript out of the box.
+If the standard or extended markdown elements do not fit your needs, any almost any CSS framework and JavaScript library can be added to the `index.html`. The only restriction is the use of static resources, there is no support for NPM modules or TypeScript out of the box.
 
 The restriction is that you can use only static compiled resources libraries, there is no support for NPM modules or TypeScript, except you are adding this support by yourself.
 
@@ -63,7 +63,7 @@ The restriction is that you can use only static compiled resources libraries, th
 ### Printing
 The main purpose of this tool is to create a PDF through the browsers print option. Thus all pages are exactly shaped as A4 in portrait orientation, because this is the common format for documentations or papers. This trick and the browser printing have some limitations that cannot be avoided, because JavaScript is not allowed to modify printing options.
 
-If there is the need of another paper size like A5, the sizes has to be edited in the embedded style sheets of the `render.html`. When printing the document, the custom page size should also be set in the printing options again, this can be done automatically as well as enabling printing background images and colors!
+If there is the need of another paper size like A5, the sizes has to be edited in the embedded style sheets of the `index.html`. When printing the document, the custom page size should also be set in the printing options again, this can be done automatically as well as enabling printing background images and colors!
 
 When printing, any padding of the page should be removed. The printing border is already handled by the page layout, allowing for individual configuration.
 
@@ -92,8 +92,8 @@ Thus I created this simple tool to write and edit my script easily and on any de
 ### Contributing
 Feel free to make this tool valuable for your needs and other people. Please contribute your ideas, improvements, or fixes by pull requests.
 Please keep following guidelines for contributions:
-- The `render.html` should stay the only file required to run the tool, do not add additional files or folders as dependencies. I want this too to be as lightweight and accessible as possible.
-- Do not add a CSS framework. All styling made should be included in the `render.html` file. The formatting should be kept simple and minimal, everything else is the choice of the user and can be added by themself.
+- The `index.html` should stay the only file required to run the tool, do not add additional files or folders as dependencies. I want this too to be as lightweight and accessible as possible.
+- Do not add a CSS framework. All styling made should be included in the `index.html` file. The formatting should be kept simple and minimal, everything else is the choice of the user and can be added by themself.
 
 
 
