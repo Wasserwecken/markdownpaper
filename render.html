@@ -2,9 +2,7 @@
 <html lang="en">
 
 <head>
-    <script id="mdContent" type="text/plain" src="content.md">
-<!-- Write here your markdown content, or specify a valid 'src' to your markdown file -->
-    </script>
+    <script id="mdContent" type="text/markdown" src="./content.md"></script>
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -48,6 +46,7 @@
         }
 
         .page {
+            position: relative;
             display: flex;
             flex-direction: column;
 
@@ -155,6 +154,7 @@
             width: 100%;
             max-width: 100%;
             border-radius: 0.25rem;
+            border: 1px solid #000000;
         }
 
         table {
@@ -195,13 +195,15 @@
 
             background-color: #eee;
             border-radius: 0.25rem;
+            border: 1px solid #000000;
         }
 
         pre code {
             padding: 1rem;
             width: 100%;
-            display: block;
+            display: inline-block;
             white-space: pre-wrap;
+            word-wrap: break-word;
         }
 
 
@@ -290,7 +292,6 @@
 </head>
 
 <body>
-
     <div id="page-template" class="page">
         <div class="page-header"></div>
         <div class="page-top"></div>

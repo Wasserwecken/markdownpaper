@@ -29,7 +29,7 @@ This is the documentation about *markdownpaper* and its usage. It should cover a
 
 
 
-### Installation
+### Installation & Usage
 Requirements:
 - Any modern browser of your choice
 - Any text editor of your choice
@@ -46,6 +46,8 @@ Quickstart:
 By default the `render.html` expects a `content.md` in the same directory. This is defined in the header by the line `<script id="mdContent" type="text/plain" src="content.md">`.
 
 The markdown content can be provided by an URL and can be changed by setting the `src` attribute to you path of needs. The root path of any media defined in the markdown will be the location of the `render.html`. The actual location of the content is NOT respected.
+
+This is shown in [people] where the process is vidusalized.
 
 There is also the option to embedded the markdown content directly into the `render.html` by removing the `src` attribute entirely and adding the content directly in the tag.
 
@@ -384,8 +386,14 @@ Any paragraph can now refer to the quote[myQuote] by using the quote id.
 
 </div>
 
+
+
+<div>
+
 ### Layout configuration
 The markdown content can define the layout of the document using the `<Config>` tag.
+
+</div>
 
 ### Column & Page break
 TODO TODO
@@ -400,16 +408,18 @@ TODO TODO
 <div>
 
 ### Complex content
-Because markdown is converted to HTML elements, any HTML structure can be embedded into the markdown. Very customized content can be created this way.
+Because markdown is converted to HTML elements, any HTML structure can be embedded into the markdown. Almost any content style can be created this way.
 
 ```
-<div style="transform: rotate(45deg)">
-<iframe src="https://www.example.com" width="100%" height="100%"></iframe>
+<div style="position: relative;">
+    <iframe src="https://www.example.com" style="position: absolute; transform: rotate(-15deg); border: 5px dashed #1C6EA4;" ></iframe>
 </div>
 ```
 ---
-<div style="transform: rotate(45deg); padding: 5rem;">
-<iframe src="https://www.example.com"></iframe>
+<div style="position: relative;">
+    <div style="background-color: white; position: absolute; transform: rotate(-15deg);">
+        <iframe src="https://www.example.com" style="border: 5px dashed #1C6EA4; overflow: hidden;"></iframe>
+    </div>
 </div>
 
 </div>
