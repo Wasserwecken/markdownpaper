@@ -1,4 +1,4 @@
-<Config columns=2 padding="16mm" fontSize="9pt" hyphens="auto" textAlign="justify"></Config>
+<Config columns=2 padding="16mm" fontSize="9pt" hyphens="auto" textAlign="justify" fontFamily="'Linux Libertine O', math, Georgia, serif"></Config>
 
 <Header>
 This here defines the header content for all pages.
@@ -313,16 +313,16 @@ $$\pi^* = v_{\pi^*}(s) = \max_{a \in A} \sum_{s',r} p(s',r|s,a) [r+\gamma v(s')]
 <div>
 
 ### Header & Footer
-A global annotation for all pages, visible the very top and bottom of each page, can be defined anywhere with a `<header>` and `<footer>` tag. You can define them multiple times, but only the content of the very last will be used.
+A global annotation for all pages, visible the very top and bottom of each page, can be defined anywhere with a `<Header>` and `<Footer>` tag. You can define them multiple times, but only the content of the very last will be used.
 
 ```
-<header>
+<Header>
 This here defines the header content for all pages.
-</header>
+</Header>
 
-<footer>
+<Footer>
 This here defines the footer content for all pages.
-</footer>
+</Footer>
 ```
 ---
 Look at the top and bottom of each page to see the result.
@@ -331,9 +331,26 @@ Look at the top and bottom of each page to see the result.
 
 
 
-### Grouping
-TODO TODO
+<div>
 
+### Grouping
+Elements can be grouped together to avoid a split on page or column breaks. Group does not force a page or column break, but the content will stay in the same column. Elements can be grouped together by using the `<div>` tag and content to be grouped should be placed inside the `<div>` tag.
+
+Content should not be indented at all, and there must be an empty line before and after the `<div>` tag to be recognized correctly. This behaviour breaks if the grouped content is bigger than the page size to fit in.
+
+```
+<div>
+
+## Heading in a div
+This is my important content.
+
+</div>
+
+```
+---
+All sections content is grouped together, no section should spread over multiple columns or pages.
+
+</div>
 
 
 <div>
@@ -367,8 +384,8 @@ Any paragraph can now refer to the quote[myQuote] by using the quote id.
 
 </div>
 
-### Wide content
-TODO TODO
+### Layout configuration
+The markdown content can define the layout of the document using the `<Config>` tag.
 
 ### Column & Page break
 TODO TODO
@@ -376,8 +393,26 @@ TODO TODO
 ### Table of contents
 TODO TODO
 
-### Layout configuration
+### Wide content
 TODO TODO
+
+
+<div>
+
+### Complex content
+Because markdown is converted to HTML elements, any HTML structure can be embedded into the markdown. Very customized content can be created this way.
+
+```
+<div style="transform: rotate(45deg)">
+<iframe src="https://www.example.com" width="100%" height="100%"></iframe>
+</div>
+```
+---
+<div style="transform: rotate(45deg); padding: 5rem;">
+<iframe src="https://www.example.com"></iframe>
+</div>
+
+</div>
 
 
 <ColumnBreak></ColumnBreak>

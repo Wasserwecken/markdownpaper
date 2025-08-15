@@ -9,6 +9,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="data:image/png;base64,iVBORw0KGgo=">
+    <link href="https://fonts.cdnfonts.com/css/linux-libertine-o" rel="stylesheet">
 
     <script>
         MathJax = {
@@ -220,11 +221,34 @@
     </style>
 
     <style id="cssMarkdownExtensions">
+        .ref-sub-line {
+            display: flex;
+            gap: 0.5rem;
+            align-items: baseline;
+        }
+
+        .ref-sub-label {
+            font-weight: bold;
+            text-wrap: nowrap;
+        }
+
+        .ref-sub-content * {
+            font-style: italic;
+            text-align: unset;
+        }
+
+        .ref-sub-line p:first-of-type {
+            margin: 0;
+        }
+
         .ref-list-item {
             display: flex;
             align-items: first baseline;
             font-size: var(--font-annotation-size);
-            margin-bottom: -1rem;
+        }
+
+        .ref-list-item p:first-of-type {
+            margin: 0.5rem;
         }
 
         .ref-list-id {
@@ -541,10 +565,19 @@
 
             // replace the link ids with the labels and actual links.
             for (const item of contentDiv.querySelectorAll('*')) {
+                // skip special elements because they are expected to hold raw data.
+                if (item.tagName == 'CODE') {
+                    continue;
+                }
+
                 for (const [type, refs] of Object.entries(linkReferences)) {
                     for (const [refId, refLabel] of refs) {
                         const linkLabel = `<a class="ref-link" href="#${refId}">[${refLabel}]</a>`;
-                        item.innerHTML = item.innerHTML.replace(`[${refId}]`, linkLabel);
+
+                        if (item.innerHTML.includes(`[${refId}]`))
+                            item.innerHTML = item.innerHTML;
+
+                        item.innerHTML = item.innerHTML.replaceAll(`[${refId}]`, linkLabel);
                     }
                 }
 
