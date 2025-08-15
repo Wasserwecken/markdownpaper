@@ -755,7 +755,9 @@
             if (markdownSrc) {
                 try {
                     const response = await fetch(markdownSrc);
-                    markdownContent = await response.text();
+                    markdownContent = response.status == 200
+                        ? await response.text()
+                        : undefined;
                 } catch {
                     markdownContent = undefined;
                 }
