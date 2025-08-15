@@ -8,6 +8,39 @@ This here defines the header content for all pages.
 This here defines the footer content for all pages.
 </Footer>
 
+<Ref id="markdown" type="citation">
+*Markdown syntax*,
+John Gruber,
+*Markdown is a text-to-HTML conversion tool for web writers.*,
+2004,
+https://daringfireball.net/projects/markdown/
+</Ref>
+
+<Ref id="markdownpaper" type="citation">
+*markdownpaper*,
+Eric Dolch,
+*Display markdown into paper style HTML site*,
+2025,
+https://github.com/Wasserwecken/markdownpaper
+</Ref>
+
+<Ref id="mathjax" type="citation">
+*MathJax*,
+MathJax Team,
+*Beautiful and accessible math in all browsers*,
+2025,
+https://www.mathjax.org/
+</Ref>
+
+<Ref id="mdMarked" type="citation">
+*Marked.js*
+Christopher Jeffrey, Josh Bruce, Steven, Jamie Davis, Tony Brix, Trevor Buckner
+*A markdown parser and compiler. Built for speed*,
+2025,
+https://marked.js.org/
+</Ref>
+
+
 
 # markdownpaper
 Use markdown[markdown] syntax to create beautiful documentations, scientific scripts or papers, through a single static HTML file without runtime dependencies or build processes.
@@ -34,9 +67,13 @@ Requirements:
 - Any modern browser of your choice
 - Any text editor of your choice
 
-QuickStart:
+QuickStart 1:
 - Download the `index.html` from the repository
 - Load the `index.html` locally in your browser
+- Drag & Drop your markdown file
+
+QuickStart 2:
+- Open <https://github.com/Wasserwecken/markdownpaper>
 - Drag & Drop your markdown file
 
 
@@ -382,7 +419,29 @@ If there would be some important context to this quote, it could be included her
 </ref>
 
 Any paragraph can now refer to the quote[myQuote] by using the quote id.
+</div>
 
+<div>
+
+But the `<ref>` tag is also utelized for external references, also known as 'citation', where a reference list is generated. If the tag type is set to `citation`, no subline is created, but the content is added to the `<References>` tag. This tag holds a list of all citations and can be placed anywhere.
+
+```
+<Ref id="markdown" type="citation">
+*Markdown syntax*,
+John Gruber,
+*Markdown is a text-to-HTML conversion tool for web writers.*,
+2004,
+https://daringfireball.net/projects/markdown/
+</Ref>
+
+<References>
+## References
+</References>
+```
+---
+<References>
+## References
+</References>
 </div>
 
 
@@ -474,42 +533,3 @@ Because markdown is converted to HTML elements, any HTML structure can be embedd
 </div>
 
 </div>
-
-
-
-<References>
-## References
-</References>
-
-
-<Ref id="markdown" type="citation">
-*Markdown syntax*,
-John Gruber,
-*Markdown is a text-to-HTML conversion tool for web writers.*,
-2004,
-https://daringfireball.net/projects/markdown/
-</Ref>
-
-<Ref id="markdownpaper" type="citation">
-*markdownpaper*,
-Eric Dolch,
-*Display markdown into paper style HTML site*,
-2025,
-https://github.com/Wasserwecken/markdownpaper
-</Ref>
-
-<Ref id="mathjax" type="citation">
-*MathJax*,
-MathJax Team,
-*Beautiful and accessible math in all browsers*,
-2025,
-https://www.mathjax.org/
-</Ref>
-
-<Ref id="mdMarked" type="citation">
-*Marked.js*
-Christopher Jeffrey, Josh Bruce, Steven, Jamie Davis, Tony Brix, Trevor Buckner
-*A markdown parser and compiler. Built for speed*,
-2025,
-https://marked.js.org/
-</Ref>

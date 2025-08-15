@@ -719,7 +719,8 @@
 
 
         /**
-         *
+         * Evaluates the page numbers in the table of contents.
+         * @param {Element[]} pageList - The list of pages.
          */
         async function EvaluatePageNo(pageList) {
             const pageDivList = pageList.map(e => e.Page);
@@ -767,7 +768,8 @@
         }
 
         /**
-         *
+         * Renders the markdown content into HTML, handles the render stages,
+         * @param {string} markdownContent - The markdown content to render.
          */
         async function Render(markdownContent) {
             let contentDiv = document.createElement('div');
@@ -800,15 +802,26 @@
             }
         };
 
+        /**
+         * Handles the drag over event for the file picker.
+         * @param {DragEvent} e - The drag event.
+         */
         function dragOverHandler(e) {
             e.preventDefault();
         }
 
+        /**
+         * Handles the drop event for the file picker.
+         * @param {DragEvent} e - The drag event.
+         */
         function dropHandler(e) {
             e.preventDefault();
             handleFileUpload(e.dataTransfer.files[0]);
         }
 
+        /**
+         * Handles the click event for the file picker.
+         */
         function pickContent() {
             const input = document.querySelector('#file-picker-input');
             input.addEventListener('change', function (e) {
@@ -818,6 +831,11 @@
             input.click();
         }
 
+        /**
+         * Handles the file upload process.
+         * Calls the Render function with the file content.
+         * @param {File} file - The file to upload.
+         */
         function handleFileUpload(file) {
             const reader = new FileReader();
             reader.onload = function (event) {
