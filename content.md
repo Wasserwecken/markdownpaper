@@ -52,7 +52,7 @@ There is also the option to embedded the markdown content directly into the `ren
 
 
 ### Customization
-Because the tool is just a static HTML file, any customizations can be made immediately. The default paper style and behavior is embedded directly in the `render.html`. There are options to define basic layout and appearance by the `<Config>` tag, which is documented in detail in the section '<a href="#h3-8">3.8. Layout configuration</a>'.
+Because the tool is just a static HTML file, any customizations can be made immediately. The default paper style and behavior is embedded directly in the `render.html`. There are options to define basic layout and appearance by the `<Config>` tag, which is documented in detail in the section '<a href="#h3-5">3.5. Layout configuration</a>'.
 
 If the standard or extended markdown elements do not fit your needs, any almost any CSS framework and JavaScript library can be added to the `render.html`. The only restriction is the use of static resources, there is no support for NPM modules or TypeScript out of the box.
 
@@ -450,6 +450,9 @@ The table of contents at the beginning of this document is renderd by the shown 
 
 
 ### Wide content
+TODO TODO
+
+### Left space
 TODO TODO
 
 
