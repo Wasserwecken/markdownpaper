@@ -29,6 +29,7 @@
             --paper-width: 210mm;
             --paper-height: 297mm;
             --paper-space: 20mm;
+            --cornell-space: 0mm;
 
         }
 
@@ -93,6 +94,7 @@
             display: grid;
             gap: 2rem;
             grid-template-columns: 1fr 1fr;
+            padding-right: var(--cornell-space);
         }
     </style>
 
@@ -387,6 +389,7 @@
                 Padding: "20mm",
                 Hyphen: true,
                 FontSize: "9pt",
+                CornellSize: "0",
                 FontFamily: `'Linux Libertine O', math, Georgia, serif`,
                 TextAlign: "justify",
             };
@@ -395,6 +398,7 @@
                 config.Columns = contentConfig.getAttribute('Columns') ?? config.Columns;
                 config.Padding = contentConfig.getAttribute('Padding') ?? config.Padding;
                 config.Hyphens = contentConfig.getAttribute('Hyphens') ?? config.Hyphens;
+                config.CornellSize = contentConfig.getAttribute('CornellSize') ?? config.CornellSize;
                 config.FontSize = contentConfig.getAttribute('FontSize') ?? config.FontSize;
                 config.FontFamily = contentConfig.getAttribute('FontFamily') ?? config.FontFamily;
                 config.TextAlign = contentConfig.getAttribute('TextAlign') ?? config.TextAlign;
@@ -414,7 +418,7 @@
         function ApplyConfig(config, pageId) {
             const customStyle = document.createElement('style');
             const pageIdName = pageId ? `#${pageId}` : ``;
-            customStyle.innerHTML += `\n${pageIdName} :root { --paper-space: ${config.Padding}; }`;
+            customStyle.innerHTML += `\n${pageIdName} :root { --paper-space: ${config.Padding}; --cornell-space: ${config.CornellSize}; }`;
             customStyle.innerHTML += `\n${pageIdName} p { hyphens: ${config.Hyphens}; text-align: ${config.TextAlign}; }`;
             customStyle.innerHTML += `\n${pageIdName} body { font-size: ${config.FontSize}; font-family: ${config.FontFamily}; }`;
             customStyle.innerHTML += `\n${pageIdName} .page-grid { grid-template-columns: ${'1fr'.repeat(config.Columns)}; }`;
@@ -692,6 +696,7 @@
                     config.Columns = pageBreak.getAttribute('Columns') ?? config.Columns;
                     config.Padding = pageBreak.getAttribute('Padding') ?? config.Padding;
                     config.Hyphens = pageBreak.getAttribute('Hyphens') ?? config.Hyphens;
+                    config.CornellSize = pageBreak.getAttribute('CornellSize') ?? config.CornellSize;
                     config.FontSize = pageBreak.getAttribute('FontSize') ?? config.FontSize;
                     config.FontFamily = pageBreak.getAttribute('FontFamily') ?? config.FontFamily;
                     config.TextAlign = pageBreak.getAttribute('TextAlign') ?? config.TextAlign;

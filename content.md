@@ -1,4 +1,4 @@
-<Config columns=2 padding="16mm" fontSize="9pt" hyphens="auto" textAlign="justify" fontFamily="'Linux Libertine O', math, Georgia, serif"></Config>
+<Config columns=2 padding="16mm" fontSize="9pt" hyphens="auto" textAlign="justify" fontFamily="'Linux Libertine O', math, Georgia, serif" CornellSize="0mm"></Config>
 
 <Header>
 This here defines the header content for all pages.
@@ -397,11 +397,12 @@ The general look and feel of the renderer can be adjusted with ease by using the
 - **TextAlign**: Sets the horizontal alignment of the inline-level content. [Use any valid CSS text-align value](https://developer.mozilla.org/en-US/docs/Web/CSS/text-align).
 - **FontFamily**: Specifies a prioritized list of one or more font family names and/or generic family names. [Use any valid CSS font-family value](https://developer.mozilla.org/en-US/docs/Web/CSS/font-family).
 - **FontSize**: Sets the base size of the font, headings and other special elements are in relation to this size. [Use any valid CSS font-size value](https://developer.mozilla.org/en-US/docs/Web/CSS/font-size).
+- **CornellSize**: Defines an extra right padding of the content, providing space for custom notes by the reader. This is also known as the 'cornell method'. Any CSS size value is accepted.
 
 
 ```
 
-<Config columns=2 padding="16mm" fontSize="9pt" hyphens="auto" textAlign="justify" fontFamily="'Linux Libertine O', math, Georgia, serif"></Config>
+<Config columns=2 padding="16mm" fontSize="9pt" hyphens="auto" textAlign="justify" fontFamily="'Linux Libertine O', math, Georgia, serif" CornellSize="0mm"></Config>
 
 ```
 ---
@@ -450,9 +451,6 @@ The table of contents at the beginning of this document is renderd by the shown 
 
 
 ### Wide content
-TODO TODO
-
-### Cornell method
 TODO TODO
 
 
