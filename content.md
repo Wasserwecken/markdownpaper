@@ -306,19 +306,19 @@ Tables can be created using pipes (`|`) and hyphens (`-`). They will be rendered
 ```
 | Tables   |      Are      |  Cool |
 |----------|:-------------:|------:|
-| col 1 is |  left-aligned | $1600 |
-| col 2 is |    centered   |   $12 |
-| col 3 is | right-aligned |    $1 |
-| this is just | just a very wide | column |
+| col 1 |  left-aligned | $1600 |
+| col 2 |    centered   |   $12 |
+| col 3 | right-aligned |    $1 |
+| Lorem | Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. | ipsum |
 ```
 ---
 
 | Tables   |      Are      |  Cool |
 |----------|:-------------:|------:|
-| col 1 is |  left-aligned | $1600 |
-| col 2 is |    centered   |   $12 |
-| col 3 is | right-aligned |    $1 |
-| this is just | just a very wide | column |
+| col 1 |  left-aligned | $1600 |
+| col 2 |    centered   |   $12 |
+| col 3 | right-aligned |    $1 |
+| Lorem | Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. | ipsum |
 
 </div>
 
