@@ -54,7 +54,6 @@ There is no need for NPM, Ruby, Python, Perl Environment, Docker container, Java
 </TableOfContents>
 
 
-
 <ColumnBreak></ColumnBreak>
 
 ## Introduction
@@ -511,6 +510,25 @@ The table of contents at the beginning of this document is renderd by the shown 
 
 ### Wide content
 TODO TODO
+
+
+
+<div>
+
+### Diagrams
+Diagrams from `https://app.diagrams.net/` can be embedded directly into the document with the `drawio` tag.
+
+The diagram data can be provided either via an URL that can be set as `src` attribute in the tag. If this attribute is not defined, the content of the tag is expected to hold the diagram data.
+
+```
+<drawio src="./.doc/graph.drawio"></drawio>
+
+```
+---
+<drawio src="./.doc/graph.drawio"></drawio>
+
+</div>
+
 
 
 <div>

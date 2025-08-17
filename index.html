@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <script id="mdContent" type="text/markdown" src="./content.mdd"></script>
+    <script id="mdContent" type="text/markdown" src="./content.md"></script>
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -17,6 +17,7 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://viewer.diagrams.net/js/viewer-static.min.js"></script>
 
     <style id="cssPageLayout">
         * {
@@ -300,11 +301,20 @@
             flex: 1 1 auto;
             border-bottom: 1px dotted;
         }
+
+        .mxgraph svg {
+            min-width: unset !important;
+        }
+
+        .geAdaptiveAsset {
+            display: none;
+        }
     </style>
 
 </head>
 
 <body>
+
     <div id="file-picker" class="page">
         <div id="file-picker-page" style="margin: auto; opacity: 66%;">
             <h2>Drag your markdown file here or click to pick</h2>
@@ -345,6 +355,9 @@
         </div>
     </div>
 
+    <div id="drawio-frame" class="mxgraph" data-mxgraph='{"resize": true, {{content}}}'>
+    </div>
+
 
     <script>
         /**
@@ -352,6 +365,10 @@
          * @returns {Object} - Collection of template elements.
          */
         async function LoadTemplateCollection() {
+            const drawioFrame = document.querySelector('#drawio-frame');
+            drawioFrame.id = '';
+            drawioFrame.remove();
+
             const filePicker = document.querySelector('#file-picker');
             const filePickerPage = filePicker.querySelector('#file-picker-page');
             const filePickerInput = filePicker.querySelector('#file-picker-input');
@@ -377,6 +394,7 @@
             refSub.remove();
 
             const templates = {
+                DrawioFrame: drawioFrame,
                 FilePicker: filePicker,
                 FilePickerPage: filePickerPage,
                 FilePickerInput: filePickerInput,
@@ -490,6 +508,7 @@
             // build the table of contens if defined.
             let tocDiv = contentDiv.querySelector('TableOfContents');
             if (tocDiv) {
+                const tocDepth = parseInt(tocDiv.getAttribute('depth')) || 5;
                 tocDivReplacement = document.createElement('div');
                 tocDivReplacement.innerHTML = marked.parse(tocDiv.innerHTML);
                 tocDiv.replaceWith(tocDivReplacement);
@@ -501,8 +520,12 @@
                 levelList.classList.add('toc-list-root');
 
                 for (const heading of headings) {
-                    const tocItem = templates.TocListItem.cloneNode(true);
                     const level = parseInt(heading.tagName[1]) - 1;
+                    if (level > tocDepth) {
+                        continue;
+                    }
+
+                    const tocItem = templates.TocListItem.cloneNode(true);
                     tocItem.href = `#${heading.id}`;
                     tocItem.querySelector('.toc-list-item-heading').innerHTML = heading.innerHTML;
 
@@ -533,8 +556,6 @@
          * @param {Element} contentDiv - Element holding all markdown defined content.
          */
         async function EvaluateReferences(templates, contentDiv) {
-
-            // get the templates from the DOM.
             const srcReferences = [];
             const linkReferences = {};
 
@@ -625,11 +646,25 @@
          * Pre-renders the content and waits for all resources to be loaded.
          * @param {Element} contentDiv - Element holding all markdown defined content.
          */
-        async function PreRenderAndWait(contentDiv) {
+        async function PreRenderAndWait(templates, contentDiv) {
             document.body.appendChild(contentDiv);
 
             // math rendering
             MathJax.typeset();
+
+            // diagram rendering
+            for (const graph of document.querySelectorAll('drawio')) {
+
+                const graphFrame = templates.DrawioFrame.cloneNode(true);
+                const srcPath = graph.getAttribute('src');
+                let graphConfig = graphFrame.getAttribute('data-mxgraph');
+                graphConfig = srcPath
+                    ? graphConfig.replace("{{content}}", `"url": "${srcPath}"`)
+                    : graphConfig.replace("{{content}}", `"xml": "${graph.innerHTML}"`);
+                graphFrame.setAttribute('data-mxgraph', graphConfig);
+                graph.replaceWith(graphFrame);
+            }
+            GraphViewer.processElements();
 
             // wait for images to be loaded to know their size.
             for (let image of contentDiv.querySelectorAll('img')) {
@@ -812,7 +847,7 @@
 
             await EnumerateHeadings(templates, contentDiv);
             await EvaluateReferences(templates, contentDiv);
-            await PreRenderAndWait(contentDiv);
+            await PreRenderAndWait(templates, contentDiv);
 
             const pageList = await BuildPages(templates, config, contentDiv);
             await EvaluatePageNo(pageList);
