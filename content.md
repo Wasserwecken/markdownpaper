@@ -45,7 +45,11 @@ https://marked.js.org/
 # markdownpaper
 Use markdown[markdown] syntax to create beautiful documentations, scientific scripts or papers, through a single static HTML file without runtime dependencies or build processes.
 
-There is no need for NPM, Ruby, Python, Perl Environment, Docker container, Java runtime, online services or subscription. It runs offline *(if your really want to)*, it runs anywhere without any installation, and uses a simple syntax *(markdown)* to define content.
+There is no need for NPM, Ruby, Python, Perl Environment, Docker container, Java runtime, online services or subscription. It runs anywhere without any installation and creates a print ready HTML layout.
+
+Write your content and focus on your content. The layout ain't your problem you want to solve.
+
+
 
 
 
@@ -57,9 +61,13 @@ There is no need for NPM, Ruby, Python, Perl Environment, Docker container, Java
 <ColumnBreak></ColumnBreak>
 
 ## Introduction
-This is the documentation about *markdownpaper* and its usage. It should cover any configuration options as well as the extended markdown syntax for important feature support.
+This is the documentation about *markdownpaper* and its usage. It covers all configuration options as well as the extended syntax, enabling important features like Citations and math formulas.
+
+Please do not expect that every single markdown will render beautifully with this. The focus is on academic and printing content. Rendering elements that are larger than a single page is not supported (e.g. large code sections, endless lists, etc.). There are other tools to checkout for converting markdown into presentable content like [MkDocs](https://www.mkdocs.org/).
 
 
+
+<div>
 
 ### Installation & Usage
 Requirements:
@@ -67,25 +75,36 @@ Requirements:
 - Any text editor of your choice
 
 QuickStart 1:
-- Download the `index.html` from the repository
-- Load the `index.html` locally in your browser
-- Drag & Drop your markdown file
+- Download the `index.html` from the repository.
+- Load the `index.html` locally in your browser.
+- Drag & Drop your markdown file to render.
 
 QuickStart 2:
-- Open <https://github.com/Wasserwecken/markdownpaper>
-- Drag & Drop your markdown file
+- Go to <https://github.com/Wasserwecken/markdownpaper>
+- Drag & Drop your markdown file to render.
+
+</div>
 
 
+<div>
 
 ### Content source
 There are three approaches to render markdown content:
-1. Open the `index.html` locally and drag & drop or pick your markdown file to render
-1. Host the `index.html` and provide a markdown file on the webserver. The default path is `./contend.md`
-1. Embed markdown content directly into `index.html` by editing the first script tag with the id `mdContent` and removing the `src` attribute
+1. Open the `index.html` locally and drag & drop your markdown file to render.
+1. Host the `index.html` as static Website with a markdown file on the webserver. The default path is `./contend.md`.
+1. Embed markdown content directly into `index.html` by editing the first script tag with the id `mdContent` and removing the `src` attribute.
 
-TThe root path of any media defined in the markdown will be the location of the `index.html`. The actual location of the content is NOT respected. Make sure that all resources, like images, use the root path of the `index.html`.
+The root path of any media defined in the markdown is the location of the `index.html`. The actual location of the content is NOT respected. Make sure that all resources, like images, use the root path of the `index.html`.
+
+Loading the markdown content automatically works only if the `index.html` is hosted, because the browser blocks fetching from local file paths. The default loading path can be changed by editing the `src` attribute in the first script tag with the id `mdContent`.
+
+*IMHO:* My setup is [VSCode](https://code.visualstudio.com/) with the extension [Live Preview](https://marketplace.visualstudio.com/items?itemName=ms-vscode.live-server). This will host the `index.html` locally without headache and works as a live preview of the content.
+
+</div>
 
 
+
+<div>
 
 ### Customization
 Because the tool is just a static HTML file, any customizations can be made immediately. The default paper style and behavior is embedded directly in the `index.html`. There are options to define basic layout and appearance by the `<Config>` tag, which is documented in detail in the section '<a href="#h3-5">3.5. Layout configuration</a>'.
@@ -94,7 +113,11 @@ If the standard or extended markdown elements do not fit your needs, any almost 
 
 The restriction is that you can use only static compiled resources libraries, there is no support for NPM modules or TypeScript, except you are adding this support by yourself.
 
+</div>
 
+
+
+<div>
 
 ### Printing
 The main purpose of this tool is to create a PDF through the browsers print option. Thus all pages are exactly shaped as A4 in portrait orientation, because this is the common format for documentations or papers. This trick and the browser printing have some limitations that cannot be avoided, because JavaScript is not allowed to modify printing options.
@@ -103,16 +126,23 @@ If there is the need of another paper size like A5, the sizes has to be edited i
 
 When printing, any padding of the page should be removed. The printing border is already handled by the page layout, allowing for individual configuration.
 
+</div>
 
+
+<div>
 
 ### Dependencies
-This projects stands on the following JavaScript libraries, they are required and loaded from CDN to handle your markdown content:
+This projects is based on following JavaScript libraries, they are required and loaded from CDN to handle your markdown content:
 - [marked.js](https://github.com/markedjs/marked) - A low-level markdown to HTML parser.
 - [MathJax](https://www.mathjax.org/) - For rendering mathematical notations.
+- [DrawIO](https://app.diagrams.net/) - For rendering diagrams.
 
 If you need to run this tool in a complete offline environment, you can download the required libraries and include them locally.
 
+</div>
 
+
+<div>
 
 ### Motivation
 Since I have a small lecture at my local university in addition to my full-time job as a software developer, I wanted to provide my students with an engaging script to follow throughout the course. I was looking for a simple straight forward tool.
@@ -123,20 +153,26 @@ I am sick of installing hundreds of megabytes just to complete a simple task. I 
 
 Thus I created this simple tool to write and edit my script easily and on any device or platform.
 
+</div>
 
+
+
+<div>
 
 ### Contributing
-Feel free to make this tool valuable for your needs and other people. Please contribute your ideas, improvements, or fixes by pull requests.
+Feel free to make this tool valuable for your needs and other people. Please contribute your ideas, improvements, or fixes by pull requests. Feel free to create issues for formatting errors, documentation improvements and feature requests.
+
 Please keep following guidelines for contributions:
 - The `index.html` should stay the only file required to run the tool, do not add additional files or folders as dependencies. I want this too to be as lightweight and accessible as possible.
 - Do not add a CSS framework. All styling made should be included in the `index.html` file. The formatting should be kept simple and minimal, everything else is the choice of the user and can be added by themself.
 
+</div>
 
 
 <ColumnBreak></ColumnBreak>
 
 ## Writing markdown
-The library marked.js[mdMarked] is used for parsing and compiling markdown. Thus all common markdown syntax is supported. The following sections show the apeareance of standard markdown elements.
+The library marked.js[mdMarked] is used for parsing and compiling markdown. Thus all common markdown syntax is supported. The following sections show the appearance of standard markdown elements.
 
 <div>
 
@@ -393,7 +429,13 @@ All sections content is grouped together, no section should spread over multiple
 <div>
 
 ### References & Sublines
-Images, formulars, quotes and tables often need additional context or a label to refer from the paragraphs. To encode the label, enumerate the references and attatch them propertly to the corresponding elements, the `<ref>` tag can be used.
+Images, formulars, quotes and tables often need additional context or a label to refer from the paragraphs. Use the `<ref>` tag to define citations, references or footnotes.
+
+#### Citations
+
+#### Footnotes
+
+#### Sublines
 
 Write the `<ref>` tag directly after the element you want to label. Any element like lists, figures or tables can be labeled this way. The tag required two attributes to be configured:
 - **`id`** For the reference label, which can be used to refer to this subline.
