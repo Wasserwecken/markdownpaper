@@ -47,14 +47,22 @@
             --font-annotation-size: 0.8rem;
         }
 
+        #pages {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem auto;
+        }
+
         .page {
+            flex: none;
             position: relative;
             display: flex;
             flex-direction: column;
 
             width: var(--paper-width);
             height: var(--paper-height);
-            margin: 2rem auto;
             padding: 0 var(--paper-space);
 
             background: var(--paper-bg-color);
@@ -106,6 +114,25 @@
             border: 5px dashed #1C6EA4;
             border-radius: 2rem;
             cursor: pointer;
+        }
+
+
+        @media print {
+
+            html,
+            body {
+                background: var(--paper-bg-color);
+            }
+
+            #pages {
+                display: block;
+                margin: 0;
+            }
+
+            .page {
+                box-shadow: none;
+                break-inside: avoid;
+            }
         }
     </style>
 
@@ -218,21 +245,6 @@
             white-space: pre-wrap;
             word-wrap: break-word;
         }
-
-
-        @media print {
-
-            html,
-            body {
-                background: var(--paper-bg-color);
-            }
-
-            .page {
-                margin: 0;
-                box-shadow: none;
-                break-inside: avoid;
-            }
-        }
     </style>
 
     <style id="cssMarkdownExtensions">
@@ -314,6 +326,10 @@
 </head>
 
 <body>
+
+    <div id="pages">
+
+    </div>
 
     <div id="file-picker" class="page">
         <div id="file-picker-page" style="margin: auto; opacity: 66%;">
@@ -703,7 +719,7 @@
             newPageDiv.querySelector('.page-header').appendChild(pageNo);
             newPageDiv.querySelector('.page-footer').appendChild(pageNo.cloneNode(true));
 
-            document.body.appendChild(newPageDiv);
+            document.querySelector('#pages').appendChild(newPageDiv);
             ApplyConfig(config, newPageDiv.id);
             return pageList.at(-1).Columns.at(-1);
         }
