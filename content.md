@@ -405,19 +405,31 @@ When parsed, a enumerated label of the specified type is generated and all refer
 > "This is my personal Quote, may stating something important!"
 
 <ref id="myQuote" type="quote">
-If there is important context to this quote, it could be included here as subtext.
+This is an important addition to the quote.
 </ref>
 
-This paragraph can now refer to the quote[myQuote] by using the quote id.
+<img src="./.doc/sailboat.bmp"/>
+
+<ref id="myFig" type="figure">
+I did not expect using Lorem Ipsum that much after I knew about it.
+</ref>
+
+This paragraph can now refer to the quote[myQuote] by using the quote id and also to the [myFig] showing off the linking.
 ```
 ---
 > "This is my personal Quote, may stating something important!"
 
 <ref id="myQuote" type="quote">
-If there would be some important context to this quote, it could be included here.
+This is an important addition to the quote.
 </ref>
 
-Any paragraph can now refer to the quote[myQuote] by using the quote id.
+<img src="./.doc/sailboat.bmp"/>
+
+<ref id="myFig" type="figure">
+I did not expect using Lorem Ipsum that much in my liver after I knew about it.
+</ref>
+
+This paragraph can now refer to the quote[myQuote] by using the quote id and also to the [myFig] showing off the linking.
 </div>
 
 <div>

@@ -327,13 +327,12 @@
 
 <body>
 
-    <div id="pages">
-
-    </div>
+    <div id="pages"></div>
 
     <div id="file-picker" class="page">
-        <div id="file-picker-page" style="margin: auto; opacity: 66%;">
-            <h2>Drag your markdown file here or click to pick</h2>
+        <div id="file-picker-page" style="margin: auto; opacity: 66%; text-align: center;">
+            <h2>Drag and drop your markdown </h2>
+            <h2>Or click to pick</h2>
             <input id="file-picker-input" style="position:absolute; top:-2rem; display: none;" type="file"
                 accept=".md,text/markdown,text/plain" />
         </div>
@@ -879,7 +878,7 @@
             if (markdownContent) {
                 await Render(templates, markdownContent);
             } else {
-                document.body.appendChild(templates.FilePicker);
+                document.querySelector('#pages').appendChild(templates.FilePicker);
             }
         };
 
