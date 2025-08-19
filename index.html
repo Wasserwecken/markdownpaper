@@ -317,10 +317,6 @@
             margin-left: 1rem;
         }
 
-        .toc-list-root {
-            text-align: unset !important;
-        }
-
         .toc-list-item {
             width: 100%;
             display: flex;
@@ -553,16 +549,10 @@
             // build the table of contens if defined.
             let tocDiv = contentDiv.querySelector('TableOfContents');
             if (tocDiv) {
+                tocDiv.innerHTML = marked.parse(tocDiv.innerHTML);
+                let previousLevel = 0;
+                let levelList = tocDiv;
                 const tocDepth = parseInt(tocDiv.getAttribute('depth')) || 5;
-                tocDivReplacement = document.createElement('div');
-                tocDivReplacement.innerHTML = marked.parse(tocDiv.innerHTML);
-                tocDiv.replaceWith(tocDivReplacement);
-                tocDiv = tocDivReplacement;
-
-                tocDiv.appendChild(templates.TocList.cloneNode(false));
-                let levelList = tocDiv.lastChild;
-                let previousLevel = 1;
-                levelList.classList.add('toc-list-root');
 
                 for (const heading of headings) {
                     const level = parseInt(heading.tagName[1]) - 1;
@@ -582,14 +572,22 @@
                         }
                     }
                     else if (previousLevel > level) {
-                        while (previousLevel != level && previousLevel > 1) {
+                        levelList = levelList.parentNode;
+                        while (previousLevel > level && previousLevel >= 0) {
                             levelList = levelList.parentNode;
                             previousLevel -= 1;
                         }
+                        levelList.appendChild(templates.TocList.cloneNode(false));
+                        levelList = levelList.lastChild;
                     }
 
                     levelList.appendChild(tocItem);
                 }
+
+                for (const item of [...tocDiv.childNodes]) {
+                    tocDiv.parentNode.insertBefore(item, tocDiv);
+                }
+                tocDiv.remove();
             }
         }
 
@@ -690,7 +688,7 @@
                 }
 
                 for (const [refId, srcItem] of footRefs) {
-                    const linkLabel = `<sup>${srcItem.id}</sup>`;
+                    const linkLabel = `<sup class="ref-link" refId="${refId}"></sup>`;
                     item.innerHTML = item.innerHTML.replaceAll(`[${srcItem.id}]`, linkLabel);
                 }
             }
@@ -789,6 +787,27 @@
             }
         }
 
+        async function AppendPageElement(templates, footNotes, currentPage, contentItem) {
+            currentPage.Columns.at(-1).appendChild(contentItem);
+
+            const footRefUses = contentItem.querySelectorAll('sup.ref-link');
+            for (const footRefUse of footRefUses) {
+                const refId = footRefUse.getAttribute('refId');
+                let footItem = currentPage.Footer.querySelector(`#${refId}`);
+                if (!footItem) {
+                    const footNote = footNotes.find(e => e.id == refId);
+                    const footId = currentPage.Footer.childNodes.length + 1;
+                    const footContent = marked.parse(footNote.innerHTML);
+                    footItem = templates.RefFoot.cloneNode(true);
+                    footItem.id = refId;
+                    footItem.querySelector('.ref-foot-id').innerHTML = footId;
+                    footItem.querySelector('.ref-foot-content').innerHTML = footContent;
+                    currentPage.Footer.appendChild(footItem);
+                }
+                footRefUse.innerHTML = footItem.querySelector('.ref-foot-id').innerHTML;
+            }
+        }
+
         /**
          * Places the markdown elements into the pages, creates new columns and pages as needed.
          * @param {Object} templates - The templates used for creating new pages and columns.
@@ -805,9 +824,7 @@
 
             // adds the first page
             const pageList = [];
-            let currentColumn = AddPage(templates, config, pageList);
-            let previousHeading = null;
-
+            AddPage(templates, config, pageList);
             for (let item of [...contentDiv.children]) {
 
                 // Add a new page or clolumn
@@ -820,48 +837,25 @@
                     config.FontSize = pageBreak.getAttribute('FontSize') ?? config.FontSize;
                     config.FontFamily = pageBreak.getAttribute('FontFamily') ?? config.FontFamily;
                     config.TextAlign = pageBreak.getAttribute('TextAlign') ?? config.TextAlign;
-                    currentColumn = AddPage(config, pageList, pageTemplate);
+                    AddPage(config, pageList, pageTemplate);
                 }
                 else if (item.querySelector('ColumnBreak')) {
-                    currentColumn = AddColumn(templates, config, pageList);
+                    AddColumn(templates, config, pageList);
                 }
 
                 // place the element in the current column
-                if (!['PAGEBREAK', 'COLUMNBREAK'].includes(item.tagName)) {
-                    currentColumn.appendChild(item);
-                }
-
+                await AppendPageElement(templates, footNotes, pageList.at(-1), item);
 
                 // check if the item is overflowing the page grid and move it to the next column.
                 gridBottom = pageList.at(-1).Grid.getBoundingClientRect();
                 itemBottom = item.getBoundingClientRect();
                 if (itemBottom.bottom > gridBottom.bottom) {
-                    currentColumn = AddColumn(templates, config, pageList);
-                    if (previousHeading)
-                        currentColumn.appendChild(previousHeading);
-                    currentColumn.appendChild(item);
-                }
+                    AddColumn(templates, config, pageList);
 
-                const footRefs = item.querySelectorAll('sup');
-                for (const footRef of footRefs) {
-                    let footItem = pageList.at(-1).Footer.querySelector(`#${footRef.innerHTML}`);
-                    if (!footItem) {
-                        for (const note of footNotes) {
-                            if (footRef.innerHTML == note.id) {
-                                const footId = pageList.at(-1).Footer.childNodes.length + 1;
-                                const footContent = marked.parse(note.innerHTML);
-                                footItem = templates.RefFoot.cloneNode(true);
-                                footItem.id = note.id;
-                                footItem.querySelector('.ref-foot-id').innerHTML = footId;
-                                footItem.querySelector('.ref-foot-content').innerHTML = footContent;
-                                pageList.at(-1).Footer.appendChild(footItem);
-                            }
-                        }
-                    }
-                    footRef.innerHTML = footItem.querySelector('.ref-foot-id').innerHTML;
+                    if (/^H[1-6]$/.test(item.previousElementSibling?.tagName))
+                        pageList.at(-1).Columns.at(-1).appendChild(item.previousElementSibling);
+                    await AppendPageElement(templates, footNotes, pageList.at(-1), item);
                 }
-
-                previousHeading = /^H[1-6]$/.test(item.tagName) ? item : null;
             }
 
             return pageList;
@@ -874,20 +868,18 @@
          * @param {Element[]} pageList - The list of pages.
          */
         async function EvaluatePageNo(pageList) {
-            const pageDivList = pageList.map(e => e.Page);
-            let tocDiv = document.querySelector('.toc-list');
-            if (tocDiv) {
-                for (const item of tocDiv.querySelectorAll('a')) {
-                    const href = item.getAttribute("href")
-                    if (href.startsWith('#')) {
-                        const target = document.querySelector(href);
-                        let page = target.parentNode;
-                        while (!page.classList.contains('page')) {
-                            page = page.parentNode;
-                        }
-                        const pageNo = pageDivList.indexOf(page) + 1;
-                        item.querySelector('.toc-list-item-page').innerHTML = pageNo;
+            const pageDivList = pageList.map(e => e.Page)
+            const tocItems = document.querySelectorAll('a.toc-list-item');
+            for (const item of tocItems) {
+                const href = item.getAttribute("href")
+                if (href.startsWith('#')) {
+                    const target = document.querySelector(href);
+                    let page = target.parentNode;
+                    while (!page.classList.contains('page')) {
+                        page = page.parentNode;
                     }
+                    const pageNo = pageDivList.indexOf(page) + 1;
+                    item.querySelector('.toc-list-item-page').innerHTML = pageNo;
                 }
             }
         }
