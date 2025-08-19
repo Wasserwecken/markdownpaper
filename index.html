@@ -664,6 +664,13 @@
                 }
             }
 
+            if (srcRefList){
+                for (const item of [...srcRefList.childNodes]) {
+                    srcRefList.parentNode.insertBefore(item, srcRefList);
+                }
+                srcRefList.remove();
+            }
+
             // replace the link ids with the labels and actual links.
             for (const item of contentDiv.querySelectorAll('*')) {
                 // skip special elements because they are expected to hold raw data.
