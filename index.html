@@ -99,12 +99,12 @@
             top: 0rem;
         }
 
-        .page-grid {
+        .page-content {
             min-height: 0;
             height: 100%;
-            display: grid;
-            gap: 2rem;
-            grid-template-columns: 1fr 1fr;
+            column-count: 2;
+            column-gap: 2rem;
+            column-fill: auto;
             padding-right: var(--cornell-space);
         }
 
@@ -116,6 +116,10 @@
             border: 5px dashed #1C6EA4;
             border-radius: 2rem;
             cursor: pointer;
+        }
+
+        .column-break {
+            break-before: column;
         }
 
 
@@ -151,6 +155,7 @@
         h5,
         h6 {
             margin: 2rem 0 0 0;
+            break-after: avoid;
         }
 
         h1 {
@@ -356,13 +361,17 @@
     </div>
 
     <div id="page-template" class="page">
-        <div class="page-header"></div>
-        <div class="page-top"></div>
-        <div class="page-grid">
-            <div class="page-column"></div>
+        <div class="page-header">
+            <p class="page-no"></p>
         </div>
+
+        <div class="page-top"></div>
+        <div class="page-content"></div>
         <div class="page-bottom"></div>
-        <div class="page-footer"></div>
+
+        <div class="page-footer">
+            <p class="page-no"></p>
+        </div>
     </div>
 
     <div id="toc-list-template" class="toc-list">
@@ -744,73 +753,44 @@
 
 
         /**
-         * Adds a new page to the document, with a initial column.
-         * @returns {Element} - The column of the newly created page element.
+         * Adds a new page to the document.
          */
         function AddPage(templates, config, pageList) {
             const newPageDiv = templates.Page.cloneNode(true);
             const newPage = {
                 Page: newPageDiv,
-                Grid: newPageDiv.querySelector('.page-grid'),
-                Header: newPageDiv.querySelector('.page-top'),
-                Footer: newPageDiv.querySelector('.page-bottom'),
-                Columns: [newPageDiv.querySelector('.page-column')],
+                Header: newPageDiv.querySelector('.page-header'),
+                Top: newPageDiv.querySelector('.page-top'),
+                Content: newPageDiv.querySelector('.page-content'),
+                Bottom: newPageDiv.querySelector('.page-bottom'),
+                Footer: newPageDiv.querySelector('.page-footer'),
             }
             pageList.push(newPage);
 
-            const pageNo = document.createElement('p');
-            pageNo.classList.add('page-no');
-            pageNo.innerText = `${pageList.length}`;
-            newPageDiv.id = `page-${pageList.length}`;
-            newPageDiv.querySelector('.page-header').appendChild(pageNo);
-            newPageDiv.querySelector('.page-footer').appendChild(pageNo.cloneNode(true));
+            newPage.Page.id = `page-${pageList.length}`;
+            newPage.Header.querySelector('.page-no').innerHTML = pageList.length;
+            newPage.Footer.querySelector('.page-no').innerHTML = pageList.length;
 
-            document.querySelector('#pages').appendChild(newPageDiv);
+            document.querySelector('#pages').appendChild(newPage.Page);
             ApplyConfig(config, newPageDiv.id);
-            return pageList.at(-1).Columns.at(-1);
-        }
-
-        /**
-         * Adds a new column to the current page. If the grid is full, a new page is created.
-         * @param {Object} currentPage - The current page object.
-         * @returns {Element} - The newly created column element.
-         */
-        function AddColumn(templates, config, pageList) {
-            const currentPage = pageList.at(-1);
-            const currentColumn = currentPage.Columns.at(-1);
-            const newColumn = currentColumn.cloneNode(false);
-            currentColumn.parentElement.appendChild(newColumn);
-
-            // if the column has the same height, it was added next to the other one.
-            const currTop = currentColumn.getBoundingClientRect().top;
-            const newTop = newColumn.getBoundingClientRect().top;
-            if (currTop == newTop) {
-                currentPage.Columns.push(newColumn);
-                return newColumn;
-            }
-            // if not, there are more columns than definitions, thus a new page is required.
-            else {
-                newColumn.remove();
-                return AddPage(templates, config, pageList);
-            }
         }
 
         async function AppendPageElement(templates, footNotes, currentPage, contentItem) {
-            currentPage.Columns.at(-1).appendChild(contentItem);
+            currentPage.Content.appendChild(contentItem);
 
             const footRefUses = contentItem.querySelectorAll('sup.ref-link');
             for (const footRefUse of footRefUses) {
                 const refId = footRefUse.getAttribute('refId');
-                let footItem = currentPage.Footer.querySelector(`#${refId}`);
+                let footItem = currentPage.Bottom.querySelector(`#${refId}`);
                 if (!footItem) {
                     const footNote = footNotes.find(e => e.id == refId);
-                    const footId = currentPage.Footer.childNodes.length + 1;
+                    const footId = currentPage.Bottom.childNodes.length + 1;
                     const footContent = marked.parse(footNote.innerHTML);
                     footItem = templates.RefFoot.cloneNode(true);
                     footItem.id = refId;
                     footItem.querySelector('.ref-foot-id').innerHTML = footId;
                     footItem.querySelector('.ref-foot-content').innerHTML = footContent;
-                    currentPage.Footer.appendChild(footItem);
+                    currentPage.Bottom.appendChild(footItem);
                 }
                 footRefUse.innerHTML = footItem.querySelector('.ref-foot-id').innerHTML;
             }
@@ -818,8 +798,8 @@
 
         async function CleanupFootnotes(currentPage) {
             const usedFootIds = [];
-            currentPage.Columns.forEach(c => c.querySelectorAll('sup.ref-link')
-                .forEach(f => usedFootIds.push(f.getAttribute('refId'))));
+            currentPage.Content.querySelectorAll('sup.ref-link')
+                .forEach(f => usedFootIds.push(f.getAttribute('refId')));
 
             const footNotes = currentPage.Footer.querySelectorAll('.ref-foot');
             for (const note of footNotes) {
@@ -864,25 +844,25 @@
                         config.FontSize = pageBreak.getAttribute('FontSize') ?? config.FontSize;
                         config.FontFamily = pageBreak.getAttribute('FontFamily') ?? config.FontFamily;
                         config.TextAlign = pageBreak.getAttribute('TextAlign') ?? config.TextAlign;
-                        AddPage(config, pageList, pageTemplate);
+                        AddPage(templates, config, pageList);
                     }
                     else if (item.querySelector('ColumnBreak')) {
-                        AddColumn(templates, config, pageList);
+                        item.classList.add('column-break');
                     }
 
                     // place the element in the current column
                     await AppendPageElement(templates, footNotes, pageList.at(-1), item);
 
                     // check if the item is overflowing the page grid and move it to the next column.
-                    gridBottom = pageList.at(-1).Grid.getBoundingClientRect();
-                    itemBottom = item.getBoundingClientRect();
-                    if (itemBottom.bottom > gridBottom.bottom) {
+                    gridRect = pageList.at(-1).Content.getBoundingClientRect();
+                    itemRect = item.getBoundingClientRect();
+                    if (itemRect.bottom > gridRect.bottom || itemRect.right > gridRect.right) {
                         const previousNode = item.previousElementSibling
                         item.remove();
 
                         await CleanupFootnotes(pageList.at(-1));
+                        AddPage(templates, config, pageList);
 
-                        AddColumn(templates, config, pageList);
                         if (/^H[1-6]$/.test(previousNode?.tagName))
                             pageList.at(-1).Columns.at(-1).appendChild(previousNode);
                         await AppendPageElement(templates, footNotes, pageList.at(-1), item);
