@@ -110,6 +110,8 @@
 
         .page-content>* {
             break-inside: avoid;
+            display: inline-block;
+            width: 100%;
         }
 
         #page-template {
@@ -757,12 +759,30 @@
             contentDiv.remove();
         }
 
+        /**
+         *
+         */
+        function CleanupFootnotes(currentPage) {
+            const usedFootIds = [];
+            currentPage.Content.querySelectorAll('sup.ref-link')
+                .forEach(f => usedFootIds.push(f.getAttribute('refId')));
 
+            const footNotes = currentPage.Footer.querySelectorAll('.ref-foot');
+            for (const note of footNotes) {
+                if (!usedFootIds.includes(note.id)) {
+                    note.remove();
+                }
+            }
+        }
 
         /**
          * Adds a new page to the document.
          */
         function AddPage(templates, config, pageList) {
+            if (pageList.length > 0) {
+                CleanupFootnotes(pageList.at(-1));
+            }
+
             const newPageDiv = templates.Page.cloneNode(true);
             const newPage = {
                 Page: newPageDiv,
@@ -780,6 +800,7 @@
 
             document.querySelector('#pages').appendChild(newPage.Page);
             ApplyConfig(config, newPageDiv.id);
+
         }
 
         async function AppendPageElement(templates, footNotes, currentPage, contentItem) {
@@ -800,19 +821,6 @@
                     currentPage.Bottom.appendChild(footItem);
                 }
                 footRefUse.innerHTML = footItem.querySelector('.ref-foot-id').innerHTML;
-            }
-        }
-
-        async function CleanupFootnotes(currentPage) {
-            const usedFootIds = [];
-            currentPage.Content.querySelectorAll('sup.ref-link')
-                .forEach(f => usedFootIds.push(f.getAttribute('refId')));
-
-            const footNotes = currentPage.Footer.querySelectorAll('.ref-foot');
-            for (const note of footNotes) {
-                if (!usedFootIds.includes(note.id)) {
-                    note.remove();
-                }
             }
         }
 
@@ -867,11 +875,10 @@
                         const previousNode = item.previousElementSibling
                         item.remove();
 
-                        await CleanupFootnotes(pageList.at(-1));
                         AddPage(templates, config, pageList);
 
                         if (/^H[1-6]$/.test(previousNode?.tagName))
-                            pageList.at(-1).Columns.at(-1).appendChild(previousNode);
+                            pageList.at(-1).Content.appendChild(previousNode);
                         await AppendPageElement(templates, footNotes, pageList.at(-1), item);
                     }
                 }
