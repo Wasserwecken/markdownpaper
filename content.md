@@ -1,4 +1,4 @@
-<Config columns=2 padding="16mm" fontSize="9pt" hyphens="auto" textAlign="justify" fontFamily="'Linux Libertine O', math, Georgia, serif" CornellSize="0mm"></Config>
+<Config columns=2 padding="16mm" fontSize="9pt" hyphens="auto" textAlign="justify" fontFamily="'LMRoman10', Georgia, serif" CornellSize="0mm"></Config>
 
 <Header>
 This here defines the header content for all pages.
