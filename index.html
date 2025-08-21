@@ -871,14 +871,14 @@
                 gridBottom = pageList.at(-1).Grid.getBoundingClientRect();
                 itemBottom = item.getBoundingClientRect();
                 if (itemBottom.bottom > gridBottom.bottom) {
+                    const previousNode = item.previousElementSibling
                     item.remove();
 
                     await CleanupFootnotes(pageList.at(-1));
 
-
                     AddColumn(templates, config, pageList);
-                    if (/^H[1-6]$/.test(item.previousElementSibling?.tagName))
-                        pageList.at(-1).Columns.at(-1).appendChild(item.previousElementSibling);
+                    if (/^H[1-6]$/.test(previousNode?.tagName))
+                        pageList.at(-1).Columns.at(-1).appendChild(previousNode);
                     await AppendPageElement(templates, footNotes, pageList.at(-1), item);
                 }
             }
