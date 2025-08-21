@@ -7,6 +7,17 @@ Write content, focus on content. Layout ain't your problem.
 
 
 
+## Extended Markdown
+- [x] Citations
+- [x] Footnotes
+- [x] Sublines for figures, tables, etc.
+- [x] Diagrams
+- [x] Table of contents
+- [x] Multi Column Layout
+- [x] Per page layout settings
+
+
+
 ## Documentation & Demo
 - [Documentation](https://feralex.github.io/markdownpaper/)
 - [Demo](https://feralex.github.io/markdownpaper/)
@@ -46,16 +57,6 @@ Because the tool is just a static HTML file, any customizations can be made imme
 If the standard or extended markdown elements do not fit your needs, any almost any CSS framework and JavaScript library can be added to the `index.html`. The only restriction is the use of static resources, there is no support for NPM modules or TypeScript out of the box.
 
 The restriction is that you can use only static compiled resources libraries, there is no support for NPM modules or TypeScript, except you are adding this support by yourself.
-
-
-
-### Dependencies
-This projects is based on following JavaScript libraries, they are required and loaded from CDN to handle your markdown content:
-- [marked.js](https://github.com/markedjs/marked) - A low-level markdown to HTML parser.
-- [MathJax](https://www.mathjax.org/) - For rendering mathematical notations.
-- [DrawIO](https://app.diagrams.net/) - For rendering diagrams.
-
-If you need to run this tool in a complete offline environment, you can download the required libraries and include them locally.
 
 
 

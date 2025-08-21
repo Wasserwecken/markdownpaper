@@ -513,7 +513,7 @@ The table of contents at the beginning of this document is renderd by the shown 
 </div>
 
 
-### Wide content
+### Column span
 TODO TODO
 
 

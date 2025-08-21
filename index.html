@@ -847,7 +847,11 @@
             const pageList = [];
             AddPage(templates, config, pageList);
             for (const contentItem of [...contentDiv.children]) {
-                const content = [contentItem];
+                let content = [contentItem];
+
+                if (content.tagName == 'COLUMNSPAN' && config.Columns == 1) {
+                    content = [...contentItem.childNodes];
+                }
 
                 for (const item of content) {
                     // Add a new page or clolumn
