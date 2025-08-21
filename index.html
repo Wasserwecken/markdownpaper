@@ -196,7 +196,6 @@
             width: 100%;
             max-width: 100%;
             border-radius: 0.25rem;
-            border: 1px solid #000000;
         }
 
         table {
@@ -235,7 +234,7 @@
             font-size: var(--font-annotation-size);
 
             border-radius: 0.25rem;
-            border: 1px solid #000000;
+            border: 1px solid #c2c2c2;
         }
 
         pre code {
@@ -248,7 +247,12 @@
     </style>
 
     <style id="cssMarkdownExtensions">
+        .ref-sub {
+            margin: 1rem 0;
+        }
+
         .ref-sub-line {
+            opacity: 66%;
             display: flex;
             gap: 0.5rem;
             align-items: baseline;
@@ -261,27 +265,28 @@
 
         .ref-sub-content * {
             font-style: italic;
-            text-align: unset;
+            text-align: unset !important;
         }
 
-        .ref-sub-line p:first-of-type {
+        .ref-sub-line *:first-of-type {
             margin: 0;
         }
 
         .ref-list-item {
             display: flex;
+            margin: 0.5rem 0;
             align-items: first baseline;
             font-size: var(--font-annotation-size);
         }
 
-        .ref-list-item p:first-of-type {
-            margin: 0.5rem;
+        .ref-list-item *:first-of-type {
+            margin: 0;
         }
 
         .ref-list-id {
             flex: none;
             display: inline-block;
-            width: 1rem;
+            width: 1.5rem;
         }
 
         .ref-list-item * {
@@ -293,12 +298,24 @@
             text-decoration: underline;
         }
 
-        .toc-list {
-            margin-left: 1rem;
+        .ref-foot {
+            opacity: 66%;
+            font-size: var(--font-annotation-size);
+            display: flex;
+            gap: 0.5rem;
+            margin: 0.25rem 0;
         }
 
-        .toc-list-root {
-            margin-left: unset;
+        .ref-foot * {
+            text-align: unset !important;
+        }
+
+        .ref-foot *:first-of-type {
+            margin: 0;
+        }
+
+        .toc-list {
+            margin-left: 1rem;
         }
 
         .toc-list-item {
@@ -327,13 +344,12 @@
 
 <body>
 
-    <div id="pages">
-
-    </div>
+    <div id="pages"></div>
 
     <div id="file-picker" class="page">
-        <div id="file-picker-page" style="margin: auto; opacity: 66%;">
-            <h2>Drag your markdown file here or click to pick</h2>
+        <div id="file-picker-page" style="margin: auto; opacity: 66%; text-align: center;">
+            <h2>Drag and drop your markdown </h2>
+            <h2>Or click to pick</h2>
             <input id="file-picker-input" style="position:absolute; top:-2rem; display: none;" type="file"
                 accept=".md,text/markdown,text/plain" />
         </div>
@@ -369,6 +385,11 @@
             <div class="ref-sub-label"></div>
             <div class="ref-sub-content"></div>
         </div>
+    </div>
+
+    <div id="ref-foot-template" class="ref-foot">
+        <sup class="ref-foot-id"></sup>
+        <div class="ref-foot-content"></div>
     </div>
 
     <div id="drawio-frame" class="mxgraph" data-mxgraph='{"resize": true, {{content}}}'>
@@ -409,6 +430,10 @@
             refSub.id = '';
             refSub.remove();
 
+            refFoot = document.querySelector('#ref-foot-template');
+            refFoot.id = '';
+            refFoot.remove();
+
             const templates = {
                 DrawioFrame: drawioFrame,
                 FilePicker: filePicker,
@@ -419,7 +444,8 @@
                 TocListItem: tocListItem,
                 RefList: refList,
                 RefListItem: refListItem,
-                RefSub: refSub
+                RefSub: refSub,
+                RefFoot: refFoot,
             }
 
             filePicker.addEventListener("dragover", dragOverHandler);
@@ -524,16 +550,10 @@
             // build the table of contens if defined.
             let tocDiv = contentDiv.querySelector('TableOfContents');
             if (tocDiv) {
+                tocDiv.innerHTML = marked.parse(tocDiv.innerHTML);
+                let previousLevel = 0;
+                let levelList = tocDiv;
                 const tocDepth = parseInt(tocDiv.getAttribute('depth')) || 5;
-                tocDivReplacement = document.createElement('div');
-                tocDivReplacement.innerHTML = marked.parse(tocDiv.innerHTML);
-                tocDiv.replaceWith(tocDivReplacement);
-                tocDiv = tocDivReplacement;
-
-                tocDiv.appendChild(templates.TocList.cloneNode(false));
-                let levelList = tocDiv.lastChild;
-                let previousLevel = 1;
-                levelList.classList.add('toc-list-root');
 
                 for (const heading of headings) {
                     const level = parseInt(heading.tagName[1]) - 1;
@@ -553,14 +573,22 @@
                         }
                     }
                     else if (previousLevel > level) {
-                        while (previousLevel != level && previousLevel > 1) {
+                        levelList = levelList.parentNode;
+                        while (previousLevel > level && previousLevel >= 0) {
                             levelList = levelList.parentNode;
                             previousLevel -= 1;
                         }
+                        levelList.appendChild(templates.TocList.cloneNode(false));
+                        levelList = levelList.lastChild;
                     }
 
                     levelList.appendChild(tocItem);
                 }
+
+                for (const item of [...tocDiv.childNodes]) {
+                    tocDiv.parentNode.insertBefore(item, tocDiv);
+                }
+                tocDiv.remove();
             }
         }
 
@@ -572,8 +600,9 @@
          * @param {Element} contentDiv - Element holding all markdown defined content.
          */
         async function EvaluateReferences(templates, contentDiv) {
-            const srcReferences = [];
-            const linkReferences = {};
+            const srcRefs = [];
+            const footRefs = [];
+            const linkRefs = {};
 
             // prepare the reference list item.
             let srcRefList = contentDiv.querySelector('references');
@@ -588,10 +617,10 @@
                 const refId = reference.getAttribute('id');
                 const refType = reference.getAttribute('type');
 
-                // citation references are rendered in seperatly.
+                // citation references are rendered only in a reference lists.
                 if (refType == 'citation') {
-                    const refLabel = `[${srcReferences.length + 1}]`;
-                    srcReferences.push([refId, refLabel, reference]);
+                    const refLabel = `[${srcRefs.length + 1}]`;
+                    srcRefs.push([refId, refLabel, reference]);
                     reference.remove();
 
                     if (srcRefList) {
@@ -604,15 +633,20 @@
                     }
                 }
 
+                // footnotes are handled while building the pages.
+                else if (refType == 'footnote') {
+                    footRefs.push([refId, reference]);
+                }
+
                 // any other reference are treated as subline.
                 else {
-                    if (!(refType in linkReferences))
-                        linkReferences[refType] = [];
+                    if (!(refType in linkRefs))
+                        linkRefs[refType] = [];
 
                     // extract the ref infos and set a enumerated label.
-                    const refCount = linkReferences[refType].length + 1;
+                    const refCount = linkRefs[refType].length + 1;
                     const refLabel = `${refType.charAt(0).toUpperCase()}${refType.slice(1)} ${refCount}`;
-                    linkReferences[refType].push([refId, refLabel]);
+                    linkRefs[refType].push([refId, refLabel]);
 
                     const refContent = marked.parse(reference.innerHTML);
                     const refSub = templates.RefSub.cloneNode(true);
@@ -631,6 +665,13 @@
                 }
             }
 
+            if (srcRefList){
+                for (const item of [...srcRefList.childNodes]) {
+                    srcRefList.parentNode.insertBefore(item, srcRefList);
+                }
+                srcRefList.remove();
+            }
+
             // replace the link ids with the labels and actual links.
             for (const item of contentDiv.querySelectorAll('*')) {
                 // skip special elements because they are expected to hold raw data.
@@ -638,7 +679,7 @@
                     continue;
                 }
 
-                for (const [type, refs] of Object.entries(linkReferences)) {
+                for (const [type, refs] of Object.entries(linkRefs)) {
                     for (const [refId, refLabel] of refs) {
                         const linkLabel = `<a class="ref-link" href="#${refId}">[${refLabel}]</a>`;
 
@@ -649,9 +690,14 @@
                     }
                 }
 
-                for (const [srcId, srcLabel, srcItem] of srcReferences) {
+                for (const [srcId, srcLabel, srcItem] of srcRefs) {
                     const linkLabel = `<a class="ref-link" href="#${srcId}">${srcLabel}</a>`;
-                    item.innerHTML = item.innerHTML.replace(`[${srcId}]`, linkLabel);
+                    item.innerHTML = item.innerHTML.replaceAll(`[${srcId}]`, linkLabel);
+                }
+
+                for (const [refId, srcItem] of footRefs) {
+                    const linkLabel = `<sup class="ref-link" refId="${refId}"></sup>`;
+                    item.innerHTML = item.innerHTML.replaceAll(`[${srcItem.id}]`, linkLabel);
                 }
             }
         }
@@ -749,6 +795,27 @@
             }
         }
 
+        async function AppendPageElement(templates, footNotes, currentPage, contentItem) {
+            currentPage.Columns.at(-1).appendChild(contentItem);
+
+            const footRefUses = contentItem.querySelectorAll('sup.ref-link');
+            for (const footRefUse of footRefUses) {
+                const refId = footRefUse.getAttribute('refId');
+                let footItem = currentPage.Footer.querySelector(`#${refId}`);
+                if (!footItem) {
+                    const footNote = footNotes.find(e => e.id == refId);
+                    const footId = currentPage.Footer.childNodes.length + 1;
+                    const footContent = marked.parse(footNote.innerHTML);
+                    footItem = templates.RefFoot.cloneNode(true);
+                    footItem.id = refId;
+                    footItem.querySelector('.ref-foot-id').innerHTML = footId;
+                    footItem.querySelector('.ref-foot-content').innerHTML = footContent;
+                    currentPage.Footer.appendChild(footItem);
+                }
+                footRefUse.innerHTML = footItem.querySelector('.ref-foot-id').innerHTML;
+            }
+        }
+
         /**
          * Places the markdown elements into the pages, creates new columns and pages as needed.
          * @param {Object} templates - The templates used for creating new pages and columns.
@@ -757,11 +824,15 @@
          */
         async function BuildPages(templates, config, contentDiv) {
 
+            const footNotes = [...contentDiv.querySelectorAll('ref')]
+                .filter(e => e.getAttribute('type') == 'footnote');
+            for (const note of footNotes) {
+                note.remove();
+            }
+
             // adds the first page
             const pageList = [];
-            let currentColumn = AddPage(templates, config, pageList);
-            let previousHeading = null;
-
+            AddPage(templates, config, pageList);
             for (let item of [...contentDiv.children]) {
 
                 // Add a new page or clolumn
@@ -774,28 +845,25 @@
                     config.FontSize = pageBreak.getAttribute('FontSize') ?? config.FontSize;
                     config.FontFamily = pageBreak.getAttribute('FontFamily') ?? config.FontFamily;
                     config.TextAlign = pageBreak.getAttribute('TextAlign') ?? config.TextAlign;
-                    currentColumn = AddPage(config, pageList, pageTemplate);
+                    AddPage(config, pageList, pageTemplate);
                 }
                 else if (item.querySelector('ColumnBreak')) {
-                    currentColumn = AddColumn(templates, config, pageList);
-                }
-                // place the element in the current column
-                else {
-                    currentColumn.appendChild(item);
+                    AddColumn(templates, config, pageList);
                 }
 
+                // place the element in the current column
+                await AppendPageElement(templates, footNotes, pageList.at(-1), item);
 
                 // check if the item is overflowing the page grid and move it to the next column.
                 gridBottom = pageList.at(-1).Grid.getBoundingClientRect();
                 itemBottom = item.getBoundingClientRect();
                 if (itemBottom.bottom > gridBottom.bottom) {
-                    currentColumn = AddColumn(templates, config, pageList);
-                    if (previousHeading)
-                        currentColumn.appendChild(previousHeading);
-                    currentColumn.appendChild(item);
-                }
+                    AddColumn(templates, config, pageList);
 
-                previousHeading = /^H[1-6]$/.test(item.tagName) ? item : null;
+                    if (/^H[1-6]$/.test(item.previousElementSibling?.tagName))
+                        pageList.at(-1).Columns.at(-1).appendChild(item.previousElementSibling);
+                    await AppendPageElement(templates, footNotes, pageList.at(-1), item);
+                }
             }
 
             return pageList;
@@ -808,20 +876,18 @@
          * @param {Element[]} pageList - The list of pages.
          */
         async function EvaluatePageNo(pageList) {
-            const pageDivList = pageList.map(e => e.Page);
-            let tocDiv = document.querySelector('.toc-list');
-            if (tocDiv) {
-                for (const item of tocDiv.querySelectorAll('a')) {
-                    const href = item.getAttribute("href")
-                    if (href.startsWith('#')) {
-                        const target = document.querySelector(href);
-                        let page = target.parentNode;
-                        while (!page.classList.contains('page')) {
-                            page = page.parentNode;
-                        }
-                        const pageNo = pageDivList.indexOf(page) + 1;
-                        item.querySelector('.toc-list-item-page').innerHTML = pageNo;
+            const pageDivList = pageList.map(e => e.Page)
+            const tocItems = document.querySelectorAll('a.toc-list-item');
+            for (const item of tocItems) {
+                const href = item.getAttribute("href")
+                if (href.startsWith('#')) {
+                    const target = document.querySelector(href);
+                    let page = target.parentNode;
+                    while (!page.classList.contains('page')) {
+                        page = page.parentNode;
                     }
+                    const pageNo = pageDivList.indexOf(page) + 1;
+                    item.querySelector('.toc-list-item-page').innerHTML = pageNo;
                 }
             }
         }
@@ -879,7 +945,7 @@
             if (markdownContent) {
                 await Render(templates, markdownContent);
             } else {
-                document.body.appendChild(templates.FilePicker);
+                document.querySelector('#pages').appendChild(templates.FilePicker);
             }
         };
 

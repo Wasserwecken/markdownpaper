@@ -8,13 +8,6 @@ This here defines the header content for all pages.
 This here defines the footer content for all pages.
 </Footer>
 
-<Ref id="markdown" type="citation">
-*Markdown syntax*,
-John Gruber,
-*Markdown is a text-to-HTML conversion tool for web writers.*,
-2004,
-https://daringfireball.net/projects/markdown/
-</Ref>
 
 <Ref id="markdownpaper" type="citation">
 *markdownpaper*,
@@ -426,45 +419,21 @@ All sections content is grouped together, no section should spread over multiple
 </div>
 
 
-<div>
 
 ### References & Sublines
 Images, formulars, quotes and tables often need additional context or a label to refer from the paragraphs. Use the `<ref>` tag to define citations, references or footnotes.
 
-#### Citations
+The tag requires to attributes to be set:
+- **id** - Used to create internal references by using brackets.
+- **type** - Determines the behaviour and label for the reference.
 
-#### Footnotes
-
-#### Sublines
-
-Write the `<ref>` tag directly after the element you want to label. Any element like lists, figures or tables can be labeled this way. The tag required two attributes to be configured:
-- **`id`** For the reference label, which can be used to refer to this subline.
-- **`type`** Specifies the display label of the referenced element.
-
-When parsed, a enumerated label of the specified type is generated and all refers are replaced with that label.
-
-```
-> "This is my personal Quote, may stating something important!"
-
-<ref id="myQuote" type="quote">
-If there is important context to this quote, it could be included here as subtext.
-</ref>
-
-This paragraph can now refer to the quote[myQuote] by using the quote id.
-```
----
-> "This is my personal Quote, may stating something important!"
-
-<ref id="myQuote" type="quote">
-If there would be some important context to this quote, it could be included here.
-</ref>
-
-Any paragraph can now refer to the quote[myQuote] by using the quote id.
-</div>
 
 <div>
 
-But the `<ref>` tag is also utelized for external references, also known as 'citation', where a reference list is generated. If the tag type is set to `citation`, no subline is created, but the content is added to the `<References>` tag. This tag holds a list of all citations and can be placed anywhere.
+#### Citations
+Citations give credit to the original authors of ideas and information, help readers verify information and explore sources further. Set the `type` attribute to `citation` and place the information inside the tag anywhere in your document. The tag is not rendered inplace, but will be added to the reference list.
+
+Use the tag `<References>` to render the list of citations where you need to show them. All content inside the reference list tag will be rendered first and all citations are then listed below.
 
 ```
 <Ref id="markdown" type="citation">
@@ -480,9 +449,79 @@ https://daringfireball.net/projects/markdown/
 </References>
 ```
 ---
+<Ref id="markdown" type="citation">
+*Markdown syntax*,
+John Gruber,
+*Markdown is a text-to-HTML conversion tool for web writers.*,
+2004,
+https://daringfireball.net/projects/markdown/
+</Ref>
+
 <References>
 ## References
 </References>
+
+</div>
+
+
+
+<div>
+
+#### Footnotes
+To add small numbered notes with additional information at the bottom of a page. Set the `type` attribute to `footnote` and place the information inside the tag anywhere in your document. The tag is not rendered inplace, but will be rendered at the bottom of the page where the reference is refered to.
+
+```
+<Ref id="myFoot" type="footnote">
+In geometry, a **straight** line, usually abbreviated line, is an infinitely long object with no width, depth, or curvature, an idealization of such physical objects as a straightedge, a taut string, or a ray of light.
+</Ref>
+
+This line[myFoot] has an annotation to some additional information.
+```
+---
+<Ref id="myFoot" type="footnote">
+In geometry, a **straight** line, usually abbreviated line, is an infinitely long object with no width, depth, or curvature, an idealization of such physical objects as a straightedge, a taut string, or a ray of light.
+</Ref>
+
+This line[myFoot] has a annotation to some additional information.
+
+
+</div>
+
+
+
+<div>
+
+#### Sublines
+The `<ref>` is also used to annotate and label any element in the document. The element placed before the `ref` tag is then used as target for the annotation. Any element like lists, figures or tables can be labeled this way. Set the `type` attribute to anything else than `footnote` or `citation`, the given type name is then used as label for the subline and will be enumerated.
+
+```
+> "This is my personal Quote, may stating something important!"
+
+<ref id="myQuote" type="quote">
+This is an important addition to the quote.
+</ref>
+
+<img src="./.doc/sailboat.bmp"/>
+
+<ref id="myFig" type="figure">
+I did not expect using Lorem Ipsum that much after I knew about it.
+</ref>
+
+This paragraph can now refer to the quote[myQuote] by using the quote id and also to the [myFig] showing off the linking.
+```
+---
+> "This is my personal Quote, may stating something important!"
+
+<ref id="myQuote" type="quote">
+An addition to the quote would not improve the conclusion.
+</ref>
+
+<img src="./.doc/plot.png"/>
+
+<ref id="myFig" type="figure">
+There is a wobbly line in the figure to express something important.
+</ref>
+
 </div>
 
 
@@ -523,8 +562,6 @@ The `<PageBreak>` does not only force a new page, but can also later the look an
 
 ```
 <ColumnBreak></ColumnBreak>
-
-<PageBreak></PageBreak>
 
 <PageBreak Columns=1></PageBreak>
 ```
