@@ -45,6 +45,8 @@ Write content, focus on content. Layout ain't your problem.
 Do not expect that every single markdown will render correctly. The focus is on academic and printing content. Rendering elements that are larger than a single page are not supported (e.g. large code sections, endless lists, etc.). There are other tools to checkout for converting markdown into presentable HTML like [MkDocs](https://www.mkdocs.org/).
 
 
+<ColumnBreak></ColumnBreak>
+
 
 <TableOfContents>
 ## Content
@@ -278,6 +280,8 @@ Tables can be created using pipes (`|`) and hyphens (`-`). They will be rendered
 
 
 
+<ColumnBreak></ColumnBreak>
+
 ## Markdown Extensions
 There are several tags and behaviours to extend the markdown definitions. These extensions are the key of writing serious scripts with proper citations, sublines or table of contents.
 
@@ -354,6 +358,30 @@ The tag requires to attributes to be set:
 - **type** - Determines the behaviour and label for the reference.
 
 
+
+<div>
+
+#### Footnotes
+To add small numbered notes with additional information at the bottom of a page. Set the `type` attribute to `footnote` and place the information inside the tag anywhere in your document. The tag is not rendered inplace, but will be rendered at the bottom of the page where the reference is refered to.
+
+```
+<Ref id="myFoot" type="footnote">
+In geometry, a **straight** line, usually abbreviated line, is an infinitely long object with no width, depth, or curvature, an idealization of such physical objects as a straightedge, a taut string, or a ray of light.
+</Ref>
+
+This line[myFoot] has an annotation to some additional information.
+```
+---
+<Ref id="myFoot" type="footnote">
+In geometry, a **straight** line, usually abbreviated line, is an infinitely long object with no width, depth, or curvature, an idealization of such physical objects as a straightedge, a taut string, or a ray of light.
+</Ref>
+
+This line[myFoot] has a annotation to some additional information.
+
+</div>
+
+
+
 <div>
 
 #### Citations
@@ -386,30 +414,6 @@ https://daringfireball.net/projects/markdown/
 <References>
 ## References
 </References>
-
-</div>
-
-
-
-<div>
-
-#### Footnotes
-To add small numbered notes with additional information at the bottom of a page. Set the `type` attribute to `footnote` and place the information inside the tag anywhere in your document. The tag is not rendered inplace, but will be rendered at the bottom of the page where the reference is refered to.
-
-```
-<Ref id="myFoot" type="footnote">
-In geometry, a **straight** line, usually abbreviated line, is an infinitely long object with no width, depth, or curvature, an idealization of such physical objects as a straightedge, a taut string, or a ray of light.
-</Ref>
-
-This line[myFoot] has an annotation to some additional information.
-```
----
-<Ref id="myFoot" type="footnote">
-In geometry, a **straight** line, usually abbreviated line, is an infinitely long object with no width, depth, or curvature, an idealization of such physical objects as a straightedge, a taut string, or a ray of light.
-</Ref>
-
-This line[myFoot] has a annotation to some additional information.
-
 
 </div>
 
@@ -514,7 +518,18 @@ The table of contents at the beginning of this document is renderd by the shown 
 
 
 ### Column span
-TODO TODO
+asdasdad
+
+```
+<ColumnSpan>
+<drawio src="./.doc/graph.drawio"></drawio>
+</ColumnSpan>
+```
+---
+
+<ColumnSpan>
+<drawio src="./.doc/graph.drawio"></drawio>
+</ColumnSpan>
 
 
 

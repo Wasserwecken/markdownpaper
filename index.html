@@ -110,8 +110,6 @@
 
         .page-content>* {
             break-inside: avoid;
-            display: inline-block;
-            width: 100%;
         }
 
         #page-template {
@@ -125,10 +123,8 @@
         }
 
         .column-break {
-            break-before: column;
+            break-after: column;
             margin: 0;
-            display: none;
-
         }
 
 
@@ -317,7 +313,7 @@
             font-size: var(--font-annotation-size);
             display: flex;
             gap: 0.5rem;
-            margin: 0.25rem 0;
+            padding: 0.25rem 0;
         }
 
         .ref-foot * {
@@ -329,7 +325,7 @@
         }
 
         .toc-list {
-            margin-left: 1rem;
+            padding-left: 1rem;
         }
 
         .toc-list-item {
@@ -337,7 +333,7 @@
             display: flex;
             gap: .5rem;
             align-items: baseline;
-            margin: 0.125rem 0rem;
+            padding: 0.125rem 0rem;
         }
 
         .toc-list-item-dots {
@@ -840,30 +836,40 @@
 
             // adds the first page
             const pageList = [];
+            let topContent = [];
             AddPage(templates, config, pageList);
+
             for (const contentItem of [...contentDiv.children]) {
                 let content = [contentItem];
 
-                if (content.tagName == 'COLUMNSPAN' && config.Columns == 1) {
-                    content = [...contentItem.childNodes];
+                // Add a new page or clolumn
+                const pageBreak = contentItem.querySelector('PageBreak');
+                if (pageBreak) {
+                    config.Columns = pageBreak.getAttribute('Columns') ?? config.Columns;
+                    config.Padding = pageBreak.getAttribute('Padding') ?? config.Padding;
+                    config.Hyphens = pageBreak.getAttribute('Hyphens') ?? config.Hyphens;
+                    config.CornellSize = pageBreak.getAttribute('CornellSize') ?? config.CornellSize;
+                    config.FontSize = pageBreak.getAttribute('FontSize') ?? config.FontSize;
+                    config.FontFamily = pageBreak.getAttribute('FontFamily') ?? config.FontFamily;
+                    config.TextAlign = pageBreak.getAttribute('TextAlign') ?? config.TextAlign;
+                    AddPage(templates, config, pageList);
+                    topContent.forEach(e => pageList.at(-1).Top.appendChild(e));
+                    topContent = [];
+                }
+                else if (contentItem.querySelector('ColumnBreak')) {
+                    contentItem.classList.add('column-break');
+                }
+                else if (contentItem.querySelector('ColumnSpan')) {
+                    if (config.Columns == 1) {
+                        content = [...contentItem.childNodes];
+                    }
+                    else {
+                        topContent.push(...contentItem.childNodes)
+                    }
                 }
 
+                // iterate
                 for (const item of content) {
-                    // Add a new page or clolumn
-                    const pageBreak = item.querySelector('PageBreak');
-                    if (pageBreak) {
-                        config.Columns = pageBreak.getAttribute('Columns') ?? config.Columns;
-                        config.Padding = pageBreak.getAttribute('Padding') ?? config.Padding;
-                        config.Hyphens = pageBreak.getAttribute('Hyphens') ?? config.Hyphens;
-                        config.CornellSize = pageBreak.getAttribute('CornellSize') ?? config.CornellSize;
-                        config.FontSize = pageBreak.getAttribute('FontSize') ?? config.FontSize;
-                        config.FontFamily = pageBreak.getAttribute('FontFamily') ?? config.FontFamily;
-                        config.TextAlign = pageBreak.getAttribute('TextAlign') ?? config.TextAlign;
-                        AddPage(templates, config, pageList);
-                    }
-                    else if (item.querySelector('ColumnBreak')) {
-                        item.classList.add('column-break');
-                    }
 
                     // place the element in the current column
                     await AppendPageElement(templates, footNotes, pageList.at(-1), item);
@@ -876,6 +882,8 @@
                         item.remove();
 
                         AddPage(templates, config, pageList);
+                        topContent.forEach(e => pageList.at(-1).Top.appendChild(e));
+                        topContent = [];
 
                         if (/^H[1-6]$/.test(previousNode?.tagName))
                             pageList.at(-1).Content.appendChild(previousNode);
