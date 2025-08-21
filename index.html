@@ -823,7 +823,7 @@
 
             const footNotes = currentPage.Footer.querySelectorAll('.ref-foot');
             for (const note of footNotes) {
-                if (!usedFootIds.includes(note.id)){
+                if (!usedFootIds.includes(note.id)) {
                     note.remove();
                 }
             }
@@ -846,42 +846,46 @@
             // adds the first page
             const pageList = [];
             AddPage(templates, config, pageList);
-            for (let item of [...contentDiv.children]) {
+            for (const contentItem of [...contentDiv.children]) {
+                const content = [contentItem];
 
-                // Add a new page or clolumn
-                const pageBreak = item.querySelector('PageBreak');
-                if (pageBreak) {
-                    config.Columns = pageBreak.getAttribute('Columns') ?? config.Columns;
-                    config.Padding = pageBreak.getAttribute('Padding') ?? config.Padding;
-                    config.Hyphens = pageBreak.getAttribute('Hyphens') ?? config.Hyphens;
-                    config.CornellSize = pageBreak.getAttribute('CornellSize') ?? config.CornellSize;
-                    config.FontSize = pageBreak.getAttribute('FontSize') ?? config.FontSize;
-                    config.FontFamily = pageBreak.getAttribute('FontFamily') ?? config.FontFamily;
-                    config.TextAlign = pageBreak.getAttribute('TextAlign') ?? config.TextAlign;
-                    AddPage(config, pageList, pageTemplate);
-                }
-                else if (item.querySelector('ColumnBreak')) {
-                    AddColumn(templates, config, pageList);
-                }
+                for (const item of content) {
+                    // Add a new page or clolumn
+                    const pageBreak = item.querySelector('PageBreak');
+                    if (pageBreak) {
+                        config.Columns = pageBreak.getAttribute('Columns') ?? config.Columns;
+                        config.Padding = pageBreak.getAttribute('Padding') ?? config.Padding;
+                        config.Hyphens = pageBreak.getAttribute('Hyphens') ?? config.Hyphens;
+                        config.CornellSize = pageBreak.getAttribute('CornellSize') ?? config.CornellSize;
+                        config.FontSize = pageBreak.getAttribute('FontSize') ?? config.FontSize;
+                        config.FontFamily = pageBreak.getAttribute('FontFamily') ?? config.FontFamily;
+                        config.TextAlign = pageBreak.getAttribute('TextAlign') ?? config.TextAlign;
+                        AddPage(config, pageList, pageTemplate);
+                    }
+                    else if (item.querySelector('ColumnBreak')) {
+                        AddColumn(templates, config, pageList);
+                    }
 
-                // place the element in the current column
-                await AppendPageElement(templates, footNotes, pageList.at(-1), item);
-
-                // check if the item is overflowing the page grid and move it to the next column.
-                gridBottom = pageList.at(-1).Grid.getBoundingClientRect();
-                itemBottom = item.getBoundingClientRect();
-                if (itemBottom.bottom > gridBottom.bottom) {
-                    const previousNode = item.previousElementSibling
-                    item.remove();
-
-                    await CleanupFootnotes(pageList.at(-1));
-
-                    AddColumn(templates, config, pageList);
-                    if (/^H[1-6]$/.test(previousNode?.tagName))
-                        pageList.at(-1).Columns.at(-1).appendChild(previousNode);
+                    // place the element in the current column
                     await AppendPageElement(templates, footNotes, pageList.at(-1), item);
+
+                    // check if the item is overflowing the page grid and move it to the next column.
+                    gridBottom = pageList.at(-1).Grid.getBoundingClientRect();
+                    itemBottom = item.getBoundingClientRect();
+                    if (itemBottom.bottom > gridBottom.bottom) {
+                        const previousNode = item.previousElementSibling
+                        item.remove();
+
+                        await CleanupFootnotes(pageList.at(-1));
+
+                        AddColumn(templates, config, pageList);
+                        if (/^H[1-6]$/.test(previousNode?.tagName))
+                            pageList.at(-1).Columns.at(-1).appendChild(previousNode);
+                        await AppendPageElement(templates, footNotes, pageList.at(-1), item);
+                    }
                 }
             }
+
 
             return pageList;
         }
