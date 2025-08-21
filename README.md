@@ -8,12 +8,12 @@ Write content, focus on content. Layout ain't your problem.
 
 
 ## Extended Markdown
+- [x] Sublines for figures, tables, etc.
 - [x] Citations
 - [x] Footnotes
-- [x] Sublines for figures, tables, etc.
 - [x] Diagrams
 - [x] Table of contents
-- [x] Multi Column Layout
+- [x] Multi column Layout
 - [x] Per page layout settings
 
 
