@@ -665,7 +665,7 @@
                 }
             }
 
-            if (srcRefList){
+            if (srcRefList) {
                 for (const item of [...srcRefList.childNodes]) {
                     srcRefList.parentNode.insertBefore(item, srcRefList);
                 }
@@ -816,6 +816,19 @@
             }
         }
 
+        async function CleanupFootnotes(currentPage) {
+            const usedFootIds = [];
+            currentPage.Columns.forEach(c => c.querySelectorAll('sup.ref-link')
+                .forEach(f => usedFootIds.push(f.getAttribute('refId'))));
+
+            const footNotes = currentPage.Footer.querySelectorAll('.ref-foot');
+            for (const note of footNotes) {
+                if (!usedFootIds.includes(note.id)){
+                    note.remove();
+                }
+            }
+        }
+
         /**
          * Places the markdown elements into the pages, creates new columns and pages as needed.
          * @param {Object} templates - The templates used for creating new pages and columns.
@@ -858,8 +871,12 @@
                 gridBottom = pageList.at(-1).Grid.getBoundingClientRect();
                 itemBottom = item.getBoundingClientRect();
                 if (itemBottom.bottom > gridBottom.bottom) {
-                    AddColumn(templates, config, pageList);
+                    item.remove();
 
+                    await CleanupFootnotes(pageList.at(-1));
+
+
+                    AddColumn(templates, config, pageList);
                     if (/^H[1-6]$/.test(item.previousElementSibling?.tagName))
                         pageList.at(-1).Columns.at(-1).appendChild(item.previousElementSibling);
                     await AppendPageElement(templates, footNotes, pageList.at(-1), item);

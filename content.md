@@ -40,7 +40,7 @@ Use markdown[markdown] syntax to create beautiful documentations, scientific scr
 
 There is no need for NPM, Ruby, Python, Perl Environment, Docker container, Java runtime, online services or subscription. It runs anywhere without any installation and creates a print ready HTML layout.
 
-Write your content and focus on your content. The layout ain't your problem you want to solve.
+Write content, focus on content. Layout ain't your problem.
 
 
 
@@ -91,7 +91,7 @@ The root path of any media defined in the markdown is the location of the `index
 
 Loading the markdown content automatically works only if the `index.html` is hosted, because the browser blocks fetching from local file paths. The default loading path can be changed by editing the `src` attribute in the first script tag with the id `mdContent`.
 
-*IMHO:* My setup is [VSCode](https://code.visualstudio.com/) with the extension [Live Preview](https://marketplace.visualstudio.com/items?itemName=ms-vscode.live-server). This will host the `index.html` locally without headache and works as a live preview of the content.
+*IMHO:* My setup is [VSCode](https://code.visualstudio.com/) with the extension [Live Preview](https://marketplace.visualstudio.com/items?itemName=ms-vscode.live-server). This will host the `index.html` locally without headache and enables a live preview of the content.
 
 </div>
 
