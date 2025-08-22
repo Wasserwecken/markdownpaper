@@ -24,7 +24,7 @@ Do not expect that every single markdown will render correctly. The focus is on 
 
 
 
-### Installation & Usage
+## Installation & Usage
 Requirements:
 - Any modern browser of your choice
 - Any text editor of your choice
@@ -40,7 +40,7 @@ QuickStart 2:
 
 
 
-### Motivation
+## Motivation
 Since I have a small lecture at my local university in addition to my full-time job as a software developer, I wanted to provide my students with an engaging script to follow throughout the course. I was looking for a simple straight forward tool.
 
 I love the idea of LaTeX, writing content and do not care about the document layout. But the steep learning curve of LaTeX and the usage of another required runtime *(Perl)*, which installation is NOT straight forward at all, prevented me from using it. But I am used to write markdown for readme's, personal notes, todo's or meeting's. It always appeared to me like a LaTeX-Lite version.
