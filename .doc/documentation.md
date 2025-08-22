@@ -36,11 +36,11 @@ https://marked.js.org/
 
 
 # markdownpaper
+Write content, focus on content. Layout ain't your problem.
+
 Use markdown[markdown] syntax to create beautiful documentations, scientific scripts or papers, through a single static HTML file without runtime dependencies or build processes.
 
 There is no need for NPM, Ruby, Python, Perl Environment, Docker container, Java runtime, online services or subscription. It runs anywhere without any installation and creates a print ready HTML layout.
-
-Write content, focus on content. Layout ain't your problem.
 
 Do not expect that every single markdown will render correctly. The focus is on academic and printing content. Rendering elements that are larger than a single page are not supported (e.g. large code sections, endless lists, etc.). There are other tools to checkout for converting markdown into presentable HTML like [MkDocs](https://www.mkdocs.org/).
 
@@ -186,14 +186,14 @@ Lists can be created using the `-` or `1.` characters for unordered lists, and n
 Images can be included in the markdown file, and will be displayed in the HTML output. You can use the HTML image tag, or use the markdown syntax. All examples result in the same output.
 
 ```
-[img]: ./.doc/sailboat.bmp
+[img]: ./media/sailboat.bmp
 ![img]
 ![](./.doc/sailboat.bmp)
-<img src="./.doc/sailboat.bmp"/>
+<img src="./media/sailboat.bmp"/>
 ```
 ---
 
-<img src="./.doc/sailboat.bmp"/>
+<img src="./media/sailboat.bmp"/>
 
 </div>
 
@@ -431,7 +431,7 @@ The `<ref>` is also used to annotate and label any element in the document. The 
 This is an important addition to the quote.
 </ref>
 
-<img src="./.doc/sailboat.bmp"/>
+<img src="./media/sailboat.bmp"/>
 
 <ref id="myFig" type="figure">
 I did not expect using Lorem Ipsum that much after I knew about it.
@@ -446,7 +446,7 @@ This paragraph can now refer to the quote[myQuote] by using the quote id and als
 An addition to the quote would not improve the conclusion.
 </ref>
 
-<img src="./.doc/plot.png"/>
+<img src="./media/plot.png"/>
 
 <ref id="myFig" type="figure">
 There is a wobbly line in the figure to express something important.
@@ -522,13 +522,13 @@ asdasdad
 
 ```
 <ColumnSpan>
-<drawio src="./.doc/graph.drawio"></drawio>
+<drawio src="./media/graph.drawio"></drawio>
 </ColumnSpan>
 ```
 ---
 
 <ColumnSpan>
-<drawio src="./.doc/graph.drawio"></drawio>
+<drawio src="./media/graph.drawio"></drawio>
 </ColumnSpan>
 
 
@@ -541,11 +541,11 @@ Diagrams from `https://app.diagrams.net/` can be embedded directly into the docu
 The diagram data can be provided either via an URL that can be set as `src` attribute in the tag. If this attribute is not defined, the content of the tag is expected to hold the diagram data.
 
 ```
-<drawio src="./.doc/graph.drawio"></drawio>
+<drawio src="./media/graph.drawio"></drawio>
 
 ```
 ---
-<drawio src="./.doc/graph.drawio"></drawio>
+<drawio src="./media/graph.drawio"></drawio>
 
 </div>
 
