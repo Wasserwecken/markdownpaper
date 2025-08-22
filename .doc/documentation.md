@@ -372,9 +372,9 @@ In geometry, a **straight** line, usually abbreviated line, is an infinitely lon
 This line[myFoot] has an annotation to some additional information.
 ```
 ---
-<Ref id="myFoot" type="footnote">
+<mdFootnote id="myFoot" key="*">
 In geometry, a **straight** line, usually abbreviated line, is an infinitely long object with no width, depth, or curvature, an idealization of such physical objects as a straightedge, a taut string, or a ray of light.
-</Ref>
+</mdFootnote>
 
 This line[myFoot] has a annotation to some additional information.
 

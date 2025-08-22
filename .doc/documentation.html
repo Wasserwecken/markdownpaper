@@ -429,7 +429,7 @@
 
     <div id="ref-foot-template" class="ref-foot">
         <!-- Footnote template -->
-        <sup class="ref-foot-id"></sup>
+        <sup class="ref-foot-key"></sup>
         <div class="ref-foot-content"></div>
     </div>
 
@@ -619,10 +619,10 @@
          *
          */
         function ProcessCitations(templates, contentDiv) {
-
-            // get all defined citations.
             let citationEnum = 0;
             const citations = [];
+
+            // iterate
             for (const citation of contentDiv.querySelectorAll('citation')) {
                 const id = citation.getAttribute('id');
                 let key = citation.getAttribute('key');
@@ -655,6 +655,19 @@
                 }
             }
 
+            // replace citation pointers
+            for (const item of contentDiv.querySelectorAll('*')) {
+                if (['CODE', 'SVG', 'IFRAME', 'IMG'].includes(item.tagName)) {
+                    continue;
+                }
+
+                for (const citation of citations) {
+                    const key = citation.getAttribute('key');
+                    const link = `<a class="ref-cit-link" href="#${citation.id}">${key}</a>`;
+                    item.innerHTML = item.innerHTML.replaceAll(`[${citation.id}]`, link);
+                }
+            }
+
             return citations;
         }
 
@@ -665,6 +678,7 @@
             const captions = {};
             const captionEnums = {};
 
+            // iterate
             for (const caption of [...contentDiv.querySelectorAll('mdCaption')]) {
                 const id = caption.getAttribute('id');
                 const type = caption.getAttribute('type');
@@ -703,7 +717,53 @@
                 caption.replaceWith(captionWrap);
             }
 
+            // replace caption pointers
+            for (const item of contentDiv.querySelectorAll('*')) {
+                if (['CODE', 'SVG', 'IFRAME', 'IMG'].includes(item.tagName)) {
+                    continue;
+                }
+
+                for (const [type, list] of Object.entries(captions)) {
+                    for (const caption of list) {
+                        const key = caption.getAttribute('key');
+                        const link = `<a class="ref-cit-link" href="#${caption.id}">${key}</a>`;
+                        item.innerHTML = item.innerHTML.replaceAll(`[${caption.id}]`, link);
+                    }
+                }
+            }
+
             return captions;
+        }
+
+        /**
+         *
+         */
+        function PrepareFootnotes(templates, contentDiv) {
+            const footnotes = [];
+
+            // iterate
+            for (const footnote of [...contentDiv.querySelectorAll('mdFootnote')]) {
+                const footnoteItem = templates.RefFootItem.cloneNode(true);
+                footnoteItem.id = footnote.id;
+                footnoteItem.querySelector('.ref-foot-key').innerHTML = footnoteItem.getAttribute('');
+                footnoteItem.querySelector('.ref-foot-content').innerHTML = marked.parse(footnote.innerHTML);
+                footnotes.push(footnoteItem);
+            }
+
+            // prepare footnote pointers
+            for (const item of contentDiv.querySelectorAll('*')) {
+                if (['CODE', 'SVG', 'IFRAME', 'IMG'].includes(item.tagName)) {
+                    continue;
+                }
+
+                for (const footnote of footnotes) {
+                    const key = footnote.getAttribute('key') ?? footnote.id;
+                    const link = `<sup class="ref-foot-link" refId="${footnote.id}">${key}</sup>`;
+                    item.innerHTML = item.innerHTML.replaceAll(`[${footnote.id}]`, link);
+                }
+            }
+
+            return footnotes;
         }
 
         async function EvaluateReferences(templates, contentDiv) {
@@ -1024,6 +1084,8 @@
             const config = ExtractConfig(templates, contentDiv);
             const citations = ProcessCitations(templates, contentDiv);
             const captions = ProcessCaptions(templates, contentDiv);
+            const footnotes = PrepareFootnotes(templates, contentDiv);
+
             await EvaluateReferences(templates, contentDiv);
             await EnumerateHeadings(templates, contentDiv);
             await PreRenderAndWait(templates, contentDiv);
