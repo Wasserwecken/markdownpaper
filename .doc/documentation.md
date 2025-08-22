@@ -9,29 +9,29 @@ This here defines the footer content for all pages.
 </Footer>
 
 
-<Ref id="markdownpaper" type="citation">
+<mdCitation id="markdownpaper" type="citation">
 *markdownpaper*,
 Eric Dolch,
 *Display markdown into paper style HTML site*,
 2025,
 https://github.com/Wasserwecken/markdownpaper
-</Ref>
+</mdCitation>
 
-<Ref id="mathjax" type="citation">
+<mdCitation id="mathjax" type="citation">
 *MathJax*,
 MathJax Team,
 *Beautiful and accessible math in all browsers*,
 2025,
 https://www.mathjax.org/
-</Ref>
+</mdCitation>
 
-<Ref id="mdMarked" type="citation">
+<mdCitation id="mdMarked" type="citation">
 *Marked.js*
 Christopher Jeffrey, Josh Bruce, Steven, Jamie Davis, Tony Brix, Trevor Buckner
 *A markdown parser and compiler. Built for speed*,
 2025,
 https://marked.js.org/
-</Ref>
+</mdCitation>
 
 
 
@@ -403,17 +403,17 @@ https://daringfireball.net/projects/markdown/
 </References>
 ```
 ---
-<Ref id="markdown" type="citation">
+<mdCitation id="markdown" type="citation">
 *Markdown syntax*,
 John Gruber,
 *Markdown is a text-to-HTML conversion tool for web writers.*,
 2004,
 https://daringfireball.net/projects/markdown/
-</Ref>
+</mdCitation>
 
-<References>
+<mdCitations>
 ## References
-</References>
+</mdCitations>
 
 </div>
 
@@ -442,15 +442,15 @@ This paragraph can now refer to the quote[myQuote] by using the quote id and als
 ---
 > "This is my personal Quote, may stating something important!"
 
-<ref id="myQuote" type="quote">
+<mdCaption id="myQuote" type="quote">
 An addition to the quote would not improve the conclusion.
-</ref>
+</mdCaption>
 
 <img src="./media/plot.png"/>
 
-<ref id="myFig" type="figure">
+<mdCaption id="myFig" type="figure">
 There is a wobbly line in the figure to express something important.
-</ref>
+</mdCaption>
 
 </div>
 
