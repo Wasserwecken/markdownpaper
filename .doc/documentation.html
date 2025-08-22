@@ -277,55 +277,45 @@
     </style>
 
     <style id="cssMarkdownExtensions">
-        .ref-sub {
+        .ref-cit-link,
+        .ref-cap-link,
+        .ref-foot-link {
+            font-style: unset;
+            text-decoration: underline;
+        }
+
+        .ref-cap-wrapper {
             margin: 1rem 0;
         }
 
-        .ref-sub-line {
+        .ref-cap {
             opacity: 66%;
             display: flex;
             gap: 0.5rem;
             align-items: baseline;
         }
 
-        .ref-sub-label {
+        .ref-cap-key {
             font-weight: bold;
             text-wrap: nowrap;
         }
 
-        .ref-sub-content * {
+        .ref-cap-content * {
             font-style: italic;
             text-align: unset !important;
         }
 
-        .ref-sub-line *:first-of-type {
-            margin: 0;
-        }
-
-        .ref-list-item {
+        .ref-cit {
             display: flex;
             margin: 0.5rem 0;
             align-items: first baseline;
             font-size: var(--font-annotation-size);
         }
 
-        .ref-list-item *:first-of-type {
-            margin: 0;
-        }
-
-        .ref-list-id {
+        .ref-cit-key {
             flex: none;
             display: inline-block;
             width: 1.5rem;
-        }
-
-        .ref-list-item * {
-            text-align: unset;
-        }
-
-        .ref-link {
-            font-style: unset;
-            text-decoration: underline;
         }
 
         .ref-foot {
@@ -348,7 +338,7 @@
             padding-left: 1rem;
         }
 
-        .toc-list-item {
+        .toc-item {
             width: 100%;
             display: flex;
             gap: .5rem;
@@ -356,7 +346,7 @@
             padding: 0.125rem 0rem;
         }
 
-        .toc-list-item-dots {
+        .toc-item-dots {
             flex: 1 1 auto;
             border-bottom: 1px dotted;
         }
@@ -450,7 +440,10 @@
 
 
     <script>
-        async function LoadTemplates() {
+        /**
+         *
+         */
+        function LoadTemplates() {
             const diagram = document.querySelector('#diagram-template');
             diagram.id = '';
             diagram.remove();
@@ -507,6 +500,9 @@
             return templates
         }
 
+        /**
+         *
+         */
         function ExtractConfig(templates, contentDiv) {
             for (const header of contentDiv.querySelectorAll('mdHeader')) {
                 const headerContent = document.createElement('div');
@@ -603,19 +599,6 @@
                 }
             }
 
-            // replace citation pointers
-            for (const item of contentDiv.querySelectorAll('*')) {
-                if (['CODE', 'SVG', 'IFRAME', 'IMG'].includes(item.tagName)) {
-                    continue;
-                }
-
-                for (const citation of citations) {
-                    const key = citation.getAttribute('key');
-                    const link = `<a class="ref-cit-link" href="#${citation.id}">${key}</a>`;
-                    item.innerHTML = item.innerHTML.replaceAll(`[${citation.id}]`, link);
-                }
-            }
-
             return citations;
         }
 
@@ -665,21 +648,6 @@
                 caption.replaceWith(captionWrap);
             }
 
-            // replace caption pointers
-            for (const item of contentDiv.querySelectorAll('*')) {
-                if (['CODE', 'SVG', 'IFRAME', 'IMG'].includes(item.tagName)) {
-                    continue;
-                }
-
-                for (const [type, list] of Object.entries(captions)) {
-                    for (const caption of list) {
-                        const key = caption.getAttribute('key');
-                        const link = `<a class="ref-cit-link" href="#${caption.id}">${key}</a>`;
-                        item.innerHTML = item.innerHTML.replaceAll(`[${caption.id}]`, link);
-                    }
-                }
-            }
-
             return captions;
         }
 
@@ -699,6 +667,39 @@
                 footnote.remove();
             }
 
+            return footnotes;
+        }
+
+        function ProcessReferencePointers(citations, captions, footnotes, contentDiv) {
+
+            // replace citation pointers
+            for (const item of contentDiv.querySelectorAll('*')) {
+                if (['CODE', 'SVG', 'IFRAME', 'IMG'].includes(item.tagName)) {
+                    continue;
+                }
+
+                for (const citation of citations) {
+                    const key = citation.getAttribute('key');
+                    const link = `<a class="ref-cit-link" href="#${citation.id}">${key}</a>`;
+                    item.innerHTML = item.innerHTML.replaceAll(`[${citation.id}]`, link);
+                }
+            }
+
+            // replace caption pointers
+            for (const item of contentDiv.querySelectorAll('*')) {
+                if (['CODE', 'SVG', 'IFRAME', 'IMG'].includes(item.tagName)) {
+                    continue;
+                }
+
+                for (const [type, list] of Object.entries(captions)) {
+                    for (const caption of list) {
+                        const key = caption.getAttribute('key');
+                        const link = `<a class="ref-cit-link" href="#${caption.id}">${key}</a>`;
+                        item.innerHTML = item.innerHTML.replaceAll(`[${caption.id}]`, link);
+                    }
+                }
+            }
+
             // prepare footnote pointers.
             for (const item of contentDiv.querySelectorAll('*')) {
                 if (['CODE', 'SVG', 'IFRAME', 'IMG'].includes(item.tagName)) {
@@ -711,8 +712,6 @@
                     item.innerHTML = item.innerHTML.replaceAll(`[${footnote.id}]`, link);
                 }
             }
-
-            return footnotes;
         }
 
         /**
@@ -982,6 +981,9 @@
             }
         }
 
+        /**
+         *
+         */
         async function LoadLocalMarkdown() {
             const markdownBlock = document.getElementById('mdContent');
             const markdownSrc = markdownBlock.getAttribute('src');
@@ -1001,6 +1003,9 @@
             return markdownContent;
         }
 
+        /**
+         *
+         */
         async function Render(templates, markdownContent) {
             const contentDiv = document.createElement('div');
             contentDiv.innerHTML = marked.parse(markdownContent);
@@ -1011,23 +1016,16 @@
             const footnotes = PrepareFootnotes(templates, contentDiv);
             const headings = EnumerateHeadings(templates, contentDiv);
 
+            ProcessReferencePointers(citations, captions, footnotes, contentDiv);
             await PreRenderAndWait(templates, contentDiv);
 
             const pageList = await BuildPages(templates, config, contentDiv);
             await EvaluatePageNo(pageList);
         }
 
-        window.onload = async () => {
-            const templates = await LoadTemplates();
-            let markdownContent = await LoadLocalMarkdown();
-
-            if (markdownContent) {
-                await Render(templates, markdownContent);
-            } else {
-                document.querySelector('#pages').appendChild(templates.FilePicker);
-            }
-        };
-
+        /**
+         *
+         */
         function handleFileUpload(templates, file) {
             const reader = new FileReader();
             reader.onload = function (event) {
@@ -1035,6 +1033,20 @@
                 Render(templates, event.target.result);
             };
             reader.readAsText(file);
+        };
+
+        /**
+         *
+         */
+        window.onload = async () => {
+            const templates = LoadTemplates();
+            let markdownContent = await LoadLocalMarkdown();
+
+            if (markdownContent) {
+                await Render(templates, markdownContent);
+            } else {
+                document.querySelector('#pages').appendChild(templates.FilePicker);
+            }
         };
     </script>
 </body>
