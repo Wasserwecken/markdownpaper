@@ -1,15 +1,14 @@
-<Config columns=2 padding="16mm" fontSize="9pt" hyphens="auto" textAlign="justify" fontFamily="'LMRoman10', Georgia, serif" CornellSize="0mm"></Config>
+<mdConfig columns=2 padding="16mm" fontSize="9pt" hyphens="auto" textAlign="justify" fontFamily="'LMRoman10', Georgia, serif" CornellSize="0mm"></mdConfig>
 
-<Header>
+<mdHeader>
 This here defines the header content for all pages.
-</Header>
+</mdHeader>
 
-<Footer>
+<mdFooter>
 This here defines the footer content for all pages.
-</Footer>
+</mdFooter>
 
-
-<mdCitation id="markdownpaper" type="citation">
+<mdCitation id="citMarkdownpaper">
 *markdownpaper*,
 Eric Dolch,
 *Display markdown into paper style HTML site*,
@@ -17,7 +16,7 @@ Eric Dolch,
 https://github.com/Wasserwecken/markdownpaper
 </mdCitation>
 
-<mdCitation id="mathjax" type="citation">
+<mdCitation id="citMathjax">
 *MathJax*,
 MathJax Team,
 *Beautiful and accessible math in all browsers*,
@@ -25,7 +24,7 @@ MathJax Team,
 https://www.mathjax.org/
 </mdCitation>
 
-<mdCitation id="mdMarked" type="citation">
+<mdCitation id="citMarked">
 *Marked.js*
 Christopher Jeffrey, Josh Bruce, Steven, Jamie Davis, Tony Brix, Trevor Buckner
 *A markdown parser and compiler. Built for speed*,
@@ -38,14 +37,14 @@ https://marked.js.org/
 # markdownpaper
 Write content, focus on content. Layout ain't your problem.
 
-Use markdown[markdown] syntax to create beautiful documentations, scientific scripts or papers, through a single static HTML file without runtime dependencies or build processes.
+Use markdown[citMarked] syntax to create beautiful documentations, scientific scripts or papers, through a single static HTML file without runtime dependencies or build processes.
 
 There is no need for NPM, Ruby, Python, Perl Environment, Docker container, Java runtime, online services or subscription. It runs anywhere without any installation and creates a print ready HTML layout.
 
 Do not expect that every single markdown will render correctly. The focus is on academic and printing content. Rendering elements that are larger than a single page are not supported (e.g. large code sections, endless lists, etc.). There are other tools to checkout for converting markdown into presentable HTML like [MkDocs](https://www.mkdocs.org/).
 
 
-<ColumnBreak></ColumnBreak>
+<mdColumnBreak></mdColumnBreak>
 
 
 <TableOfContents>
@@ -53,7 +52,7 @@ Do not expect that every single markdown will render correctly. The focus is on 
 </TableOfContents>
 
 
-<ColumnBreak></ColumnBreak>
+<mdColumnBreak></mdColumnBreak>
 
 ## Introduction
 This is the documentation about *markdownpaper* and its usage. It covers all configuration options as well as the extended syntax, enabling important features like Citations and math formulas.
@@ -528,7 +527,7 @@ asdasdad
 ---
 
 <ColumnSpan>
-<drawio src="./media/graph.drawio"></drawio>
+<mdDiagram src="./media/graph.drawio"></drawio>
 </ColumnSpan>
 
 
@@ -545,7 +544,7 @@ The diagram data can be provided either via an URL that can be set as `src` attr
 
 ```
 ---
-<drawio src="./media/graph.drawio"></drawio>
+<mdDiagram src="./media/graph.drawio"></drawio>
 
 </div>
 

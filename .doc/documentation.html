@@ -81,6 +81,13 @@
             opacity: 66%;
         }
 
+        .page-content {
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            height: 100%;
+        }
+
         .page-no {
             position: absolute;
             right: 0rem;
@@ -106,7 +113,7 @@
             top: 0rem;
         }
 
-        .page-content {
+        .page-columns {
             min-height: 0;
             height: 100%;
             column-count: 2;
@@ -115,8 +122,12 @@
             padding-right: var(--cornell-space);
         }
 
-        .page-content>* {
+        .page-columns>* {
             break-inside: avoid;
+        }
+
+        .page-columns *:first-child {
+            margin-top: 0;
         }
 
         #page-template {
@@ -483,24 +494,28 @@
                 RefFootItem: refFootItem,
             }
 
-            filePicker.addEventListener("dragover", dragOverHandler);
-            filePicker.addEventListener("drop", (e) => dropHandler(templates, e));
-            filePicker.addEventListener("click", (e) => pickContent(templates, e));
-            filePicker.querySelector('#file-picker-input')
-                .addEventListener('change', (e) => handleFileUpload(templates, e.target.files[0]));
+            filePicker.addEventListener("dragover", e => e.preventDefault());
+            filePicker.addEventListener("click", (e) => e => filePicker.querySelector('#file-picker-input').click());
+            filePicker.querySelector('#file-picker-input').addEventListener('change', e => {
+                handleFileUpload(templates, e.target.files[0])
+            });
+            filePicker.addEventListener("drop", (e) => e => {
+                e.preventDefault();
+                handleFileUpload(templates, e.dataTransfer.files[0]);
+            });
 
             return templates
         }
 
         function ExtractConfig(templates, contentDiv) {
-            for (const header of contentDiv.querySelectorAll('header')) {
+            for (const header of contentDiv.querySelectorAll('mdHeader')) {
                 const headerContent = document.createElement('div');
                 headerContent.innerHTML = marked.parse(header.innerHTML);
                 templates.Page.querySelector('.page-header').appendChild(headerContent);
                 header.remove();
             }
 
-            for (const footer of contentDiv.querySelectorAll('footer')) {
+            for (const footer of contentDiv.querySelectorAll('mdFooter')) {
                 const footerContent = document.createElement('div');
                 footerContent.innerHTML = marked.parse(footer.innerHTML);
                 templates.Page.querySelector('.page-footer').appendChild(footerContent);
@@ -521,7 +536,7 @@
                 FontFamily: `'LMRoman10', Georgia, serif`,
                 TextAlign: "justify",
             };
-            const contentConfig = contentDiv.querySelector('config');
+            const contentConfig = contentDiv.querySelector('mdConfig');
             if (contentConfig) {
                 config.Columns = contentConfig.getAttribute('Columns') ?? config.Columns;
                 config.Padding = contentConfig.getAttribute('Padding') ?? config.Padding;
@@ -547,73 +562,6 @@
             document.head.appendChild(customStyle);
         }
 
-        async function EnumerateHeadings(templates, contentDiv) {
-
-            // enumerate and collect defined headings.
-            let headingLevels = [0, 0, 0, 0, 0, 0];
-            const headings = [...contentDiv.querySelectorAll('h2, h3, h4, h5, h6')];
-            for (const heading of headings) {
-                if (heading.innerHTML.startsWith('[!]')) {
-                    heading.innerHTML = heading.innerHTML.replace('[!]', '');
-                    heading.id = heading.innerHTML.replace(/\s/g, '');;
-                    continue;
-                }
-
-                const level = parseInt(heading.tagName[1]) - 1;
-                headingLevels[level - 1]++;
-                for (let i = level; i < headingLevels.length; i++) {
-                    headingLevels[i] = 0;
-                }
-                const prefix = headingLevels.map(e => Math.max(1, e)).slice(0, level).join(".");
-                heading.id = `h${prefix.replaceAll('.', '-')}`;
-                heading.innerHTML = `${prefix}. ${heading.innerHTML}`;
-            }
-
-            // build the table of contens if defined.
-            let tocDiv = contentDiv.querySelector('TableOfContents');
-            if (tocDiv) {
-                tocDiv.innerHTML = marked.parse(tocDiv.innerHTML);
-                let previousLevel = 0;
-                let levelList = tocDiv;
-                const tocDepth = parseInt(tocDiv.getAttribute('depth')) || 5;
-
-                for (const heading of headings) {
-                    const level = parseInt(heading.tagName[1]) - 1;
-                    if (level > tocDepth) {
-                        continue;
-                    }
-
-                    const tocItem = templates.TocListItem.cloneNode(true);
-                    tocItem.href = `#${heading.id}`;
-                    tocItem.querySelector('.toc-list-item-heading').innerHTML = heading.innerHTML;
-
-                    if (previousLevel < level) {
-                        while (previousLevel != level && previousLevel < 6) {
-                            levelList.appendChild(templates.TocList.cloneNode(false));
-                            levelList = levelList.lastChild;
-                            previousLevel += 1;
-                        }
-                    }
-                    else if (previousLevel > level) {
-                        levelList = levelList.parentNode;
-                        while (previousLevel > level && previousLevel >= 0) {
-                            levelList = levelList.parentNode;
-                            previousLevel -= 1;
-                        }
-                        levelList.appendChild(templates.TocList.cloneNode(false));
-                        levelList = levelList.lastChild;
-                    }
-
-                    levelList.appendChild(tocItem);
-                }
-
-                for (const item of [...tocDiv.childNodes]) {
-                    tocDiv.parentNode.insertBefore(item, tocDiv);
-                }
-                tocDiv.remove();
-            }
-        }
-
 
         /**
          *
@@ -622,8 +570,8 @@
             let citationEnum = 0;
             const citations = [];
 
-            // iterate
-            for (const citation of contentDiv.querySelectorAll('citation')) {
+            // iterate...
+            for (const citation of contentDiv.querySelectorAll('mdCitation')) {
                 const id = citation.getAttribute('id');
                 let key = citation.getAttribute('key');
 
@@ -640,7 +588,7 @@
             }
 
             // populate citation list.
-            let citRefList = contentDiv.querySelector('citations');
+            let citRefList = contentDiv.querySelector('mdCitations');
             if (citRefList) {
                 templates.RefCitList.innerHTML = marked.parse(citRefList.innerHTML);
                 citRefList.replaceWith(templates.RefCitList);
@@ -678,7 +626,7 @@
             const captions = {};
             const captionEnums = {};
 
-            // iterate
+            // iterate...
             for (const caption of [...contentDiv.querySelectorAll('mdCaption')]) {
                 const id = caption.getAttribute('id');
                 const type = caption.getAttribute('type');
@@ -741,16 +689,17 @@
         function PrepareFootnotes(templates, contentDiv) {
             const footnotes = [];
 
-            // iterate
+            // iterate...
             for (const footnote of [...contentDiv.querySelectorAll('mdFootnote')]) {
                 const footnoteItem = templates.RefFootItem.cloneNode(true);
                 footnoteItem.id = footnote.id;
                 footnoteItem.querySelector('.ref-foot-key').innerHTML = footnoteItem.getAttribute('');
                 footnoteItem.querySelector('.ref-foot-content').innerHTML = marked.parse(footnote.innerHTML);
                 footnotes.push(footnoteItem);
+                footnote.remove();
             }
 
-            // prepare footnote pointers
+            // prepare footnote pointers.
             for (const item of contentDiv.querySelectorAll('*')) {
                 if (['CODE', 'SVG', 'IFRAME', 'IMG'].includes(item.tagName)) {
                     continue;
@@ -766,109 +715,85 @@
             return footnotes;
         }
 
-        async function EvaluateReferences(templates, contentDiv) {
-            const srcRefs = [];
-            const footRefs = [];
-            const linkRefs = {};
+        /**
+         *
+         */
+        function EnumerateHeadings(templates, contentDiv) {
+            const headings = [...contentDiv.querySelectorAll('h2, h3, h4, h5, h6')];
 
-            // prepare the reference list item.
-            let srcRefList = contentDiv.querySelector('references');
-            if (srcRefList) {
-                templates.RefList.innerHTML = marked.parse(srcRefList.innerHTML);
-                srcRefList.replaceWith(templates.RefList);
-                srcRefList = templates.RefList;
-            }
+            // enumerate...
+            let headingLevels = [0, 0, 0, 0, 0, 0];
+            for (const heading of headings) {
 
-            // analyse all references.
-            for (const reference of [...contentDiv.querySelectorAll('ref')]) {
-                const refId = reference.getAttribute('id');
-                const refType = reference.getAttribute('type');
-
-                // citation references are rendered only in a reference lists.
-                if (refType == 'citation') {
-                    const refLabel = `[${srcRefs.length + 1}]`;
-                    srcRefs.push([refId, refLabel, reference]);
-                    reference.remove();
-
-                    if (srcRefList) {
-                        const srcItem = templates.RefListItem.cloneNode(true);
-                        const srcContent = marked.parse(reference.innerHTML);
-                        srcItem.id = refId;
-                        srcItem.querySelector('.ref-list-id').innerHTML = refLabel;
-                        srcItem.querySelector('.ref-list-content').innerHTML = srcContent;
-                        srcRefList.appendChild(srcItem);
-                    }
-                }
-
-                // footnotes are handled while building the pages.
-                else if (refType == 'footnote') {
-                    footRefs.push([refId, reference]);
-                }
-
-                // any other reference are treated as subline.
-                else {
-                    if (!(refType in linkRefs))
-                        linkRefs[refType] = [];
-
-                    // extract the ref infos and set a enumerated label.
-                    const refCount = linkRefs[refType].length + 1;
-                    const refLabel = `${refType.charAt(0).toUpperCase()}${refType.slice(1)} ${refCount}`;
-                    linkRefs[refType].push([refId, refLabel]);
-
-                    const refContent = marked.parse(reference.innerHTML);
-                    const refSub = templates.RefSub.cloneNode(true);
-                    refSub.id = refId;
-                    refSub.querySelector('.ref-sub-label').innerHTML = refLabel;
-                    refSub.querySelector('.ref-sub-content').innerHTML = refContent;
-
-                    // bundle the previous element with the reference.
-                    let previousItem = reference.previousElementSibling;
-                    while (!previousItem) {
-                        previousItem = reference.parentNode.previousElementSibling;
-                    }
-
-                    refSub.prepend(previousItem);
-                    reference.replaceWith(refSub);
-                }
-            }
-
-            if (srcRefList) {
-                for (const item of [...srcRefList.childNodes]) {
-                    srcRefList.parentNode.insertBefore(item, srcRefList);
-                }
-                srcRefList.remove();
-            }
-
-            // replace the link ids with the labels and actual links.
-            for (const item of contentDiv.querySelectorAll('*')) {
-                // skip special elements because they are expected to hold raw data.
-                if (item.tagName == 'CODE') {
+                // skip marked headings
+                if (heading.innerHTML.startsWith('[!]')) {
+                    heading.innerHTML = heading.innerHTML.replace('[!]', '');
+                    heading.id = heading.innerHTML.replace(/\s/g, '');;
                     continue;
                 }
 
-                for (const [type, refs] of Object.entries(linkRefs)) {
-                    for (const [refId, refLabel] of refs) {
-                        const linkLabel = `<a class="ref-link" href="#${refId}">[${refLabel}]</a>`;
-
-                        if (item.innerHTML.includes(`[${refId}]`))
-                            item.innerHTML = item.innerHTML;
-
-                        item.innerHTML = item.innerHTML.replaceAll(`[${refId}]`, linkLabel);
-                    }
+                // count and label
+                const level = parseInt(heading.tagName[1]) - 1;
+                headingLevels[level - 1]++;
+                for (let i = level; i < headingLevels.length; i++) {
+                    headingLevels[i] = 0;
                 }
-
-                for (const [srcId, srcLabel, srcItem] of srcRefs) {
-                    const linkLabel = `<a class="ref-link" href="#${srcId}">${srcLabel}</a>`;
-                    item.innerHTML = item.innerHTML.replaceAll(`[${srcId}]`, linkLabel);
-                }
-
-                for (const [refId, srcItem] of footRefs) {
-                    const linkLabel = `<sup class="ref-link" refId="${refId}"></sup>`;
-                    item.innerHTML = item.innerHTML.replaceAll(`[${srcItem.id}]`, linkLabel);
-                }
+                const prefix = headingLevels.map(e => Math.max(1, e)).slice(0, level).join(".");
+                heading.id = `h${prefix.replaceAll('.', '-')}`;
+                heading.innerHTML = `${prefix}. ${heading.innerHTML}`;
             }
+
+            // build the table of contens.
+            let tocDiv = contentDiv.querySelector('TableOfContents');
+            if (tocDiv) {
+                tocDiv.innerHTML = marked.parse(tocDiv.innerHTML);
+                let previousLevel = 0;
+                let levelList = tocDiv;
+                const tocDepth = parseInt(tocDiv.getAttribute('depth')) || 6;
+
+                for (const heading of headings) {
+                    const level = parseInt(heading.tagName[1]) - 1;
+                    if (level > tocDepth) {
+                        continue;
+                    }
+
+                    // adjust list level
+                    if (previousLevel < level) {
+                        while (previousLevel != level && previousLevel < 6) {
+                            levelList.appendChild(templates.TocList.cloneNode(false));
+                            levelList = levelList.lastChild;
+                            previousLevel += 1;
+                        }
+                    }
+                    else if (previousLevel > level) {
+                        levelList = levelList.parentNode;
+                        while (previousLevel > level && previousLevel >= 0) {
+                            levelList = levelList.parentNode;
+                            previousLevel -= 1;
+                        }
+                        levelList.appendChild(templates.TocList.cloneNode(false));
+                        levelList = levelList.lastChild;
+                    }
+
+                    // create entry
+                    const tocItem = templates.TocListItem.cloneNode(true);
+                    tocItem.href = `#${heading.id}`;
+                    tocItem.querySelector('.toc-item-heading').innerHTML = heading.innerHTML;
+                    levelList.appendChild(tocItem);
+                }
+
+                for (const item of [...tocDiv.childNodes]) {
+                    tocDiv.parentNode.insertBefore(item, tocDiv);
+                }
+                tocDiv.remove();
+            }
+
+            return headings;
         }
 
+        /**
+         *
+         */
         async function PreRenderAndWait(templates, contentDiv) {
             document.body.appendChild(contentDiv);
 
@@ -877,8 +802,8 @@
 
             // diagram rendering
             let diagrams = [];
-            for (const graph of document.querySelectorAll('drawio')) {
-                const graphFrame = templates.DrawioFrame.cloneNode(true);
+            for (const graph of document.querySelectorAll('mdDiagram')) {
+                const graphFrame = templates.Diagram.cloneNode(true);
                 const srcPath = graph.getAttribute('src');
                 let graphConfig = graphFrame.getAttribute('data-mxgraph');
                 graphConfig = srcPath
@@ -897,7 +822,6 @@
                 }
             }
 
-
             // wait for images to be loaded to know their size.
             for (let image of contentDiv.querySelectorAll('img')) {
                 if (!image.complete) {
@@ -913,7 +837,7 @@
 
         function CleanupFootnotes(currentPage) {
             const usedFootIds = [];
-            currentPage.Content.querySelectorAll('sup.ref-link')
+            currentPage.Columns.querySelectorAll('sup.ref-link')
                 .forEach(f => usedFootIds.push(f.getAttribute('refId')));
 
             const footNotes = currentPage.Footer.querySelectorAll('.ref-foot');
@@ -934,7 +858,7 @@
                 Page: newPageDiv,
                 Header: newPageDiv.querySelector('.page-header'),
                 Top: newPageDiv.querySelector('.page-top'),
-                Content: newPageDiv.querySelector('.page-content'),
+                Columns: newPageDiv.querySelector('.page-columns'),
                 Bottom: newPageDiv.querySelector('.page-bottom'),
                 Footer: newPageDiv.querySelector('.page-footer'),
             }
@@ -950,7 +874,7 @@
         }
 
         async function AppendPageElement(templates, footNotes, currentPage, contentItem) {
-            currentPage.Content.appendChild(contentItem);
+            currentPage.Columns.appendChild(contentItem);
 
             const footRefUses = contentItem.querySelectorAll('sup.ref-link');
             for (const footRefUse of footRefUses) {
@@ -987,7 +911,7 @@
                 let content = [contentItem];
 
                 // Add a new page or clolumn
-                const pageBreak = contentItem.querySelector('PageBreak');
+                const pageBreak = contentItem.querySelector('mdPageBreak');
                 if (pageBreak) {
                     config.Columns = pageBreak.getAttribute('Columns') ?? config.Columns;
                     config.Padding = pageBreak.getAttribute('Padding') ?? config.Padding;
@@ -1002,7 +926,7 @@
                     topContent = [];
                     content = [];
                 }
-                else if (contentItem.querySelector('ColumnBreak')) {
+                else if (contentItem.querySelector('mdColumnBreak')) {
                     contentItem.classList.add('column-break');
                 }
                 else if (contentItem.tagName == 'COLUMNSPAN') {
@@ -1020,7 +944,7 @@
                     await AppendPageElement(templates, footNotes, pageList.at(-1), item);
 
                     // check if the item is overflowing the page grid and move it to the next column.
-                    gridRect = pageList.at(-1).Content.getBoundingClientRect();
+                    gridRect = pageList.at(-1).Columns.getBoundingClientRect();
                     itemRect = item.getBoundingClientRect();
                     if (itemRect.bottom > gridRect.bottom || itemRect.right > gridRect.right) {
                         const previousNode = item.previousElementSibling
@@ -1031,7 +955,7 @@
                         topContent = [];
 
                         if (/^H[1-6]$/.test(previousNode?.tagName))
-                            pageList.at(-1).Content.appendChild(previousNode);
+                            pageList.at(-1).Columns.appendChild(previousNode);
                         await AppendPageElement(templates, footNotes, pageList.at(-1), item);
                     }
                 }
@@ -1085,9 +1009,8 @@
             const citations = ProcessCitations(templates, contentDiv);
             const captions = ProcessCaptions(templates, contentDiv);
             const footnotes = PrepareFootnotes(templates, contentDiv);
+            const headings = EnumerateHeadings(templates, contentDiv);
 
-            await EvaluateReferences(templates, contentDiv);
-            await EnumerateHeadings(templates, contentDiv);
             await PreRenderAndWait(templates, contentDiv);
 
             const pageList = await BuildPages(templates, config, contentDiv);
@@ -1104,19 +1027,6 @@
                 document.querySelector('#pages').appendChild(templates.FilePicker);
             }
         };
-
-        function dragOverHandler(e) {
-            e.preventDefault();
-        }
-
-        function dropHandler(templates, e) {
-            e.preventDefault();
-            handleFileUpload(templates, e.dataTransfer.files[0]);
-        }
-
-        function pickContent(templates, e) {
-            templates.FilePickerInput.click();
-        }
 
         function handleFileUpload(templates, file) {
             const reader = new FileReader();
