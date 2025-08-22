@@ -25,16 +25,16 @@ Do not expect that every single markdown will render correctly. The focus is on 
 
 
 ## Installation & Usage
-### Requirements:
+#### Requirements:
 - Any modern browser of your choice
 - Any text editor of your choice
 
-### QuickStart 1:
+#### QuickStart 1:
 - Download the `index.html` from the repository.
 - Load the `index.html` locally in your browser.
 - Drag & Drop your markdown file to render.
 
-### QuickStart 2:
+#### QuickStart 2:
 - Go to <https://wasserwecken.github.io/markdownpaper/>
 - Drag & Drop your markdown file to render.
 
@@ -52,7 +52,7 @@ Thus I created this simple tool to write and edit my script easily and on any de
 
 
 ### Customization
-Because the tool is just a static HTML file, any customizations can be made immediately. The default paper style and behavior is embedded directly in the `index.html`. There are options to define basic layout and appearance by the `<Config>` tag, which is documented in detail in the section '<a href="#h3-5">3.5. Layout configuration</a>'.
+Because the tool is just a static HTML file, any customizations can be made immediately. The default paper style and behavior is embedded directly in the `index.html`. There are options to define basic layout and appearance by the `<Config>` tag, which is documented in detail.
 
 If the standard or extended markdown elements do not fit your needs, any almost any CSS framework and JavaScript library can be added to the `index.html`. The only restriction is the use of static resources, there is no support for NPM modules or TypeScript out of the box.
 
