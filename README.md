@@ -25,16 +25,16 @@ Do not expect that every single markdown will render correctly. The focus is on 
 
 
 ## Installation & Usage
-Requirements:
+### Requirements:
 - Any modern browser of your choice
 - Any text editor of your choice
 
-QuickStart 1:
+### QuickStart 1:
 - Download the `index.html` from the repository.
 - Load the `index.html` locally in your browser.
 - Drag & Drop your markdown file to render.
 
-QuickStart 2:
+### QuickStart 2:
 - Go to <https://wasserwecken.github.io/markdownpaper/>
 - Drag & Drop your markdown file to render.
 
