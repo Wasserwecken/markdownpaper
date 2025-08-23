@@ -1,4 +1,4 @@
-<mdConfig columns=2 padding="20mm" fontSize="9pt" hyphens="auto" textAlign="justify" fontFamily="'LMRoman10', Georgia, serif" CornellSpace="0mm"></mdConfig>
+<mdConfig columns=2 padding="20mm" fontSize="9pt" hyphens="auto" textAlign="justify" fontFamily="'CMU Serif', Georgia, serif" CornellSpace="0mm"></mdConfig>
 
 <mdHeader>
 This here defines the header content for all pages.
@@ -7,30 +7,6 @@ This here defines the header content for all pages.
 <mdFooter>
 This here defines the footer content for all pages.
 </mdFooter>
-
-<mdCitation id="citMarkdownpaper">
-*markdownpaper*,
-Eric Dolch,
-*Display markdown into paper style HTML site*,
-2025,
-https://github.com/Wasserwecken/markdownpaper
-</mdCitation>
-
-<mdCitation id="citMathjax">
-*MathJax*,
-MathJax Team,
-*Beautiful and accessible math in all browsers*,
-2025,
-https://www.mathjax.org/
-</mdCitation>
-
-<mdCitation id="citMarked">
-*Marked.js*
-Christopher Jeffrey, Josh Bruce, Steven, Jamie Davis, Tony Brix, Trevor Buckner
-*A markdown parser and compiler. Built for speed*,
-2025,
-https://marked.js.org/
-</mdCitation>
 
 
 
@@ -44,11 +20,13 @@ There is no need for NPM, Ruby, Python, Perl Environment, Docker container, Java
 Do not expect that every single markdown will render correctly. The focus is on academic and printing content. Rendering elements that are larger than a single page are not supported (e.g. large code sections, endless lists, etc.). There are other tools to checkout for converting markdown into presentable HTML like [MkDocs](https://www.mkdocs.org/).
 
 
+
 <mdColumnBreak></mdColumnBreak>
 
 <TableOfContents>
 ## Content
 </TableOfContents>
+
 
 
 <mdColumnBreak></mdColumnBreak>
@@ -401,12 +379,29 @@ https://daringfireball.net/projects/markdown/
 </References>
 ```
 ---
-<mdCitation id="markdown" type="citation">
-*Markdown syntax*,
-John Gruber,
-*Markdown is a text-to-HTML conversion tool for web writers.*,
-2004,
-https://daringfireball.net/projects/markdown/
+
+<mdCitation id="citMarkdownpaper">
+*markdownpaper*,
+Eric Dolch,
+*Display markdown into paper style HTML site*,
+2025,
+https://github.com/Wasserwecken/markdownpaper
+</mdCitation>
+
+<mdCitation id="citMathjax">
+*MathJax*,
+MathJax Team,
+*Beautiful and accessible math in all browsers*,
+2025,
+https://www.mathjax.org/
+</mdCitation>
+
+<mdCitation id="citMarked">
+*Marked.js*
+Christopher Jeffrey, Josh Bruce, Steven, Jamie Davis, Tony Brix, Trevor Buckner
+*A markdown parser and compiler. Built for speed*,
+2025,
+https://marked.js.org/
 </mdCitation>
 
 <mdCitations>
