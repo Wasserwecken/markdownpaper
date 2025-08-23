@@ -11,17 +11,13 @@ This here defines the footer content for all pages.
 
 
 # markdownpaper
-Write content, focus on content. Layout ain't your problem.
-
-Use markdown[citMarked] syntax to create beautiful documentations, scientific scripts or papers, through a single static HTML file without runtime dependencies or build processes.
+Use markdown syntax to create beautiful documentations, scientific scripts or papers, through a single static HTML file without runtime dependencies or build processes.
 
 There is no need for NPM, Ruby, Python, Perl Environment, Docker container, Java runtime, online services or subscription. It runs anywhere without any installation and creates a print ready HTML layout.
 
-Do not expect that every single markdown will render correctly. The focus is on academic and printing content. Rendering elements that are larger than a single page are not supported (e.g. large code sections, endless lists, etc.). There are other tools to checkout for converting markdown into presentable HTML like [MkDocs](https://www.mkdocs.org/).
+> Write content, focus on content. Layout ain't your problem.
 
 
-
-<mdColumnBreak></mdColumnBreak>
 
 <TableOfContents>
 ## Content
@@ -32,21 +28,26 @@ Do not expect that every single markdown will render correctly. The focus is on 
 <mdColumnBreak></mdColumnBreak>
 
 ## Introduction
-This is the documentation about *markdownpaper* and its usage. It covers all configuration options as well as the extended syntax, enabling important features like Citations and math formulas.
+This tool has no relation of dependency to LaTex and does not attempt to be feature complete to LaTex, all content is handeled by JavScript and rendered by your browser only.
 
+Academic and printing documents require some specific features like a table of contents or caption you can refer to. These and more features are supported an extended syntax which is covered by this document.
 
+Do not expect that any markdown content is rendered correctly. The focus is on academic and printing content. Rendering elements that are larger than a single page are not supported (e.g. large code sections). There are other tools to checkout for converting markdown into presentable HTML like [MkDocs](https://www.mkdocs.org/).
 
 <div>
 
 ### Content source
-There are three approaches to render markdown content:
+There are four approaches to render markdown content:
 1. Open the `index.html` locally and drag & drop your markdown file to render.
 1. Host the `index.html` as static Website with a markdown file on the webserver. The default path is `./contend.md`.
+1. Host the `index.html` as static Website and call it with the parameter `?content=path/to/markdown.md`.
 1. Embed markdown content directly into `index.html` by editing the first script tag with the id `mdContent` and removing the `src` attribute.
 
 The root path of any media defined in the markdown is the location of the `index.html`. The actual location of the content is NOT respected. Make sure that all resources, like images, use the root path of the `index.html`.
 
-Loading the markdown content automatically works only if the `index.html` is hosted, because the browser blocks fetching from local file paths. The default loading path can be changed by editing the `src` attribute in the first script tag with the id `mdContent`.
+Loading the markdown content automatically works only if the `index.html` is hosted, because the browser blocks fetching from local file paths.
+
+The default loading path for a hosted service can be changed by editing the `src` attribute in the first script tag with the id `mdContent`.
 
 *IMHO:* My setup is [VSCode](https://code.visualstudio.com/) with the extension [Live Preview](https://marketplace.visualstudio.com/items?itemName=ms-vscode.live-server). This will host the `index.html` locally without headache and enables a live preview of the content.
 
@@ -56,8 +57,25 @@ Loading the markdown content automatically works only if the `index.html` is hos
 
 <div>
 
+### Recommnded setup
+Use [VSCode](https://code.visualstudio.com/) with the extension [Live Preview](https://marketplace.visualstudio.com/items?itemName=ms-vscode.live-server) or [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer).
+
+Create a directory and place a `index.html` next to the `index.html`. VSCode has syntax highlighting support for markdown and you can watch with the 'Live preview' your rendered content.
+
+</div>
+
+
+
+<div>
+
 ### Printing
-The main purpose of this tool is to create a PDF through the browsers print option. Thus all pages are exactly shaped as A4 in portrait orientation, because this is the common format for documentations or papers. This trick and the browser printing have some limitations that cannot be avoided, because JavaScript is not allowed to modify printing options.
+Recommended printing are:
+- **Layout:** Portrait
+- **Format:** A4
+- **Margins:** None
+- **Scale:** Standard
+
+The main purpose of this tool is to create a PDF through the browsers print option. Thus all pages are exactly shaped as A4 in portrait orientation. This trick and the browser printing have some limitations that cannot be avoided, because JavaScript is not allowed to modify printing options.
 
 If there is the need of another paper size like A5, the sizes has to be edited in the embedded style sheets of the `index.html`. When printing the document, the custom page size should also be set in the printing options again, this can be done automatically as well as enabling printing background images and colors!
 
@@ -66,17 +84,18 @@ When printing, any padding of the page should be removed. The printing border is
 </div>
 
 
+
 <mdColumnBreak></mdColumnBreak>
 
 ## Writing markdown
-The library marked.js[mdMarked] is used for parsing and compiling markdown. Thus all common markdown syntax is supported. The following sections show the appearance of standard markdown elements.
+The library marked.js[mdMarked] is used for parsing and compiling markdown. Thus almost all common markdown syntax is supported, details about supported elements can be read here: <https://marked.js.org/#specifications>. The following sections show the appearance of standard markdown elements.
 
 <div>
 
 
 
 ### Headings
-Headlines are automatically enumerated by their level, with `#` for *H1*, `##` for *H2*, and so on. The heading `#` *H1* is special because it defines the title of the document and its's content, it is not enumerated and will not appear in the table of contents.
+Headlines are automatically enumerated by their level, with `#` for *H1*, `##` for *H2*, and so on. The heading `#` *H1* is treated special because it defines the title of the document and its's content, it is not enumerated and will not appear in the table of contents.
 
 ```
 # Heading 1
@@ -103,7 +122,7 @@ Headlines are automatically enumerated by their level, with `#` for *H1*, `##` f
 <div>
 
 ### Paragraphs
-Paragraphs are separated by a blank line. The text will be wrapped automatically. Do not indent your text, otherwise it will be interpreted as a code block.
+Paragraphs are separated by a blank line. The text will be wrapped automatically. Do not indent your text, otherwise it is interpreted as a code block.
 
 ```
 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat.
@@ -123,7 +142,7 @@ At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergr
 <div>
 
 ### Lists
-Lists can be created using the `-` or `1.` characters for unordered lists, and numbers followed by a period for ordered lists. Sub-items are supported as well and can be created by indenting the sub-items.
+Lists can be created using the `-`, `*` or `1.` characters for unordered lists, and numbers followed by a period for ordered lists. Nested lists are supported as well and can be created by indenting the sub list items.
 
 ```
 - Item
@@ -159,17 +178,20 @@ Lists can be created using the `-` or `1.` characters for unordered lists, and n
 <div>
 
 ### Images
-Images can be included in the markdown file, and will be displayed in the HTML output. You can use the HTML image tag, or use the markdown syntax. All examples result in the same output.
+Images are supported by the standard markdown syntax of `![Alt text](your/path.png)` or by using the `<img src="your/path.png" />` HTML syntax. All examples result in the same output.
+
+
 
 ```
 [img]: ./media/sailboat.bmp
 ![img]
+
 ![](./.doc/sailboat.bmp)
-<img src="./media/sailboat.bmp"/>
+<img src="./.doc/media/sailboat.bmp"/>
 ```
 ---
 
-<img src="./media/sailboat.bmp"/>
+![](./.doc/media/sailboat.bmp)
 
 </div>
 

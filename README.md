@@ -1,9 +1,9 @@
 # markdownpaper
-Write content, focus on content. Layout ain't your problem.
+Use markdown syntax to create beautiful documentations, scientific scripts or papers, through a single static HTML file without runtime dependencies or build processes.
 
 There is no need for NPM, Ruby, Python, Perl Environment, Docker container, Java runtime, online services or subscription. It runs anywhere without any installation and creates a print ready HTML layout.
 
-Do not expect that every single markdown will render correctly. The focus is on academic and printing content. Rendering elements that are larger than a single page are not supported (e.g. large code sections, endless lists, etc.). There are other tools to checkout for converting markdown into presentable HTML like [MkDocs](https://www.mkdocs.org/).
+> Write content, focus on content. Layout ain't your problem.
 
 
 ## Extended Markdown

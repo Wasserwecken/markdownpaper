@@ -2,13 +2,12 @@
 <html lang="en">
 
 <head>
-    <script id="mdContent" type="text/markdown" src="./content.md"></script>
+    <script id="mdContent" type="text/markdown" src="./documentation.md"></script>
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="data:image/png;base64,iVBORw0KGgo=">
-    <link href="https://fonts.cdnfonts.com/css/latin-modern-roman" rel="stylesheet">
-
+    <link href="https://fonts.cdnfonts.com/css/cmu-serif" rel="stylesheet">
 
     <script>
         MathJax = {
@@ -30,9 +29,18 @@
             --main-bg-color: #ccc;
             --paper-width: 210mm;
             --paper-height: 297mm;
-            --paper-space: 20mm;
-            --cornell-space: 0mm;
+            --font-annotation-size: 0.8rem;
 
+            --border-hint: 1px solid #c2c2c2;
+            --border-radius: 0.2rem;
+
+            --paper-padding: 20mm;
+            --cornell-space: 0mm;
+            --column-count: 2;
+            --font-family: 'CMU Serif', Georgia, serif;
+            --font-size: 9pt;
+            --text-align: justify;
+            --hyphens: auto;
         }
 
         html,
@@ -43,9 +51,8 @@
             margin: 0;
             padding: 0;
 
-            font-family: 'LMRoman10', math, Georgia, serif;
-            font-size: 9pt;
-            --font-annotation-size: 0.8rem;
+            font-family: var(--font-family);
+            font-size: var(--font-size);
         }
 
         #pages {
@@ -64,7 +71,7 @@
 
             width: var(--paper-width);
             height: var(--paper-height);
-            padding: 0 var(--paper-space);
+            padding: 0 var(--paper-padding);
 
             background: var(--paper-bg-color);
             box-shadow: 0px 0px 32px -8px #0008;
@@ -77,9 +84,16 @@
             flex: none;
             display: flex;
             justify-content: center;
-            height: var(--paper-space);
+            height: var(--paper-padding);
             font-size: var(--font-annotation-size);
             opacity: 66%;
+        }
+
+        .page-content {
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            height: 100%;
         }
 
         .page-no {
@@ -107,7 +121,7 @@
             top: 0rem;
         }
 
-        .page-content {
+        .page-columns {
             min-height: 0;
             height: 100%;
             column-count: 2;
@@ -116,8 +130,15 @@
             padding-right: var(--cornell-space);
         }
 
-        .page-content>* {
+        .page-columns>* {
             break-inside: avoid;
+            /* Allows for grouping elements */
+        }
+
+        .page-columns>*:first-child,
+        .page-columns>*:first-child>*:first-child {
+            margin-top: 0;
+            /* Cant avoid margin collapse, so the first margin has to be removed too */
         }
 
         #page-template {
@@ -131,7 +152,7 @@
         }
 
         .column-break {
-            break-after: column;
+            break-before: column;
             margin: 0;
         }
 
@@ -157,8 +178,17 @@
 
     <style id="cssMarkdownStandard">
         p {
-            hyphens: auto;
-            text-align: justify;
+            hyphens: var(--hyphens);
+            text-align: var(--text-align);
+        }
+
+        blockquote p,
+        code p,
+        a,
+        .ref-cap p,
+        .cit-ref p {
+            text-align: unset;
+            hyphens: unset;
         }
 
         h1,
@@ -197,7 +227,6 @@
         }
 
         a {
-            text-align: unset;
             hyphens: unset;
             font-style: italic;
             color: inherit;
@@ -214,7 +243,7 @@
             margin: auto;
             width: 100%;
             max-width: 100%;
-            border-radius: 0.25rem;
+            border-radius: var(--border-radius);
         }
 
         table {
@@ -229,7 +258,7 @@
         }
 
         tr {
-            border-bottom: 1px solid #ccc;
+            border-bottom: var(--border-hint);
         }
 
         thead {
@@ -243,18 +272,15 @@
 
         pre {
             font-size: var(--font-annotation-size);
-            border-radius: 0.25rem;
             display: block;
         }
 
         code {
             display: inline;
             padding: 0 0.3rem;
-
             font-size: var(--font-annotation-size);
-
-            border-radius: 0.25rem;
-            border: 1px solid #c2c2c2;
+            border: var(--border-hint);
+            border-radius: var(--border-radius);
         }
 
         pre code {
@@ -264,58 +290,53 @@
             white-space: pre-wrap;
             word-wrap: break-word;
         }
+
+        blockquote {
+            font-style: italic;
+            border-top: var(--border-hint);
+            border-bottom: var(--border-hint);
+        }
     </style>
 
     <style id="cssMarkdownExtensions">
-        .ref-sub {
+        .ref-cit-link,
+        .ref-cap-link,
+        .ref-foot-link {
+            font-style: unset;
+            text-decoration: underline;
+        }
+
+        .ref-cap-wrapper {
             margin: 1rem 0;
         }
 
-        .ref-sub-line {
+        .ref-cap {
             opacity: 66%;
             display: flex;
             gap: 0.5rem;
             align-items: baseline;
         }
 
-        .ref-sub-label {
+        .ref-cap-key {
             font-weight: bold;
             text-wrap: nowrap;
         }
 
-        .ref-sub-content * {
+        .ref-cap-content * {
             font-style: italic;
-            text-align: unset !important;
         }
 
-        .ref-sub-line *:first-of-type {
-            margin: 0;
-        }
-
-        .ref-list-item {
+        .ref-cit {
             display: flex;
             margin: 0.5rem 0;
             align-items: first baseline;
             font-size: var(--font-annotation-size);
         }
 
-        .ref-list-item *:first-of-type {
-            margin: 0;
-        }
-
-        .ref-list-id {
+        .ref-cit-key {
             flex: none;
             display: inline-block;
             width: 1.5rem;
-        }
-
-        .ref-list-item * {
-            text-align: unset;
-        }
-
-        .ref-link {
-            font-style: unset;
-            text-decoration: underline;
         }
 
         .ref-foot {
@@ -338,7 +359,7 @@
             padding-left: 1rem;
         }
 
-        .toc-list-item {
+        .toc-item {
             width: 100%;
             display: flex;
             gap: .5rem;
@@ -346,12 +367,13 @@
             padding: 0.125rem 0rem;
         }
 
-        .toc-list-item-dots {
+        .toc-item-dots {
             flex: 1 1 auto;
             border-bottom: 1px dotted;
         }
 
-        .mxgraph, .mxgraph svg {
+        .mxgraph,
+        .mxgraph svg {
             width: 100% !important;
             height: unset !important;
             min-width: unset !important;
@@ -371,11 +393,14 @@
 
 <body>
 
-    <div id="pages"></div>
+    <div id="pages">
+        <!-- All pages are added here -->
+    </div>
 
     <div id="file-picker" class="page">
+        <!-- Selecting a markdown file -->
         <div id="file-picker-page" style="margin: auto; opacity: 66%; text-align: center;">
-            <h2>Drag and drop your markdown </h2>
+            <h2>Drag and drop your markdown</h2>
             <h2>Or click to pick</h2>
             <input id="file-picker-input" style="position:absolute; top:-2rem; display: none;" type="file"
                 accept=".md,text/markdown,text/plain" />
@@ -383,13 +408,16 @@
     </div>
 
     <div id="page-template" class="page">
+        <!-- Defines the structure of a single page -->
         <div class="page-header">
             <p class="page-no"></p>
         </div>
 
-        <div class="page-top"></div>
-        <div class="page-content"></div>
-        <div class="page-bottom"></div>
+        <div class="page-content">
+            <div class="page-top"></div>
+            <div class="page-columns"></div>
+            <div class="page-bottom"></div>
+        </div>
 
         <div class="page-footer">
             <p class="page-no"></p>
@@ -397,49 +425,51 @@
     </div>
 
     <div id="toc-list-template" class="toc-list">
-        <a class="toc-list-item">
-            <span class="toc-list-item-heading"></span>
-            <span class="toc-list-item-dots"></span>
-            <span class="toc-list-item-page"></span>
+        <!-- Table of contents list -->
+        <a class="toc-item">
+            <span class="toc-item-heading"></span>
+            <span class="toc-item-dots"></span>
+            <span class="toc-item-page"></span>
         </a>
     </div>
 
-    <div id="ref-list-template" class="ref-list">
-        <div class="ref-list-item">
-            <div class="ref-list-id"></div>
-            <div class="ref-list-content"></div>
+    <div id="ref-cit-list-template" class="ref-cit-list">
+        <!-- Reference list -->
+        <div class="ref-cit">
+            <div class="ref-cit-key"></div>
+            <div class="ref-cit-content"></div>
         </div>
     </div>
 
-    <div id="ref-sub-template" class="ref-sub">
-        <div class="ref-sub-line">
-            <div class="ref-sub-label"></div>
-            <div class="ref-sub-content"></div>
+    <div id="ref-cap-wrapper-template" class="ref-cap-wrapper">
+        <!-- Captions for figures, tables, etc -->
+        <div class="ref-cap">
+            <div class="ref-cap-key"></div>
+            <div class="ref-cap-content"></div>
         </div>
     </div>
 
     <div id="ref-foot-template" class="ref-foot">
-        <sup class="ref-foot-id"></sup>
+        <!-- Footnote template -->
+        <sup class="ref-foot-key"></sup>
         <div class="ref-foot-content"></div>
     </div>
 
-    <div id="drawio-frame" class="mxgraph" data-mxgraph='{"resize": true, "center": true, {{content}}}'>
+    <div id="diagram-template" class="mxgraph" data-mxgraph='{"resize": true, "center": true, {{content}}}'>
+        <!-- Wrapper for draw.io diagrams -->
     </div>
 
 
     <script>
         /**
-         * Loads all template divs from the DOM.
-         * @returns {Object} - Collection of template elements.
+         *
          */
-        async function LoadTemplateCollection() {
-            const drawioFrame = document.querySelector('#drawio-frame');
-            drawioFrame.id = '';
-            drawioFrame.remove();
+        function LoadTemplates() {
+            const diagram = document.querySelector('#diagram-template');
+            diagram.id = '';
+            diagram.remove();
 
             const filePicker = document.querySelector('#file-picker');
-            const filePickerPage = filePicker.querySelector('#file-picker-page');
-            const filePickerInput = filePicker.querySelector('#file-picker-input');
             filePicker.remove();
 
             const page = document.querySelector('#page-template');
@@ -447,61 +477,62 @@
             page.remove();
 
             const tocList = document.querySelector('#toc-list-template');
-            const tocListItem = tocList.querySelector('.toc-list-item');
+            const tocListItem = tocList.querySelector('.toc-item');
             tocList.id = '';
             tocList.innerHTML = '';
             tocList.remove();
 
-            const refList = document.querySelector('#ref-list-template');
-            const refListItem = refList.querySelector('.ref-list-item');
-            const refSub = document.querySelector('#ref-sub-template');
-            refList.id = '';
-            refList.innerHTML = '';
-            refList.remove();
-            refSub.id = '';
-            refSub.remove();
+            const refCitList = document.querySelector('#ref-cit-list-template');
+            const refCitItem = refCitList.querySelector('.ref-cit');
+            refCitList.id = '';
+            refCitList.innerHTML = '';
+            refCitList.remove();
 
-            refFoot = document.querySelector('#ref-foot-template');
-            refFoot.id = '';
-            refFoot.remove();
+            const refCapWrap = document.querySelector('#ref-cap-wrapper-template');
+            refCapWrap.id = '';
+            refCapWrap.remove();
+
+            const refFootItem = document.querySelector('#ref-foot-template');
+            refFootItem.id = '';
+            refFootItem.remove();
 
             const templates = {
-                DrawioFrame: drawioFrame,
+                Diagram: diagram,
                 FilePicker: filePicker,
-                FilePickerPage: filePickerPage,
-                FilePickerInput: filePickerInput,
                 Page: page,
                 TocList: tocList,
                 TocListItem: tocListItem,
-                RefList: refList,
-                RefListItem: refListItem,
-                RefSub: refSub,
-                RefFoot: refFoot,
+                RefCitList: refCitList,
+                RefCitItem: refCitItem,
+                RefCapWrap: refCapWrap,
+                RefFootItem: refFootItem,
             }
 
-            filePicker.addEventListener("dragover", dragOverHandler);
-            filePicker.addEventListener("drop", (e) => dropHandler(templates, e));
-            filePicker.addEventListener("click", (e) => pickContent(templates, e));
-            filePickerInput.addEventListener('change', (e) => handleFileUpload(templates, e.target.files[0]));
+            filePicker.addEventListener("dragover", e => e.preventDefault());
+            filePicker.addEventListener("click", (e) => e => filePicker.querySelector('#file-picker-input').click());
+            filePicker.querySelector('#file-picker-input').addEventListener('change', e => {
+                handleFileUpload(templates, e.target.files[0])
+            });
+            filePicker.addEventListener("drop", (e) => e => {
+                e.preventDefault();
+                handleFileUpload(templates, e.dataTransfer.files[0]);
+            });
 
             return templates
         }
 
         /**
-         * Extracts the header and footer from the content div and sets the page title.
-         * Removes any <header> and <footer> elements from the content div.
-         * @param {Object} templates - Collection of DOM templates.
-         * @param {Element} contentDiv - Element holding all markdown defined content.
+         *
          */
-        async function ExtractConfig(templates, contentDiv) {
-            for (const header of contentDiv.querySelectorAll('header')) {
+        function ExtractConfig(templates, contentDiv) {
+            for (const header of contentDiv.querySelectorAll('mdHeader')) {
                 const headerContent = document.createElement('div');
                 headerContent.innerHTML = marked.parse(header.innerHTML);
                 templates.Page.querySelector('.page-header').appendChild(headerContent);
                 header.remove();
             }
 
-            for (const footer of contentDiv.querySelectorAll('footer')) {
+            for (const footer of contentDiv.querySelectorAll('mdFooter')) {
                 const footerContent = document.createElement('div');
                 footerContent.innerHTML = marked.parse(footer.innerHTML);
                 templates.Page.querySelector('.page-footer').appendChild(footerContent);
@@ -519,61 +550,221 @@
                 Hyphen: true,
                 FontSize: "9pt",
                 CornellSize: "0",
-                FontFamily: `'LMRoman10', Georgia, serif`,
+                FontFamily: `'CMU Serif', Georgia, serif`,
                 TextAlign: "justify",
             };
-            const contentConfig = contentDiv.querySelector('config');
+            const contentConfig = contentDiv.querySelector('mdConfig');
             if (contentConfig) {
                 config.Columns = contentConfig.getAttribute('Columns') ?? config.Columns;
                 config.Padding = contentConfig.getAttribute('Padding') ?? config.Padding;
                 config.Hyphens = contentConfig.getAttribute('Hyphens') ?? config.Hyphens;
-                config.CornellSize = contentConfig.getAttribute('CornellSize') ?? config.CornellSize;
+                config.CornellSpace = contentConfig.getAttribute('CornellSpace') ?? config.CornellSize;
                 config.FontSize = contentConfig.getAttribute('FontSize') ?? config.FontSize;
                 config.FontFamily = contentConfig.getAttribute('FontFamily') ?? config.FontFamily;
                 config.TextAlign = contentConfig.getAttribute('TextAlign') ?? config.TextAlign;
                 contentConfig.remove();
-                ApplyConfig(config);
+                AppendPageStyle(config);
             }
 
             return config;
         }
 
         /**
-         * Adds custom styles based on the provided configuration for the whole document.
-         * If the currentPage is defined, the styles will be scoped to that page.
-         * @param {Object} config - The configuration object containing style properties.
-         * @param {Object} currentPage - The current page object (if available).
+         *
          */
-        function ApplyConfig(config, pageId) {
-            const customStyle = document.createElement('style');
-            const pageIdName = pageId ? `#${pageId}` : ``;
-            customStyle.innerHTML += `\n${pageIdName}.page { --paper-space: ${config.Padding}; --cornell-space: ${config.CornellSize}; }`;
-            customStyle.innerHTML += `\n${pageIdName} p { hyphens: ${config.Hyphens}; text-align: ${config.TextAlign}; }`;
-            customStyle.innerHTML += `\n${pageIdName} body { font-size: ${config.FontSize}; font-family: ${config.FontFamily}; }`;
-            customStyle.innerHTML += `\n${pageIdName} .page-content { column-count: ${config.Columns} }`;
-            document.head.appendChild(customStyle);
+        function AppendPageStyle(config, pageId) {
+            let pageStyle = document.head.querySelector('#pageStyle');
+            if (!pageStyle) {
+                pageStyle = document.createElement('style');
+                pageStyle.id = 'pageStyle';
+                document.head.appendChild(pageStyle);
+            }
+
+            pageId = pageId ? `#${pageId}` : ``;
+            pageStyle.innerHTML += `\n${pageId}.page {
+            --paper-padding: ${config.Padding};
+            --cornell-space: ${config.CornellSpace};
+            --column-count: ${config.Columns};
+            --font-family: ${config.FontFamily};
+            --font-size: ${config.FontSize};
+            --text-align: ${config.TextAlign};
+            --hyphens: ${config.Hyphen};\n}`;
         }
 
 
+        /**
+         *
+         */
+        function ProcessCitations(templates, contentDiv) {
+            let citationEnum = 0;
+            const citations = [];
+
+            // iterate...
+            for (const citation of contentDiv.querySelectorAll('mdCitation')) {
+                const id = citation.getAttribute('id');
+                let key = citation.getAttribute('key');
+
+                // auto enumerate if there is no predefined key.
+                if (!key) {
+                    citationEnum++;
+                    key = citationEnum.toString();
+                }
+
+                // manipulate and remember.
+                citation.remove();
+                citation.setAttribute('key', `[${key}]`);
+                citations.push(citation);
+            }
+
+            // populate citation list.
+            let citRefList = contentDiv.querySelector('mdCitations');
+            if (citRefList) {
+                templates.RefCitList.innerHTML = marked.parse(citRefList.innerHTML);
+                citRefList.replaceWith(templates.RefCitList);
+                citRefList = templates.RefCitList;
+
+                for (const citation of citations) {
+                    const citListItem = templates.RefCitItem.cloneNode(true);
+                    citListItem.id = citation.id;
+                    citListItem.querySelector('.ref-cit-key').innerHTML = citation.getAttribute('key');
+                    citListItem.querySelector('.ref-cit-content').innerHTML = marked.parse(citation.innerHTML);
+                    citRefList.appendChild(citListItem);
+                }
+            }
+
+            return citations;
+        }
 
         /**
-         * Enumerates the headings in the content div and adds a prefix based on their level.
-         * Also creates a table of contents if a <TableOfContents> element is present.
-         * @param {Object} templates - Collection of DOM templates.
-         * @param {Element} contentDiv - Element holding all markdown defined content.
+         *
          */
-        async function EnumerateHeadings(templates, contentDiv) {
+        function ProcessCaptions(templates, contentDiv) {
+            const captions = {};
+            const captionEnums = {};
 
-            // enumerate and collect defined headings.
-            let headingLevels = [0, 0, 0, 0, 0, 0];
+            // iterate...
+            for (const caption of [...contentDiv.querySelectorAll('mdCaption')]) {
+                const id = caption.getAttribute('id');
+                const type = caption.getAttribute('type');
+                let key = caption.getAttribute('key');
+
+                // group captions by their type
+                if (!(type in captions)) {
+                    captions[type] = [];
+                    captionEnums[type] = 0;
+                }
+
+                // auto enumerate if there is no predefined key.
+                if (!key) {
+                    captionEnums[type]++;
+                    key = type.charAt(0).toUpperCase() + type.slice(1);
+                    key += ' ' + captionEnums[type].toString();
+                }
+
+                caption.setAttribute('key', `[${key}]`);
+
+                // create wrapper for the caption and the target.
+                const captionWrap = templates.RefCapWrap.cloneNode(true);
+                captionWrap.id = caption.id;
+                captionWrap.querySelector('.ref-cap-key').innerHTML = caption.getAttribute('key');
+                captionWrap.querySelector('.ref-cap-content').innerHTML = marked.parse(caption.innerHTML);
+                captions[type].push(captionWrap);
+
+                // bundle the previous element with the caption.
+                let target = caption.previousElementSibling;
+                while (!target) {
+                    target = caption.parentNode.previousElementSibling;
+                }
+
+                // replace with wrapper.
+                captionWrap.prepend(target);
+                caption.replaceWith(captionWrap);
+            }
+
+            return captions;
+        }
+
+        /**
+         *
+         */
+        function PrepareFootnotes(templates, contentDiv) {
+            const footnotes = [];
+
+            // iterate...
+            for (const footnote of [...contentDiv.querySelectorAll('mdFootnote')]) {
+                const footnoteItem = templates.RefFootItem.cloneNode(true);
+                footnoteItem.id = footnote.id;
+                footnoteItem.querySelector('.ref-foot-key').innerHTML = footnoteItem.getAttribute('');
+                footnoteItem.querySelector('.ref-foot-content').innerHTML = marked.parse(footnote.innerHTML);
+                footnotes.push(footnoteItem);
+                footnote.remove();
+            }
+
+            return footnotes;
+        }
+
+        function ProcessReferencePointers(citations, captions, footnotes, contentDiv) {
+
+            // replace citation pointers
+            for (const item of contentDiv.querySelectorAll('*')) {
+                if (['CODE', 'SVG', 'IFRAME', 'IMG'].includes(item.tagName)) {
+                    continue;
+                }
+
+                for (const citation of citations) {
+                    const key = citation.getAttribute('key');
+                    const link = `<a class="ref-cit-link" href="#${citation.id}">${key}</a>`;
+                    item.innerHTML = item.innerHTML.replaceAll(`[${citation.id}]`, link);
+                }
+            }
+
+            // replace caption pointers
+            for (const item of contentDiv.querySelectorAll('*')) {
+                if (['CODE', 'SVG', 'IFRAME', 'IMG'].includes(item.tagName)) {
+                    continue;
+                }
+
+                for (const [type, list] of Object.entries(captions)) {
+                    for (const caption of list) {
+                        const key = caption.getAttribute('key');
+                        const link = `<a class="ref-cit-link" href="#${caption.id}">${key}</a>`;
+                        item.innerHTML = item.innerHTML.replaceAll(`[${caption.id}]`, link);
+                    }
+                }
+            }
+
+            // prepare footnote pointers.
+            for (const item of contentDiv.querySelectorAll('*')) {
+                if (['CODE', 'SVG', 'IFRAME', 'IMG'].includes(item.tagName)) {
+                    continue;
+                }
+
+                for (const footnote of footnotes) {
+                    const key = footnote.getAttribute('key') ?? footnote.id;
+                    const link = `<sup class="ref-foot-link" refId="${footnote.id}">${key}</sup>`;
+                    item.innerHTML = item.innerHTML.replaceAll(`[${footnote.id}]`, link);
+                }
+            }
+        }
+
+        /**
+         *
+         */
+        function EnumerateHeadings(templates, contentDiv) {
             const headings = [...contentDiv.querySelectorAll('h2, h3, h4, h5, h6')];
+
+            // enumerate...
+            let headingLevels = [0, 0, 0, 0, 0, 0];
             for (const heading of headings) {
+
+                // skip marked headings
                 if (heading.innerHTML.startsWith('[!]')) {
                     heading.innerHTML = heading.innerHTML.replace('[!]', '');
                     heading.id = heading.innerHTML.replace(/\s/g, '');;
                     continue;
                 }
 
+                // count and label
                 const level = parseInt(heading.tagName[1]) - 1;
                 headingLevels[level - 1]++;
                 for (let i = level; i < headingLevels.length; i++) {
@@ -584,13 +775,13 @@
                 heading.innerHTML = `${prefix}. ${heading.innerHTML}`;
             }
 
-            // build the table of contens if defined.
+            // build the table of contens.
             let tocDiv = contentDiv.querySelector('TableOfContents');
             if (tocDiv) {
                 tocDiv.innerHTML = marked.parse(tocDiv.innerHTML);
                 let previousLevel = 0;
                 let levelList = tocDiv;
-                const tocDepth = parseInt(tocDiv.getAttribute('depth')) || 5;
+                const tocDepth = parseInt(tocDiv.getAttribute('depth')) || 6;
 
                 for (const heading of headings) {
                     const level = parseInt(heading.tagName[1]) - 1;
@@ -598,10 +789,7 @@
                         continue;
                     }
 
-                    const tocItem = templates.TocListItem.cloneNode(true);
-                    tocItem.href = `#${heading.id}`;
-                    tocItem.querySelector('.toc-list-item-heading').innerHTML = heading.innerHTML;
-
+                    // adjust list level
                     if (previousLevel < level) {
                         while (previousLevel != level && previousLevel < 6) {
                             levelList.appendChild(templates.TocList.cloneNode(false));
@@ -619,6 +807,10 @@
                         levelList = levelList.lastChild;
                     }
 
+                    // create entry
+                    const tocItem = templates.TocListItem.cloneNode(true);
+                    tocItem.href = `#${heading.id}`;
+                    tocItem.querySelector('.toc-item-heading').innerHTML = heading.innerHTML;
                     levelList.appendChild(tocItem);
                 }
 
@@ -627,123 +819,12 @@
                 }
                 tocDiv.remove();
             }
+
+            return headings;
         }
 
-
-
         /**
-         * Collect all reference information and create enumerated labels and reference list.
-         * @param {Object} templates - Collection of DOM templates.
-         * @param {Element} contentDiv - Element holding all markdown defined content.
-         */
-        async function EvaluateReferences(templates, contentDiv) {
-            const srcRefs = [];
-            const footRefs = [];
-            const linkRefs = {};
-
-            // prepare the reference list item.
-            let srcRefList = contentDiv.querySelector('references');
-            if (srcRefList) {
-                templates.RefList.innerHTML = marked.parse(srcRefList.innerHTML);
-                srcRefList.replaceWith(templates.RefList);
-                srcRefList = templates.RefList;
-            }
-
-            // analyse all references.
-            for (const reference of [...contentDiv.querySelectorAll('ref')]) {
-                const refId = reference.getAttribute('id');
-                const refType = reference.getAttribute('type');
-
-                // citation references are rendered only in a reference lists.
-                if (refType == 'citation') {
-                    const refLabel = `[${srcRefs.length + 1}]`;
-                    srcRefs.push([refId, refLabel, reference]);
-                    reference.remove();
-
-                    if (srcRefList) {
-                        const srcItem = templates.RefListItem.cloneNode(true);
-                        const srcContent = marked.parse(reference.innerHTML);
-                        srcItem.id = refId;
-                        srcItem.querySelector('.ref-list-id').innerHTML = refLabel;
-                        srcItem.querySelector('.ref-list-content').innerHTML = srcContent;
-                        srcRefList.appendChild(srcItem);
-                    }
-                }
-
-                // footnotes are handled while building the pages.
-                else if (refType == 'footnote') {
-                    footRefs.push([refId, reference]);
-                }
-
-                // any other reference are treated as subline.
-                else {
-                    if (!(refType in linkRefs))
-                        linkRefs[refType] = [];
-
-                    // extract the ref infos and set a enumerated label.
-                    const refCount = linkRefs[refType].length + 1;
-                    const refLabel = `${refType.charAt(0).toUpperCase()}${refType.slice(1)} ${refCount}`;
-                    linkRefs[refType].push([refId, refLabel]);
-
-                    const refContent = marked.parse(reference.innerHTML);
-                    const refSub = templates.RefSub.cloneNode(true);
-                    refSub.id = refId;
-                    refSub.querySelector('.ref-sub-label').innerHTML = refLabel;
-                    refSub.querySelector('.ref-sub-content').innerHTML = refContent;
-
-                    // bundle the previous element with the reference.
-                    let previousItem = reference.previousElementSibling;
-                    while (!previousItem) {
-                        previousItem = reference.parentNode.previousElementSibling;
-                    }
-
-                    refSub.prepend(previousItem);
-                    reference.replaceWith(refSub);
-                }
-            }
-
-            if (srcRefList) {
-                for (const item of [...srcRefList.childNodes]) {
-                    srcRefList.parentNode.insertBefore(item, srcRefList);
-                }
-                srcRefList.remove();
-            }
-
-            // replace the link ids with the labels and actual links.
-            for (const item of contentDiv.querySelectorAll('*')) {
-                // skip special elements because they are expected to hold raw data.
-                if (item.tagName == 'CODE') {
-                    continue;
-                }
-
-                for (const [type, refs] of Object.entries(linkRefs)) {
-                    for (const [refId, refLabel] of refs) {
-                        const linkLabel = `<a class="ref-link" href="#${refId}">[${refLabel}]</a>`;
-
-                        if (item.innerHTML.includes(`[${refId}]`))
-                            item.innerHTML = item.innerHTML;
-
-                        item.innerHTML = item.innerHTML.replaceAll(`[${refId}]`, linkLabel);
-                    }
-                }
-
-                for (const [srcId, srcLabel, srcItem] of srcRefs) {
-                    const linkLabel = `<a class="ref-link" href="#${srcId}">${srcLabel}</a>`;
-                    item.innerHTML = item.innerHTML.replaceAll(`[${srcId}]`, linkLabel);
-                }
-
-                for (const [refId, srcItem] of footRefs) {
-                    const linkLabel = `<sup class="ref-link" refId="${refId}"></sup>`;
-                    item.innerHTML = item.innerHTML.replaceAll(`[${srcItem.id}]`, linkLabel);
-                }
-            }
-        }
-
-
-
-        /**
-         * Pre-renders the content and waits for all resources to be loaded.
-         * @param {Element} contentDiv - Element holding all markdown defined content.
+         *
          */
         async function PreRenderAndWait(templates, contentDiv) {
             document.body.appendChild(contentDiv);
@@ -753,8 +834,8 @@
 
             // diagram rendering
             let diagrams = [];
-            for (const graph of document.querySelectorAll('drawio')) {
-                const graphFrame = templates.DrawioFrame.cloneNode(true);
+            for (const graph of document.querySelectorAll('mdDiagram')) {
+                const graphFrame = templates.Diagram.cloneNode(true);
                 const srcPath = graph.getAttribute('src');
                 let graphConfig = graphFrame.getAttribute('data-mxgraph');
                 graphConfig = srcPath
@@ -773,7 +854,6 @@
                 }
             }
 
-
             // wait for images to be loaded to know their size.
             for (let image of contentDiv.querySelectorAll('img')) {
                 if (!image.complete) {
@@ -787,12 +867,9 @@
             contentDiv.remove();
         }
 
-        /**
-         *
-         */
         function CleanupFootnotes(currentPage) {
             const usedFootIds = [];
-            currentPage.Content.querySelectorAll('sup.ref-link')
+            currentPage.Columns.querySelectorAll('sup.ref-link')
                 .forEach(f => usedFootIds.push(f.getAttribute('refId')));
 
             const footNotes = currentPage.Footer.querySelectorAll('.ref-foot');
@@ -803,9 +880,6 @@
             }
         }
 
-        /**
-         * Adds a new page to the document.
-         */
         function AddPage(templates, config, pageList) {
             if (pageList.length > 0) {
                 CleanupFootnotes(pageList.at(-1));
@@ -816,7 +890,7 @@
                 Page: newPageDiv,
                 Header: newPageDiv.querySelector('.page-header'),
                 Top: newPageDiv.querySelector('.page-top'),
-                Content: newPageDiv.querySelector('.page-content'),
+                Columns: newPageDiv.querySelector('.page-columns'),
                 Bottom: newPageDiv.querySelector('.page-bottom'),
                 Footer: newPageDiv.querySelector('.page-footer'),
             }
@@ -827,12 +901,11 @@
             newPage.Footer.querySelector('.page-no').innerHTML = pageList.length;
 
             document.querySelector('#pages').appendChild(newPage.Page);
-            ApplyConfig(config, newPageDiv.id);
-
+            AppendPageStyle(config, newPageDiv.id);
         }
 
         async function AppendPageElement(templates, footNotes, currentPage, contentItem) {
-            currentPage.Content.appendChild(contentItem);
+            currentPage.Columns.appendChild(contentItem);
 
             const footRefUses = contentItem.querySelectorAll('sup.ref-link');
             for (const footRefUse of footRefUses) {
@@ -852,13 +925,14 @@
             }
         }
 
-        /**
-         * Places the markdown elements into the pages, creates new columns and pages as needed.
-         * @param {Object} templates - The templates used for creating new pages and columns.
-         * @param {Object} config - The configuration options for the document.
-         * @param {Element} contentDiv - Element holding all markdown defined content.
-         */
         async function BuildPages(templates, config, contentDiv) {
+
+            // remove empty paragraphs
+            for (const empty of [...contentDiv.querySelectorAll('p')]) {
+                if (!empty.innerHTML && !empty.hasAttributes()) {
+                    empty.remove();
+                }
+            }
 
             const footNotes = [...contentDiv.querySelectorAll('ref')]
                 .filter(e => e.getAttribute('type') == 'footnote');
@@ -875,7 +949,7 @@
                 let content = [contentItem];
 
                 // Add a new page or clolumn
-                const pageBreak = contentItem.querySelector('PageBreak');
+                const pageBreak = contentItem.querySelector('mdPageBreak');
                 if (pageBreak) {
                     config.Columns = pageBreak.getAttribute('Columns') ?? config.Columns;
                     config.Padding = pageBreak.getAttribute('Padding') ?? config.Padding;
@@ -890,8 +964,9 @@
                     topContent = [];
                     content = [];
                 }
-                else if (contentItem.querySelector('ColumnBreak')) {
-                    contentItem.classList.add('column-break');
+                else if (contentItem.querySelector('mdColumnBreak')) {
+                    contentItem.nextElementSibling.classList.add('column-break');
+                    content = [];
                 }
                 else if (contentItem.tagName == 'COLUMNSPAN') {
                     if (config.Columns == 1) {
@@ -905,10 +980,11 @@
 
                 // iterate
                 for (const item of content) {
+
                     await AppendPageElement(templates, footNotes, pageList.at(-1), item);
 
                     // check if the item is overflowing the page grid and move it to the next column.
-                    gridRect = pageList.at(-1).Content.getBoundingClientRect();
+                    gridRect = pageList.at(-1).Columns.getBoundingClientRect();
                     itemRect = item.getBoundingClientRect();
                     if (itemRect.bottom > gridRect.bottom || itemRect.right > gridRect.right) {
                         const previousNode = item.previousElementSibling
@@ -919,22 +995,15 @@
                         topContent = [];
 
                         if (/^H[1-6]$/.test(previousNode?.tagName))
-                            pageList.at(-1).Content.appendChild(previousNode);
+                            pageList.at(-1).Columns.appendChild(previousNode);
                         await AppendPageElement(templates, footNotes, pageList.at(-1), item);
                     }
                 }
             }
 
-
             return pageList;
         }
 
-
-
-        /**
-         * Evaluates the page numbers in the table of contents.
-         * @param {Element[]} pageList - The list of pages.
-         */
         async function EvaluatePageNo(pageList) {
             const pageDivList = pageList.map(e => e.Page)
             const tocItems = document.querySelectorAll('a.toc-list-item');
@@ -952,16 +1021,13 @@
             }
         }
 
-
         /**
-         * Load markdown content from the script tag with id 'Markdown'.
-         * If the 'src' attribute is defined, fetches the content from that URL,
-         * otherwise the inner HTML of the tag is used.
-         * @returns {Element[]} A list of HTML elements, defined my markdown.
+         *
          */
         async function LoadLocalMarkdown() {
             const markdownBlock = document.getElementById('mdContent');
-            const markdownSrc = markdownBlock.getAttribute('src');
+            const urlParams = new URLSearchParams(document.location.search);
+            const markdownSrc = urlParams.get('content') ?? markdownBlock.getAttribute('src');
 
             let markdownContent = markdownBlock.innerHTML;
             if (markdownSrc) {
@@ -979,16 +1045,19 @@
         }
 
         /**
-         * Renders the markdown content into HTML, handles the render stages,
-         * @param {string} markdownContent - The markdown content to render.
+         *
          */
         async function Render(templates, markdownContent) {
             const contentDiv = document.createElement('div');
             contentDiv.innerHTML = marked.parse(markdownContent);
-            const config = await ExtractConfig(templates, contentDiv);
 
-            await EvaluateReferences(templates, contentDiv);
-            await EnumerateHeadings(templates, contentDiv);
+            const config = ExtractConfig(templates, contentDiv);
+            const citations = ProcessCitations(templates, contentDiv);
+            const captions = ProcessCaptions(templates, contentDiv);
+            const footnotes = PrepareFootnotes(templates, contentDiv);
+            const headings = EnumerateHeadings(templates, contentDiv);
+
+            ProcessReferencePointers(citations, captions, footnotes, contentDiv);
             await PreRenderAndWait(templates, contentDiv);
 
             const pageList = await BuildPages(templates, config, contentDiv);
@@ -996,47 +1065,7 @@
         }
 
         /**
-         * Entry point of parsing the markdown and placing it on pages.
-         */
-        window.onload = async () => {
-            const templates = await LoadTemplateCollection();
-            let markdownContent = await LoadLocalMarkdown();
-
-            if (markdownContent) {
-                await Render(templates, markdownContent);
-            } else {
-                document.querySelector('#pages').appendChild(templates.FilePicker);
-            }
-        };
-
-        /**
-         * Handles the drag over event for the file picker.
-         * @param {DragEvent} e - The drag event.
-         */
-        function dragOverHandler(e) {
-            e.preventDefault();
-        }
-
-        /**
-         * Handles the drop event for the file picker.
-         * @param {DragEvent} e - The drag event.
-         */
-        function dropHandler(templates, e) {
-            e.preventDefault();
-            handleFileUpload(templates, e.dataTransfer.files[0]);
-        }
-
-        /**
-         * Handles the click event for the file picker.
-         */
-        function pickContent(templates, e) {
-            templates.FilePickerInput.click();
-        }
-
-        /**
-         * Handles the file upload process.
-         * Calls the Render function with the file content.
-         * @param {File} file - The file to upload.
+         *
          */
         function handleFileUpload(templates, file) {
             const reader = new FileReader();
@@ -1045,6 +1074,20 @@
                 Render(templates, event.target.result);
             };
             reader.readAsText(file);
+        };
+
+        /**
+         *
+         */
+        window.onload = async () => {
+            const templates = LoadTemplates();
+            let markdownContent = await LoadLocalMarkdown();
+
+            if (markdownContent) {
+                await Render(templates, markdownContent);
+            } else {
+                document.querySelector('#pages').appendChild(templates.FilePicker);
+            }
         };
     </script>
 </body>
