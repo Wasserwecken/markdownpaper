@@ -1,4 +1,4 @@
-<mdConfig columns=2 padding="16mm" fontSize="9pt" hyphens="auto" textAlign="justify" fontFamily="'LMRoman10', Georgia, serif" CornellSize="0mm"></mdConfig>
+<mdConfig columns=2 padding="20mm" fontSize="9pt" hyphens="auto" textAlign="justify" fontFamily="'LMRoman10', Georgia, serif" CornellSpace="0mm"></mdConfig>
 
 <mdHeader>
 This here defines the header content for all pages.
@@ -46,7 +46,6 @@ Do not expect that every single markdown will render correctly. The focus is on 
 
 <mdColumnBreak></mdColumnBreak>
 
-
 <TableOfContents>
 ## Content
 </TableOfContents>
@@ -89,7 +88,7 @@ When printing, any padding of the page should be removed. The printing border is
 </div>
 
 
-<ColumnBreak></ColumnBreak>
+<mdColumnBreak></mdColumnBreak>
 
 ## Writing markdown
 The library marked.js[mdMarked] is used for parsing and compiling markdown. Thus all common markdown syntax is supported. The following sections show the appearance of standard markdown elements.

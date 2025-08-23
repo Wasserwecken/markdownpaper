@@ -30,8 +30,15 @@
             --main-bg-color: #ccc;
             --paper-width: 210mm;
             --paper-height: 297mm;
-            --paper-space: 20mm;
+            --font-annotation-size: 0.8rem;
+
+            --paper-padding: 20mm;
             --cornell-space: 0mm;
+            --column-count: 2;
+            --font-family: 'LMRoman10', Georgia, serif;
+            --font-size: 9pt;
+            --text-align: justify;
+            --hyphens: auto;
         }
 
         html,
@@ -42,9 +49,8 @@
             margin: 0;
             padding: 0;
 
-            font-family: 'LMRoman10', math, Georgia, serif;
-            font-size: 9pt;
-            --font-annotation-size: 0.8rem;
+            font-family: var(--font-family);
+            font-size: var(--font-size);
         }
 
         #pages {
@@ -63,7 +69,7 @@
 
             width: var(--paper-width);
             height: var(--paper-height);
-            padding: 0 var(--paper-space);
+            padding: 0 var(--paper-padding);
 
             background: var(--paper-bg-color);
             box-shadow: 0px 0px 32px -8px #0008;
@@ -76,7 +82,7 @@
             flex: none;
             display: flex;
             justify-content: center;
-            height: var(--paper-space);
+            height: var(--paper-padding);
             font-size: var(--font-annotation-size);
             opacity: 66%;
         }
@@ -124,10 +130,13 @@
 
         .page-columns>* {
             break-inside: avoid;
+            /* Allows for grouping elements */
         }
 
-        .page-columns *:first-child {
+        .page-columns>*:first-child,
+        .page-columns>*:first-child>*:first-child {
             margin-top: 0;
+            /* Cant avoid margin collapse, so the first margin has to be removed too */
         }
 
         #page-template {
@@ -141,7 +150,7 @@
         }
 
         .column-break {
-            break-after: column;
+            break-before: column;
             margin: 0;
         }
 
@@ -167,8 +176,8 @@
 
     <style id="cssMarkdownStandard">
         p {
-            hyphens: auto;
-            text-align: justify;
+            hyphens: var(--hyphens);
+            text-align: var(--text-align);
         }
 
         h1,
@@ -537,25 +546,37 @@
                 config.Columns = contentConfig.getAttribute('Columns') ?? config.Columns;
                 config.Padding = contentConfig.getAttribute('Padding') ?? config.Padding;
                 config.Hyphens = contentConfig.getAttribute('Hyphens') ?? config.Hyphens;
-                config.CornellSize = contentConfig.getAttribute('CornellSize') ?? config.CornellSize;
+                config.CornellSpace = contentConfig.getAttribute('CornellSpace') ?? config.CornellSize;
                 config.FontSize = contentConfig.getAttribute('FontSize') ?? config.FontSize;
                 config.FontFamily = contentConfig.getAttribute('FontFamily') ?? config.FontFamily;
                 config.TextAlign = contentConfig.getAttribute('TextAlign') ?? config.TextAlign;
                 contentConfig.remove();
-                ApplyConfig(config);
+                AppendPageStyle(config);
             }
 
             return config;
         }
 
-        function ApplyConfig(config, pageId) {
-            const customStyle = document.createElement('style');
-            const pageIdName = pageId ? `#${pageId}` : ``;
-            customStyle.innerHTML += `\n${pageIdName}.page { --paper-space: ${config.Padding}; --cornell-space: ${config.CornellSize}; }`;
-            customStyle.innerHTML += `\n${pageIdName} p { hyphens: ${config.Hyphens}; text-align: ${config.TextAlign}; }`;
-            customStyle.innerHTML += `\n${pageIdName} body { font-size: ${config.FontSize}; font-family: ${config.FontFamily}; }`;
-            customStyle.innerHTML += `\n${pageIdName} .page-content { column-count: ${config.Columns} }`;
-            document.head.appendChild(customStyle);
+        /**
+         *
+         */
+        function AppendPageStyle(config, pageId) {
+            let pageStyle = document.head.querySelector('#pageStyle');
+            if (!pageStyle) {
+                pageStyle = document.createElement('style');
+                pageStyle.id = 'pageStyle';
+                document.head.appendChild(pageStyle);
+            }
+
+            pageId = pageId ? `#${pageId}` : ``;
+            pageStyle.innerHTML += `\n${pageId}.page {
+            --paper-padding: ${config.Padding};
+            --cornell-space: ${config.CornellSpace};
+            --column-count: ${config.Columns};
+            --font-family: ${config.FontFamily};
+            --font-size: ${config.FontSize};
+            --text-align: ${config.TextAlign};
+            --hyphens: ${config.Hyphen};\n}`;
         }
 
 
@@ -868,8 +889,7 @@
             newPage.Footer.querySelector('.page-no').innerHTML = pageList.length;
 
             document.querySelector('#pages').appendChild(newPage.Page);
-            ApplyConfig(config, newPageDiv.id);
-
+            AppendPageStyle(config, newPageDiv.id);
         }
 
         async function AppendPageElement(templates, footNotes, currentPage, contentItem) {
@@ -894,6 +914,13 @@
         }
 
         async function BuildPages(templates, config, contentDiv) {
+
+            // remove empty paragraphs
+            for (const empty of [...contentDiv.querySelectorAll('p')]) {
+                if (!empty.innerHTML && !empty.hasAttributes()) {
+                    empty.remove();
+                }
+            }
 
             const footNotes = [...contentDiv.querySelectorAll('ref')]
                 .filter(e => e.getAttribute('type') == 'footnote');
@@ -926,7 +953,8 @@
                     content = [];
                 }
                 else if (contentItem.querySelector('mdColumnBreak')) {
-                    contentItem.classList.add('column-break');
+                    contentItem.nextElementSibling.classList.add('column-break');
+                    content = [];
                 }
                 else if (contentItem.tagName == 'COLUMNSPAN') {
                     if (config.Columns == 1) {
@@ -940,6 +968,7 @@
 
                 // iterate
                 for (const item of content) {
+
                     await AppendPageElement(templates, footNotes, pageList.at(-1), item);
 
                     // check if the item is overflowing the page grid and move it to the next column.
