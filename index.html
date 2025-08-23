@@ -129,7 +129,9 @@
         }
 
         .page-columns>*:first-child,
-        .page-columns>*:first-child>*:first-child {
+        .page-columns>*:first-child>*:first-child,
+        .page-columns>*:first-child>*:first-child>*:first-child,
+        .page-columns>*:first-child>*:first-child>*:first-child>*:first-child {
             margin-top: 0;
             /* Cant avoid margin collapse, so the first margin has to be removed too */
         }
@@ -815,6 +817,13 @@
                 const prefix = headingLevels.map(e => Math.max(1, e)).slice(0, level).join(".");
                 heading.id = `h${prefix.replaceAll('.', '-')}`;
                 heading.innerHTML = `${prefix}. ${heading.innerHTML}`;
+
+                // bundle heading with the next node to avoid page or column splits
+                const wrapper = document.createElement('div');
+                const nextNode = heading.nextElementSibling;
+                heading.replaceWith(wrapper);
+                wrapper.appendChild(heading);
+                wrapper.appendChild(nextNode);
             }
 
             // build the table of contens.
