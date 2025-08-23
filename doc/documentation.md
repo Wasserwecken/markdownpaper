@@ -1,6 +1,8 @@
 
 
 # markdownpaper
+<div style="text-align: center; font-size: 1.5rem">Documentation</div>
+
 Use markdown syntax to create beautiful documentations, scientific scripts or papers, through a single static HTML file without runtime dependencies or build processes.
 
 There is no need for NPM, Ruby, Python, Perl Environment, Docker container, Java runtime, online services or subscription. It runs anywhere without any installation and creates a print ready HTML layout.
@@ -178,12 +180,12 @@ The aspect ratio of images is always respected and are scaled to 100% column wid
 [img]: ./media/sailboat.bmp
 ![img]
 
-![](./.doc/sailboat.bmp)
-<img src="./.doc/media/sailboat.bmp"/>
+![](./doc/sailboat.bmp)
+<img src="./doc/media/sailboat.bmp"/>
 ```
 ---
 
-![](./.doc/media/sailboat.bmp)
+![](./doc/media/sailboat.bmp)
 
 </div>
 
@@ -482,7 +484,7 @@ If there is the need for having a specific text instead of the automatic enumera
 This is an important addition to the quote.
 </mdCaption>
 
-<img src=".doc/media/plot.png"/>
+<img src="doc/media/plot.png"/>
 
 <mdCaption id="capFig" type="figure">
 I did not expect using Lorem Ipsum that much after I knew about it.
@@ -497,7 +499,7 @@ This paragraph can now refer to [capQuote] by using the quote id and also to [ca
 This is an important addition to the quote.
 </mdCaption>
 
-<img src=".doc/media/plot.png"/>
+<img src="doc/media/plot.png"/>
 
 <mdCaption id="capFig" type="figure">
 I did not expect using Lorem Ipsum that much after I knew about it.
@@ -581,7 +583,7 @@ All content in the tag is not rendered immidiatly. After a new page has been add
 
 ```
 <mdColumnSpan>
-<mdDiagram src=".doc/media/graph.drawio"></mdDiagram>
+<mdDiagram src="doc/media/graph.drawio"></mdDiagram>
 <mdCaption id="capColSpan" type="figure">
 This is content that needs a lot of width to be useful for the reader.
 </mdCaption>
@@ -590,7 +592,7 @@ This is content that needs a lot of width to be useful for the reader.
 ---
 
 <mdColumnSpan>
-<mdDiagram src=".doc/media/graph.drawio"></mdDiagram>
+<mdDiagram src="doc/media/graph.drawio"></mdDiagram>
 <mdCaption id="capColSpan" type="figure">
 This is content that needs a lot of width to be useful for the reader.
 </mdCaption>
@@ -608,11 +610,11 @@ The diagram data can be provided either via an URL that can be set as `src` attr
 Diagrams are always scaled to the full width of the column.
 
 ```
-<mdDiagram src=".doc/media/graph.drawio"></mdDiagram>
+<mdDiagram src="doc/media/graph.drawio"></mdDiagram>
 
 ```
 ---
-<mdDiagram src=".doc/media/graph.drawio"></mdDiagram>
+<mdDiagram src="doc/media/graph.drawio"></mdDiagram>
 
 </div>
 
