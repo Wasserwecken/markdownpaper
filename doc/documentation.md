@@ -539,6 +539,36 @@ The look and feel of this document is equivalent to the shown config and also sh
 
 <div>
 
+### Column span
+This section applies only for multi column pages. If a page has a single column only, the content of the column span is rendered as any other content in order.
+
+Use the tag `<mdColumnSpan>` to span content accross the whole page. This is usually handy for visual content that requies more width than height ans has a lot of details.
+
+All content in the tag is not rendered immidiatly. After a new page has been added, the content is renderd first in the top section. You might want to add a caption to refer to it.
+
+```
+<mdColumnSpan>
+<mdDiagram src="doc/media/graph.drawio"></mdDiagram>
+<mdCaption id="capColSpan" type="figure">
+This is content that needs a lot of width to be useful for the reader.
+</mdCaption>
+</mdColumnSpan>
+```
+---
+
+<mdColumnSpan>
+<mdDiagram src="doc/media/graph.drawio"></mdDiagram>
+<mdCaption id="capColSpan" type="figure">
+This is content that needs a lot of width to be useful for the reader. Showing of the `<mdColumnSpan>` tag
+</mdCaption>
+</mdColumnSpan>
+
+</div>
+
+
+
+<div>
+
 ### Column & Page break
 Sometimes it is required to control the flow and content seperation by column or page breaks. Us the tags `<mdPageBreak>` or `<mdColumnBreak>` to force a new page or column for the following content.
 
@@ -572,31 +602,6 @@ The `depth` attribute controles the level of listings for the table. Only headin
 The table of contents at the beginning of this document is renderd by the shown example.
 
 </div>
-
-
-### Column span
-This section applies only for multi column pages. If a page has a single column only, the content of the column span is rendered as any other content in order.
-
-Use the tag `<mdColumnSpan>` to span content accross the whole page. This is usually handy for visual content that requies more width than height ans has a lot of details.
-
-All content in the tag is not rendered immidiatly. After a new page has been added, the content is renderd first in the top section. You might want to add a caption to refer to it.
-
-```
-<mdColumnSpan>
-<mdDiagram src="doc/media/graph.drawio"></mdDiagram>
-<mdCaption id="capColSpan" type="figure">
-This is content that needs a lot of width to be useful for the reader.
-</mdCaption>
-</mdColumnSpan>
-```
----
-
-<mdColumnSpan>
-<mdDiagram src="doc/media/graph.drawio"></mdDiagram>
-<mdCaption id="capColSpan" type="figure">
-This is content that needs a lot of width to be useful for the reader.
-</mdCaption>
-</mdColumnSpan>
 
 
 
