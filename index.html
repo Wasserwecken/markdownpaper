@@ -7,7 +7,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="data:image/png;base64,iVBORw0KGgo=">
-    <link href="https://fonts.cdnfonts.com/css/cmu-serif" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/cmu-serif">
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/default.min.css">
 
     <script>
         MathJax = {
@@ -15,9 +17,11 @@
             svg: { fontCache: 'global' }
         };
     </script>
+    <script src="https://viewer.diagrams.net/js/viewer-static.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="https://viewer.diagrams.net/js/viewer-static.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked-highlight/lib/index.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
 
     <style id="cssPageLayout">
         * {
@@ -186,7 +190,7 @@
         code p,
         a,
         .ref-cap p,
-        .cit-ref p {
+        .ref-cit-list p {
             text-align: unset;
             hyphens: unset;
         }
@@ -326,17 +330,29 @@
             font-style: italic;
         }
 
-        .ref-cit {
-            display: flex;
-            margin: 0.5rem 0;
-            align-items: first baseline;
+        .ref-cit-list {
+            break-inside: avoid;
+        }
+
+        .ref-cit-list table {
+            border-collapse: separate;
+            border-spacing: 0.5rem;
+            font-size: var(--font-annotation-size);
+        }
+
+        .ref-cit-list td,
+        .ref-cit-list tr {
+            border: none;
+            padding: 0;
             font-size: var(--font-annotation-size);
         }
 
         .ref-cit-key {
-            flex: none;
-            display: inline-block;
-            width: 1.5rem;
+            vertical-align: text-top;
+        }
+
+        .ref-cit-content p {
+            margin: 0;
         }
 
         .ref-foot {
@@ -435,10 +451,12 @@
 
     <div id="ref-cit-list-template" class="ref-cit-list">
         <!-- Reference list -->
-        <div class="ref-cit">
-            <div class="ref-cit-key"></div>
-            <div class="ref-cit-content"></div>
-        </div>
+        <table>
+            <tr class="ref-cit">
+                <td class="ref-cit-key"></td>
+                <td class="ref-cit-content"></td>
+            </tr>
+        </table>
     </div>
 
     <div id="ref-cap-wrapper-template" class="ref-cap-wrapper">
@@ -461,6 +479,20 @@
 
 
     <script>
+        // https://github.com/markedjs/marked-highlight/issues/257
+        const { Marked } = window.marked;
+        const { markedHighlight } = window.markedHighlight;
+        const marked = new Marked(
+            markedHighlight({
+                langPrefix: 'hljs language-',
+                highlight(code, lang, info) {
+                    const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+                    return hljs.highlight(code, { language }).value;
+                }
+            })
+        );
+
+
         /**
          *
          */
@@ -623,12 +655,15 @@
                 citRefList.replaceWith(templates.RefCitList);
                 citRefList = templates.RefCitList;
 
+                const refTable = document.createElement('table');
+                citRefList.appendChild(refTable);
+
                 for (const citation of citations) {
                     const citListItem = templates.RefCitItem.cloneNode(true);
                     citListItem.id = citation.id;
                     citListItem.querySelector('.ref-cit-key').innerHTML = citation.getAttribute('key');
                     citListItem.querySelector('.ref-cit-content').innerHTML = marked.parse(citation.innerHTML);
-                    citRefList.appendChild(citListItem);
+                    refTable.appendChild(citListItem);
                 }
             }
 
@@ -703,46 +738,58 @@
             return footnotes;
         }
 
+        /**
+         *
+         */
         function ProcessReferencePointers(citations, captions, footnotes, contentDiv) {
+            function replaceText(item, regex, replacement) {
+                let template = document.createElement('div');
+                template.innerHTML = replacement;
+                regex = new RegExp(regex);
 
-            // replace citation pointers
-            for (const item of contentDiv.querySelectorAll('*')) {
-                if (['CODE', 'SVG', 'IFRAME', 'IMG'].includes(item.tagName)) {
-                    continue;
-                }
+                [...item.childNodes]
+                    .filter(e => e.nodeType === Node.TEXT_NODE)
+                    .forEach(e => {
+                        let match;
+                        while ((match = regex.exec(e.textContent)) !== null) {
+                            const before = e.splitText(match.index);
+                            const after = before.splitText(match[0].length);
 
+                            before.remove();
+                            template.cloneNode(true).childNodes
+                                .forEach(e => after.parentNode.insertBefore(e, after));
+
+                            e = after;
+                            regex.lastIndex = 0;
+                        }
+                    });
+            }
+
+            const excludes = ['code', 'svg', 'iframe', 'img', 'blockquote'].map(e => `${e}, ${e} *`).join(', ');
+            const allExcept = `*:not(${excludes})`;
+            for (const item of contentDiv.querySelectorAll(allExcept)) {
+
+                // replace citation pointers
                 for (const citation of citations) {
                     const key = citation.getAttribute('key');
                     const link = `<a class="ref-cit-link" href="#${citation.id}">${key}</a>`;
-                    item.innerHTML = item.innerHTML.replaceAll(`[${citation.id}]`, link);
-                }
-            }
-
-            // replace caption pointers
-            for (const item of contentDiv.querySelectorAll('*')) {
-                if (['CODE', 'SVG', 'IFRAME', 'IMG'].includes(item.tagName)) {
-                    continue;
+                    replaceText(item, `\\[${citation.id}\\]`, link);
                 }
 
+                // replace caption pointers
                 for (const [type, list] of Object.entries(captions)) {
                     for (const caption of list) {
                         const key = caption.getAttribute('key');
                         const link = `<a class="ref-cit-link" href="#${caption.id}">${key}</a>`;
-                        item.innerHTML = item.innerHTML.replaceAll(`[${caption.id}]`, link);
+                        replaceText(item, `\\[${caption.id}\\]`, link);
                     }
                 }
-            }
 
-            // prepare footnote pointers.
-            for (const item of contentDiv.querySelectorAll('*')) {
-                if (['CODE', 'SVG', 'IFRAME', 'IMG'].includes(item.tagName)) {
-                    continue;
-                }
-
+                // prepare footnote pointers.
                 for (const footnote of footnotes) {
                     const key = footnote.getAttribute('key') ?? footnote.id;
                     const link = `<sup class="ref-foot-link" refId="${footnote.id}">${key}</sup>`;
-                    item.innerHTML = item.innerHTML.replaceAll(`[${footnote.id}]`, link);
+                    replaceText(item, `\\[${footnote.id}\\]`, link);
                 }
             }
         }

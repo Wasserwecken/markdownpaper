@@ -1,14 +1,5 @@
 <mdConfig columns=2 padding="20mm" fontSize="9pt" hyphens="auto" textAlign="justify" fontFamily="'CMU Serif', Georgia, serif" CornellSpace="0mm"></mdConfig>
 
-<mdHeader>
-This here defines the header content for all pages.
-</mdHeader>
-
-<mdFooter>
-This here defines the footer content for all pages.
-</mdFooter>
-
-
 
 # markdownpaper
 Use markdown syntax to create beautiful documentations, scientific scripts or papers, through a single static HTML file without runtime dependencies or build processes.
@@ -97,7 +88,7 @@ The library marked.js[mdMarked] is used for parsing and compiling markdown. Thus
 ### Headings
 Headlines are automatically enumerated by their level, with `#` for *H1*, `##` for *H2*, and so on. The heading `#` *H1* is treated special because it defines the title of the document and its's content, it is not enumerated and will not appear in the table of contents.
 
-```
+```markdown
 # Heading 1
 
 ## Heading 2
@@ -122,7 +113,7 @@ Headlines are automatically enumerated by their level, with `#` for *H1*, `##` f
 <div>
 
 ### Paragraphs
-Paragraphs are separated by a blank line. The text will be wrapped automatically. Do not indent your text, otherwise it is interpreted as a code block.
+Paragraphs are separated by a blank line. The text will be wrapped automatically. Do not indent your text, otherwise it is interpreted as a code block. The text align and hyphen policy can be set by the configuration, which is mentioned later.
 
 ```
 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat.
@@ -144,7 +135,7 @@ At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergr
 ### Lists
 Lists can be created using the `-`, `*` or `1.` characters for unordered lists, and numbers followed by a period for ordered lists. Nested lists are supported as well and can be created by indenting the sub list items.
 
-```
+```markdown
 - Item
 - Item
     1. Sub
@@ -178,11 +169,11 @@ Lists can be created using the `-`, `*` or `1.` characters for unordered lists, 
 <div>
 
 ### Images
-Images are supported by the standard markdown syntax of `![Alt text](your/path.png)` or by using the `<img src="your/path.png" />` HTML syntax. All examples result in the same output.
+Embedd images by the standard markdown syntax of `![Alt text](your/path.png)` or by using the `<img src="your/path.png" />` HTML syntax. All examples result in the same output.
 
+The aspect ratio of images is always respected and are scaled to 100% column width. The root of relative paths is set to the location of the `index.html`.
 
-
-```
+```markdown
 [img]: ./media/sailboat.bmp
 ![img]
 
@@ -200,9 +191,9 @@ Images are supported by the standard markdown syntax of `![Alt text](your/path.p
 <div>
 
 ### Links
-Links can be created using markdown syntax or HTML tags. Both will be rendered as clickable hyperlinks. They are always rendered italic, and without text or color decoration.
+Links are created either markdown syntax or HTML tags. Both will be rendered as clickable hyperlinks. They are always rendered italic, and without text or color decoration. The configured text align does not apply to link content.
 
-```
+```markdown
 [Markdown Guide](https://www.markdownguide.org/)
 
 <https://github.com/Wasserwecken/markdownpaper>
@@ -224,9 +215,9 @@ Links can be created using markdown syntax or HTML tags. Both will be rendered a
 <div>
 
 ### Quotes
-Quotes can be created using the `>` character at the beginning of a line. It will be rendered as a blockquote.
+Quotes are created using the `>` character at the beginning of a line. The configured text align does not apply to link content.
 
-```
+```markdown
 > "The only limit to our realization of tomorrow will be our doubts of today." - Franklin D. Roosevelt
 ```
 ---
@@ -240,12 +231,18 @@ Quotes can be created using the `>` character at the beginning of a line. It wil
 <div>
 
 ### Code
-Code blocks can be created using triple backticks (```) or by indenting lines with four spaces. They will be rendered in a monospaced font with a gray background.
+Code blocks are created using triple backticks (```) or by indenting lines with four spaces. They will be rendered in a monospaced font with a gray background. Enable syntax highlighting by setting the language after the begining ticks.
 
+~~~python
+```python
+def helloWorld():
+    print("Hello World")
 ```
-function helloWorld() {
-    console.log("Hello, world!");
-}
+~~~
+---
+```python
+def helloWorld():
+    print("Hello World")
 ```
 
 </div>
@@ -257,7 +254,7 @@ function helloWorld() {
 ### Tables
 Tables can be created using pipes (`|`) and hyphens (`-`). They will be rendered as HTML tables.
 
-```
+```markdown
 | Tables   |      Are      |  Cool |
 |----------|:-------------:|------:|
 | col 1 |  left-aligned | $1600 |
@@ -281,16 +278,16 @@ Tables can be created using pipes (`|`) and hyphens (`-`). They will be rendered
 <ColumnBreak></ColumnBreak>
 
 ## Markdown Extensions
-There are several tags and behaviours to extend the markdown definitions. These extensions are the key of writing serious scripts with proper citations, sublines or table of contents.
+There are several tags and behaviours to extend the markdown definitions. These extensions are the key of writing serious documents with proper citations, captions or table of contents.
 
 
 
 <div>
 
 ### Math formulas
-Math formulas can be included in the markdown file using the `$` syntax for inline formulas and `$$` for block formulas. The projects uses the MathJax[mathjax] library to render these formulas and the syntax is very simillar to LaTeX. Notherless there are some limitation, which can be read at their documentation, as well as the basic usage: <https://docs.mathjax.org/en/latest/>
+Math formulas are supported by using the `$` syntax for inline formulas and `$$` for block formulas. This is enabled by the MathJax[mathjax] library to render formulas and the syntax is very simillar to LaTeX. Notherless there are some limitation, which can be read at their documentation, as well as the basic usage here: <https://docs.mathjax.org/en/latest/>.
 
-```
+```markdown
 This is a line holding a nested formular, $a^2 * b^2 = c^2$, to show of the inlining.
 
 $$\pi^* = v_{\pi^*}(s) = \max_{a \in A} \sum_{s',r} p(s',r|s,a) [r+\gamma v(s')]$$
@@ -307,19 +304,27 @@ $$\pi^* = v_{\pi^*}(s) = \max_{a \in A} \sum_{s',r} p(s',r|s,a) [r+\gamma v(s')]
 <div>
 
 ### Header & Footer
-A global annotation for all pages, visible the very top and bottom of each page, can be defined anywhere with a `<Header>` and `<Footer>` tag. You can define them multiple times, but only the content of the very last will be used.
+A global annotation for all pages, visible the very top and bottom of each page, can be defined anywhere with a `<mdHeader>` and `<mdFooter>` tag. You can define them multiple times, but only the content of the very last will be used.
 
-```
-<Header>
+```markdown
+<mdHeader>
 This here defines the header content for all pages.
-</Header>
+</mdHeader>
 
-<Footer>
+<mdFooter>
 This here defines the footer content for all pages.
-</Footer>
+</mdFooter>
 ```
 ---
-Look at the top and bottom of each page to see the result.
+<mdHeader>
+This here defines the header content for all pages.
+</mdHeader>
+
+<mdFooter>
+This here defines the footer content for all pages.
+</mdFooter>
+
+Look at the top and bottom of each page to for the result.
 
 </div>
 
@@ -328,11 +333,11 @@ Look at the top and bottom of each page to see the result.
 <div>
 
 ### Grouping
-Elements can be grouped together to avoid a split on page or column breaks. Group does not force a page or column break, but the content will stay in the same column. Elements can be grouped together by using the `<div>` tag and content to be grouped should be placed inside the `<div>` tag.
+Elements can be grouped together to avoid a split across columns. Group elements together by using the `<div>` tag and placing any content inside the `<div>` tag.
 
-Content should not be indented at all, and there must be an empty line before and after the `<div>` tag to be recognized correctly. This behaviour breaks if the grouped content is bigger than the page size to fit in.
+Content MUST not indented at all, and there must be an empty line before and after the `<div>` tag to be recognized correctly.
 
-```
+```markdown
 <div>
 
 ## Heading in a div
@@ -342,11 +347,125 @@ This is my important content.
 
 ```
 ---
-All sections content is grouped together, no section should spread over multiple columns or pages.
+All sections in this document are grouped together, this resulting in some odd columns distriburtions.
 
 </div>
 
 
+
+<div>
+
+### Citations
+Defined citation data with the `<mdCitation>` tag and place all information inside. Citation can be defined anywhere in the document because they are not rendered inplace. There are no rules how to define the content of the citation, just write as your standard requires you to do it.
+
+To use the defined citation in your content use the markdown bracket syntax `[myCitationId]` anywhere. The id is replaced during rendering with a link and the enumeration of the citation. This should match the [IEEE](https://pitt.libguides.com/citationhelp/ieee) standard.
+
+If there is the need for having a specific text instead of the automatic enumeration, use the `key`-attribute to define the final link text.
+
+Use the tag `<mdCitations>` (plural) to render a list of all defined citations in the document. The citation list is rendered at the position where the tag is defined, allowing for any position in the document. Any content defined in the citation list tag is rendered first, all citations are added afterwards.
+
+```markdown
+<mdCitation id="citMarkdownpaper" key="okay">
+*markdownpaper*,
+Eric Dolch,
+*Display markdown into paper style HTML site*,
+2025,
+https://github.com/Wasserwecken/markdownpaper
+</mdCitation>
+
+<mdCitation id="citMathjax">
+*MathJax*,
+MathJax Team,
+*Beautiful and accessible math in all browsers*,
+2025,
+https://www.mathjax.org/
+</mdCitation>
+
+<mdCitation id="citMarked">
+*Marked.js*
+Christopher Jeffrey, Josh Bruce, Steven, Jamie Davis, Tony Brix, Trevor Buckner
+*A markdown parser and compiler. Built for speed*,
+2025,
+https://marked.js.org/
+</mdCitation>
+
+Lets refer to a citation here[citMarkdownpaper] and to a double one there[citMathjax][citMarked].
+
+<mdCitations>
+## [!]References
+</mdCitations>
+```
+---
+<mdCitation id="citMarkdownpaper" key="okay">
+*markdownpaper*,
+Eric Dolch,
+*Display markdown into paper style HTML site*,
+2025,
+https://github.com/Wasserwecken/markdownpaper
+</mdCitation>
+
+<mdCitation id="citMathjax">
+*MathJax*,
+MathJax Team,
+*Beautiful and accessible math in all browsers*,
+2025,
+https://www.mathjax.org/
+</mdCitation>
+
+<mdCitation id="citMarked">
+*Marked.js*
+Christopher Jeffrey, Josh Bruce, Steven, Jamie Davis, Tony Brix, Trevor Buckner
+*A markdown parser and compiler. Built for speed*,
+2025,
+https://marked.js.org/
+</mdCitation>
+
+Lets refer to a citation here[citMarkdownpaper] and to a double one there[citMathjax][citMarked].
+
+<mdCitations>
+<div style="margin: 0; font-size: 1.8rem; font-weight: bold;">References</div>
+</mdCitations>
+
+</div>
+
+
+
+<div>
+
+### Footnotes
+Use the tag `<mdFootnote>` to add small numbered notes with additional information at the bottom of a page. The tag can be defined anywhere and be reused. Place the content of your footnote inside the tag without indentation.
+
+To use the defined footnote in your content use the markdown bracket syntax `[myFootnoteId]` anywhere. The id is replaced during rendering with a link and the enumeration of the citation.
+
+If there is the need for having a specific text instead of the automatic enumeration, use the `key`-attribute to define the final link text.
+
+```markdown
+<mdFootnote id="fotLine" key="†">
+In geometry, a **straight** line, usually abbreviated line, is an infinitely long object with no width, depth, or curvature, an idealization of such physical objects as a straightedge, a taut string, or a ray of light.
+</mdFootnote>
+
+<mdFootnote id="fotAdd">
+Adjective. Britannica Dictionary definition: More than is usual or expected.
+</mdFootnote>
+
+This line[fotLine] has an annotation to some additional[fotLine] information.
+```
+---
+<mdFootnote id="fotLine" key="†">
+In geometry, a **straight** line, usually abbreviated line, is an infinitely long object with no width, depth, or curvature, an idealization of such physical objects as a straightedge, a taut string, or a ray of light.
+</mdFootnote>
+
+<mdFootnote id="fotAdd">
+Adjective. Britannica Dictionary definition: More than is usual or expected.
+</mdFootnote>
+
+This line[fotLine] has an annotation to some additional[fotLine] information.
+
+</div>
+
+
+
+</div>
 
 ### References & Sublines
 Images, formulars, quotes and tables often need additional context or a label to refer from the paragraphs. Use the `<ref>` tag to define citations, references or footnotes.
