@@ -5,6 +5,8 @@ There is no need for NPM, Ruby, Python, Perl Environment, Docker container, Java
 
 > Write content, focus on content. Layout ain't your problem.
 
+![](./doc/media/demo.png)
+
 
 ## Extended Markdown
 - [x] Sublines for figures, tables, etc.
