@@ -18,9 +18,9 @@ There is no need for NPM, Ruby, Python, Perl Environment, Docker container, Java
 
 
 ## Documentation & Demo & Service
-- [Documentation](https://feralex.github.io/markdownpaper/)
+- [Documentation](https://wasserwecken.github.io/markdownpaper/?content=doc/documentation.md)
 - [Service](https://wasserwecken.github.io/markdownpaper/)
-- [Demo](https://feralex.github.io/markdownpaper/)
+- [Demo](https://wasserwecken.github.io/markdownpaper/?content=doc/paper.md)
 
 
 
