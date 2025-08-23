@@ -1,4 +1,3 @@
-<mdConfig columns=2 padding="20mm" fontSize="9pt" hyphens="auto" textAlign="justify" fontFamily="'CMU Serif', Georgia, serif" CornellSpace="0mm"></mdConfig>
 
 
 # markdownpaper
@@ -10,9 +9,9 @@ There is no need for NPM, Ruby, Python, Perl Environment, Docker container, Java
 
 
 
-<TableOfContents>
+<mdTableOfContents>
 ## Content
-</TableOfContents>
+</mdTableOfContents>
 
 
 
@@ -87,6 +86,8 @@ The library marked.js[mdMarked] is used for parsing and compiling markdown. Thus
 
 ### Headings
 Headlines are automatically enumerated by their level, with `#` for *H1*, `##` for *H2*, and so on. The heading `#` *H1* is treated special because it defines the title of the document and its's content, it is not enumerated and will not appear in the table of contents.
+
+If a heading should not be enumerated use `[!]` after the hashes like `## [!]MyHeading`.
 
 ```markdown
 # Heading 1
@@ -448,10 +449,10 @@ In geometry, a **straight** line, usually abbreviated line, is an infinitely lon
 Adjective. Britannica Dictionary definition: More than is usual or expected.
 </mdFootnote>
 
-This line[fotLine] has an annotation to some additional[fotLine] information.
+This line[fotLine] has an annotation to some additional[fotAdd] information.
 ```
 ---
-<mdFootnote id="fotLine" key="†">
+<mdFootnote id="fotLine" key="*">
 In geometry, a **straight** line, usually abbreviated line, is an infinitely long object with no width, depth, or curvature, an idealization of such physical objects as a straightedge, a taut string, or a ray of light.
 </mdFootnote>
 
@@ -459,41 +460,7 @@ In geometry, a **straight** line, usually abbreviated line, is an infinitely lon
 Adjective. Britannica Dictionary definition: More than is usual or expected.
 </mdFootnote>
 
-This line[fotLine] has an annotation to some additional[fotLine] information.
-
-</div>
-
-
-
-</div>
-
-### References & Sublines
-Images, formulars, quotes and tables often need additional context or a label to refer from the paragraphs. Use the `<ref>` tag to define citations, references or footnotes.
-
-The tag requires to attributes to be set:
-- **id** - Used to create internal references by using brackets.
-- **type** - Determines the behaviour and label for the reference.
-
-
-
-<div>
-
-#### Footnotes
-To add small numbered notes with additional information at the bottom of a page. Set the `type` attribute to `footnote` and place the information inside the tag anywhere in your document. The tag is not rendered inplace, but will be rendered at the bottom of the page where the reference is refered to.
-
-```
-<Ref id="myFoot" type="footnote">
-In geometry, a **straight** line, usually abbreviated line, is an infinitely long object with no width, depth, or curvature, an idealization of such physical objects as a straightedge, a taut string, or a ray of light.
-</Ref>
-
-This line[myFoot] has an annotation to some additional information.
-```
----
-<mdFootnote id="myFoot" key="*">
-In geometry, a **straight** line, usually abbreviated line, is an infinitely long object with no width, depth, or curvature, an idealization of such physical objects as a straightedge, a taut string, or a ray of light.
-</mdFootnote>
-
-This line[myFoot] has a annotation to some additional information.
+This line[fotLine] has an annotation to some additional[fotAdd] information.
 
 </div>
 
@@ -501,90 +468,42 @@ This line[myFoot] has a annotation to some additional information.
 
 <div>
 
-#### Citations
-Citations give credit to the original authors of ideas and information, help readers verify information and explore sources further. Set the `type` attribute to `citation` and place the information inside the tag anywhere in your document. The tag is not rendered inplace, but will be added to the reference list.
+### Captions
+Captions are used to annotate figures, tables or any other content. They also allow of refering to them from paragraphs accross the document. Use the tag `<mdCaption>` after the element you want to add a caption to.
 
-Use the tag `<References>` to render the list of citations where you need to show them. All content inside the reference list tag will be rendered first and all citations are then listed below.
+To use the defined caption in your content use the markdown bracket syntax `[myCaptionId]` anywhere. The id is replaced during rendering with a link and the enumeration of the caption type.
 
-```
-<Ref id="markdown" type="citation">
-*Markdown syntax*,
-John Gruber,
-*Markdown is a text-to-HTML conversion tool for web writers.*,
-2004,
-https://daringfireball.net/projects/markdown/
-</Ref>
+If there is the need for having a specific text instead of the automatic enumeration, use the `key`-attribute to define the final link text.
 
-<References>
-## References
-</References>
-```
----
-
-<mdCitation id="citMarkdownpaper">
-*markdownpaper*,
-Eric Dolch,
-*Display markdown into paper style HTML site*,
-2025,
-https://github.com/Wasserwecken/markdownpaper
-</mdCitation>
-
-<mdCitation id="citMathjax">
-*MathJax*,
-MathJax Team,
-*Beautiful and accessible math in all browsers*,
-2025,
-https://www.mathjax.org/
-</mdCitation>
-
-<mdCitation id="citMarked">
-*Marked.js*
-Christopher Jeffrey, Josh Bruce, Steven, Jamie Davis, Tony Brix, Trevor Buckner
-*A markdown parser and compiler. Built for speed*,
-2025,
-https://marked.js.org/
-</mdCitation>
-
-<mdCitations>
-## References
-</mdCitations>
-
-</div>
-
-
-
-<div>
-
-#### Sublines
-The `<ref>` is also used to annotate and label any element in the document. The element placed before the `ref` tag is then used as target for the annotation. Any element like lists, figures or tables can be labeled this way. Set the `type` attribute to anything else than `footnote` or `citation`, the given type name is then used as label for the subline and will be enumerated.
-
-```
+```markdown
 > "This is my personal Quote, may stating something important!"
 
-<ref id="myQuote" type="quote">
+<mdCaption id="capQuote" type="quote">
 This is an important addition to the quote.
-</ref>
+</mdCaption>
 
-<img src="./media/sailboat.bmp"/>
+<img src=".doc/media/plot.png"/>
 
-<ref id="myFig" type="figure">
+<mdCaption id="capFig" type="figure">
 I did not expect using Lorem Ipsum that much after I knew about it.
-</ref>
+</mdCaption>
 
-This paragraph can now refer to the quote[myQuote] by using the quote id and also to the [myFig] showing off the linking.
+This paragraph can now refer to [capQuote] by using the quote id and also to [capFig] showing off the linking.
 ```
 ---
 > "This is my personal Quote, may stating something important!"
 
-<mdCaption id="myQuote" type="quote">
-An addition to the quote would not improve the conclusion.
+<mdCaption id="capQuote" type="quote">
+This is an important addition to the quote.
 </mdCaption>
 
-<img src="./media/plot.png"/>
+<img src=".doc/media/plot.png"/>
 
-<mdCaption id="myFig" type="figure">
-There is a wobbly line in the figure to express something important.
+<mdCaption id="capFig" type="figure">
+I did not expect using Lorem Ipsum that much after I knew about it.
 </mdCaption>
+
+This paragraph can now refer to [capQuote] by using the quote id and also to [capFig] showing off the linking.
 
 </div>
 
@@ -593,23 +512,24 @@ There is a wobbly line in the figure to express something important.
 <div>
 
 ### Layout configuration
-The general look and feel of the renderer can be adjusted with ease by using the `<Config>` tag. Several attributes are supported:
+The general look and feel of the renderer can be adjusted with ease by using the `<mdConfig>` tag. Several attributes are supported:
 - **Columns**: Defines the columns per page as integer. Recommended is 2 or 1.
 - **Padding**: Defines the print border of each page. Any CSS value can be used like '2rem' or '1.5cm'.
 - **Hyphens**: Specifies how words should be hyphenated when text wraps across multiple lines. [Use any valid CSS hyphens value](https://developer.mozilla.org/en-US/docs/Web/CSS/hyphens).
 - **TextAlign**: Sets the horizontal alignment of the inline-level content. [Use any valid CSS text-align value](https://developer.mozilla.org/en-US/docs/Web/CSS/text-align).
 - **FontFamily**: Specifies a prioritized list of one or more font family names and/or generic family names. [Use any valid CSS font-family value](https://developer.mozilla.org/en-US/docs/Web/CSS/font-family).
 - **FontSize**: Sets the base size of the font, headings and other special elements are in relation to this size. [Use any valid CSS font-size value](https://developer.mozilla.org/en-US/docs/Web/CSS/font-size).
-- **CornellSize**: Defines an extra right padding of the content, providing space for custom notes by the reader. This is also known as the 'cornell method'. Any CSS size value is accepted.
+- **CornellSpace**: Defines an extra right padding of the content, providing space for custom notes by the reader. This is also known as the 'cornell method'. Any CSS size value is accepted.
 
 
 ```
-
-<Config columns=2 padding="16mm" fontSize="9pt" hyphens="auto" textAlign="justify" fontFamily="'Linux Libertine O', math, Georgia, serif" CornellSize="0mm"></Config>
-
+<mdConfig columns=2 padding="20mm" fontSize="9pt" hyphens="auto" textAlign="justify" fontFamily="'CMU Serif', Georgia, serif" CornellSpace="0mm"></mdConfig>
 ```
 ---
-The look and feel of this document is equivalent to the shown config.
+
+<mdConfig columns=2 padding="20mm" fontSize="9pt" hyphens="auto" textAlign="justify" fontFamily="'CMU Serif', Georgia, serif" CornellSpace="0mm"></mdConfig>
+
+The look and feel of this document is equivalent to the shown config and also shows the default values.
 
 </div>
 
@@ -618,18 +538,17 @@ The look and feel of this document is equivalent to the shown config.
 <div>
 
 ### Column & Page break
-Sometimes it is required to control the flow and content seperation by column or page breaks. Us the tags `<PageBreak>` or `<ColumnBreak>` to force a new page or column for the following content.
+Sometimes it is required to control the flow and content seperation by column or page breaks. Us the tags `<mdPageBreak>` or `<mdColumnBreak>` to force a new page or column for the following content.
 
-If the layout specifies only a single column for each page, tjhe behaviour of `<ColumnBreak>` is equivalent to `<PageBreak>`.
+If the layout specifies only a single column for each page, the behaviour of `<mdColumnBreak>` is equivalent to `<mdPageBreak>`.
 
-The `<PageBreak>` does not only force a new page, but can also later the look and feel for all following pages, enabling for alternating styles within a single document. All attributes of `<Config>` are supported.
+The `<mdPageBreak>` does not only force a new page, but can also later the look and feel for all following pages, enabling for alternating styles within a single document. All attributes of `<mdConfig>` are supported.
 
 ```
 <ColumnBreak></ColumnBreak>
 
 <PageBreak Columns=1></PageBreak>
 ```
-
 
 </div>
 
@@ -638,10 +557,12 @@ The `<PageBreak>` does not only force a new page, but can also later the look an
 <div>
 
 ### Table of contents
-To render a table of contents, place the `<TableOfContents>` tag anywhere it is desired. Only enumerated headings of h2 or lower are included. Any markdown content provided within the tag is placed before any content list item.
+To render a table of contents, place the `<mdTableOfContents>` tag anywhere it is desired. Only enumerated headings of h2 or lower are included. Any markdown content provided within the tag is placed before any content list item.
+
+The `depth` attribute controles the level of listings for the table. Only headings lowler or equal to the defined depth are shown.
 
 ```
-<TableOfContents>
+<TableOfContents depth=3>
 ## Content
 </TableOfContents>
 ```
@@ -652,34 +573,46 @@ The table of contents at the beginning of this document is renderd by the shown 
 
 
 ### Column span
-asdasdad
+This section applies only for multi column pages. If a page has a single column only, the content of the column span is rendered as any other content in order.
+
+Use the tag `<mdColumnSpan>` to span content accross the whole page. This is usually handy for visual content that requies more width than height ans has a lot of details.
+
+All content in the tag is not rendered immidiatly. After a new page has been added, the content is renderd first in the top section. You might want to add a caption to refer to it.
 
 ```
-<ColumnSpan>
-<drawio src="./media/graph.drawio"></drawio>
-</ColumnSpan>
+<mdColumnSpan>
+<mdDiagram src=".doc/media/graph.drawio"></mdDiagram>
+<mdCaption id="capColSpan" type="figure">
+This is content that needs a lot of width to be useful for the reader.
+</mdCaption>
+</mdColumnSpan>
 ```
 ---
 
-<ColumnSpan>
-<mdDiagram src="./media/graph.drawio"></drawio>
-</ColumnSpan>
+<mdColumnSpan>
+<mdDiagram src=".doc/media/graph.drawio"></mdDiagram>
+<mdCaption id="capColSpan" type="figure">
+This is content that needs a lot of width to be useful for the reader.
+</mdCaption>
+</mdColumnSpan>
 
 
 
 <div>
 
 ### Diagrams
-Diagrams from `https://app.diagrams.net/` can be embedded directly into the document with the `drawio` tag.
+Diagrams from <https://app.diagrams.net/> can be embedded directly into the document with the `mdDiagram` tag.
 
 The diagram data can be provided either via an URL that can be set as `src` attribute in the tag. If this attribute is not defined, the content of the tag is expected to hold the diagram data.
 
+Diagrams are always scaled to the full width of the column.
+
 ```
-<drawio src="./media/graph.drawio"></drawio>
+<mdDiagram src=".doc/media/graph.drawio"></mdDiagram>
 
 ```
 ---
-<mdDiagram src="./media/graph.drawio"></drawio>
+<mdDiagram src=".doc/media/graph.drawio"></mdDiagram>
 
 </div>
 
@@ -689,6 +622,8 @@ The diagram data can be provided either via an URL that can be set as `src` attr
 
 ### Complex content
 Because markdown is converted to HTML elements, any HTML structure can be embedded into the markdown. Almost any content style can be created this way.
+
+This is especially useful for title pages of papers or theses, where the layout can vary alot between institutions of conferences.
 
 ```
 <div style="position: relative; height: 16rem;">

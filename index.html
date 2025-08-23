@@ -96,6 +96,7 @@
         .page-content {
             display: flex;
             flex-direction: column;
+            gap: 2rem;
             min-height: 0;
             height: 100%;
         }
@@ -103,18 +104,6 @@
         .page-no {
             position: absolute;
             right: 0rem;
-        }
-
-        .page-top *:last-child {
-            margin-bottom: 2rem;
-        }
-
-        .page-bottom *:first-child {
-            margin-top: 2rem;
-        }
-
-        .page-header {
-            align-items: end;
         }
 
         .page-header .page-no {
@@ -189,10 +178,16 @@
         blockquote p,
         code p,
         a,
+        .ref-foot p,
         .ref-cap p,
         .ref-cit-list p {
             text-align: unset;
             hyphens: unset;
+        }
+
+        .ref-foot p,
+        .ref-cit-content p {
+            margin: 0;
         }
 
         h1,
@@ -312,6 +307,7 @@
 
         .ref-cap-wrapper {
             margin: 1rem 0;
+            break-inside: avoid;
         }
 
         .ref-cap {
@@ -351,10 +347,6 @@
             vertical-align: text-top;
         }
 
-        .ref-cit-content p {
-            margin: 0;
-        }
-
         .ref-foot {
             opacity: 66%;
             font-size: var(--font-annotation-size);
@@ -363,12 +355,8 @@
             padding: 0.25rem 0;
         }
 
-        .ref-foot * {
-            text-align: unset !important;
-        }
-
-        .ref-foot *:first-of-type {
-            margin: 0;
+        .ref-foot-link {
+            font-size: 0.6rem;
         }
 
         .toc-list {
@@ -696,20 +684,16 @@
                     key += ' ' + captionEnums[type].toString();
                 }
 
-                caption.setAttribute('key', `[${key}]`);
-
                 // create wrapper for the caption and the target.
                 const captionWrap = templates.RefCapWrap.cloneNode(true);
                 captionWrap.id = caption.id;
-                captionWrap.querySelector('.ref-cap-key').innerHTML = caption.getAttribute('key');
+                captionWrap.setAttribute('key', key);
+                captionWrap.querySelector('.ref-cap-key').innerHTML = key;
                 captionWrap.querySelector('.ref-cap-content').innerHTML = marked.parse(caption.innerHTML);
                 captions[type].push(captionWrap);
 
                 // bundle the previous element with the caption.
                 let target = caption.previousElementSibling;
-                while (!target) {
-                    target = caption.parentNode.previousElementSibling;
-                }
 
                 // replace with wrapper.
                 captionWrap.prepend(target);
@@ -729,7 +713,7 @@
             for (const footnote of [...contentDiv.querySelectorAll('mdFootnote')]) {
                 const footnoteItem = templates.RefFootItem.cloneNode(true);
                 footnoteItem.id = footnote.id;
-                footnoteItem.querySelector('.ref-foot-key').innerHTML = footnoteItem.getAttribute('');
+                footnoteItem.querySelector('.ref-foot-key').innerHTML = footnote.getAttribute('key');
                 footnoteItem.querySelector('.ref-foot-content').innerHTML = marked.parse(footnote.innerHTML);
                 footnotes.push(footnoteItem);
                 footnote.remove();
@@ -823,7 +807,7 @@
             }
 
             // build the table of contens.
-            let tocDiv = contentDiv.querySelector('TableOfContents');
+            let tocDiv = contentDiv.querySelector('mdTableOfContents');
             if (tocDiv) {
                 tocDiv.innerHTML = marked.parse(tocDiv.innerHTML);
                 let previousLevel = 0;
@@ -914,32 +898,33 @@
             contentDiv.remove();
         }
 
-        function CleanupFootnotes(currentPage) {
-            const usedFootIds = [];
-            currentPage.Columns.querySelectorAll('sup.ref-link')
-                .forEach(f => usedFootIds.push(f.getAttribute('refId')));
-
-            const footNotes = currentPage.Footer.querySelectorAll('.ref-foot');
-            for (const note of footNotes) {
-                if (!usedFootIds.includes(note.id)) {
-                    note.remove();
-                }
-            }
-        }
-
+        /**
+         *
+         */
         function AddPage(templates, config, pageList) {
+            // cleanup footnotes
             if (pageList.length > 0) {
-                CleanupFootnotes(pageList.at(-1));
+                const usedLinks = pageList.at(-1).Columns.querySelectorAll('.ref-foot-link');
+                const usedLinkIds = [...usedLinks].map(e => e.getAttribute('refId'));
+                const pageNotes = pageList.at(-1).Footer.querySelectorAll('.ref-foot');
+
+                pageNotes.forEach(e => {
+                    if (!usedFootIds.includes(e.id)) {
+                        e.remove();
+                    }
+                });
             }
 
+            // build new page div
             const newPageDiv = templates.Page.cloneNode(true);
             const newPage = {
                 Page: newPageDiv,
                 Header: newPageDiv.querySelector('.page-header'),
+                Footer: newPageDiv.querySelector('.page-footer'),
+                Content: newPageDiv.querySelector('.page-content'),
                 Top: newPageDiv.querySelector('.page-top'),
                 Columns: newPageDiv.querySelector('.page-columns'),
                 Bottom: newPageDiv.querySelector('.page-bottom'),
-                Footer: newPageDiv.querySelector('.page-footer'),
             }
             pageList.push(newPage);
 
@@ -949,30 +934,37 @@
 
             document.querySelector('#pages').appendChild(newPage.Page);
             AppendPageStyle(config, newPageDiv.id);
+
+            return newPage;
         }
 
-        async function AppendPageElement(templates, footNotes, currentPage, contentItem) {
-            currentPage.Columns.appendChild(contentItem);
+        /**
+         *
+         */
+        function AppendPageElement(footnotes, page, target, contentItem) {
+            page[target].appendChild(contentItem);
 
-            const footRefUses = contentItem.querySelectorAll('sup.ref-link');
-            for (const footRefUse of footRefUses) {
-                const refId = footRefUse.getAttribute('refId');
-                let footItem = currentPage.Bottom.querySelector(`#${refId}`);
+            const footLinks = contentItem.querySelectorAll('.ref-foot-link');
+            for (const footLink of footLinks) {
+                const refId = footLink.getAttribute('refId');
+                let footItem = page.Bottom.querySelector(`#${refId}`);
+                let footKey = footItem?.querySelector('.ref-foot-key');
                 if (!footItem) {
-                    const footNote = footNotes.find(e => e.id == refId);
-                    const footId = footNote.getAttribute('key') ?? currentPage.Bottom.childNodes.length + 1;
-                    const footContent = marked.parse(footNote.innerHTML);
-                    footItem = templates.RefFoot.cloneNode(true);
-                    footItem.id = refId;
-                    footItem.querySelector('.ref-foot-id').innerHTML = footId;
-                    footItem.querySelector('.ref-foot-content').innerHTML = footContent;
-                    currentPage.Bottom.appendChild(footItem);
+                    footItem = footnotes.find(e => e.id == refId);
+                    page.Bottom.appendChild(footItem);
+                    footKey = footItem.querySelector('.ref-foot-key');
+                    if (!footKey.innerHTML) {
+                        footKey.innerHTML = page.Bottom.childNodes.length;
+                    }
                 }
-                footRefUse.innerHTML = footItem.querySelector('.ref-foot-id').innerHTML;
+                footLink.innerHTML = footKey.innerHTML;
             }
         }
 
-        async function BuildPages(templates, config, contentDiv) {
+        /**
+         *
+         */
+        function BuildPages(templates, config, footnotes, contentDiv) {
 
             // remove empty paragraphs
             for (const empty of [...contentDiv.querySelectorAll('p')]) {
@@ -981,21 +973,15 @@
                 }
             }
 
-            const footNotes = [...contentDiv.querySelectorAll('ref')]
-                .filter(e => e.getAttribute('type') == 'footnote');
-            for (const note of footNotes) {
-                note.remove();
-            }
-
             // adds the first page
             const pageList = [];
             let topContent = [];
-            AddPage(templates, config, pageList);
+            let page = AddPage(templates, config, pageList);
 
             for (const contentItem of [...contentDiv.children]) {
                 let content = [contentItem];
 
-                // Add a new page or clolumn
+                // page break
                 const pageBreak = contentItem.querySelector('mdPageBreak');
                 if (pageBreak) {
                     config.Columns = pageBreak.getAttribute('Columns') ?? config.Columns;
@@ -1006,44 +992,39 @@
                     config.FontFamily = pageBreak.getAttribute('FontFamily') ?? config.FontFamily;
                     config.TextAlign = pageBreak.getAttribute('TextAlign') ?? config.TextAlign;
 
-                    AddPage(templates, config, pageList);
-                    topContent.forEach(e => pageList.at(-1).Top.appendChild(e));
-                    topContent = [];
-                    content = [];
+                    page = AddPage(templates, config, pageList);
+                    continue;
                 }
+                // column break
                 else if (contentItem.querySelector('mdColumnBreak')) {
                     contentItem.nextElementSibling.classList.add('column-break');
-                    content = [];
+                    continue;
                 }
-                else if (contentItem.tagName == 'COLUMNSPAN') {
-                    if (config.Columns == 1) {
-                        content = [...contentItem.children];
+                // column span
+                else if (contentItem.querySelector('mdColumnSpan')) {
+                    if (config.Columns > 1) {
+                        topContent.concat([...contentItem.children])
+                        continue;
                     }
                     else {
-                        content = [];
-                        topContent.push(...contentItem.children)
+                        content = [...contentItem.children];
                     }
                 }
 
                 // iterate
                 for (const item of content) {
+                    const target = topContent.length > 0 && page.Columns.childNodes.length == 0
+                        ? 'Top' : 'Columns';
 
-                    await AppendPageElement(templates, footNotes, pageList.at(-1), item);
+                    AppendPageElement(footnotes, page, target, item);
 
                     // check if the item is overflowing the page grid and move it to the next column.
-                    gridRect = pageList.at(-1).Columns.getBoundingClientRect();
+                    gridRect = page.Content.getBoundingClientRect();
                     itemRect = item.getBoundingClientRect();
                     if (itemRect.bottom > gridRect.bottom || itemRect.right > gridRect.right) {
-                        const previousNode = item.previousElementSibling
                         item.remove();
-
-                        AddPage(templates, config, pageList);
-                        topContent.forEach(e => pageList.at(-1).Top.appendChild(e));
-                        topContent = [];
-
-                        if (/^H[1-6]$/.test(previousNode?.tagName))
-                            pageList.at(-1).Columns.appendChild(previousNode);
-                        await AppendPageElement(templates, footNotes, pageList.at(-1), item);
+                        page = AddPage(templates, config, pageList);
+                        AppendPageElement(footnotes, page, target, item);
                     }
                 }
             }
@@ -1053,7 +1034,7 @@
 
         async function EvaluatePageNo(pageList) {
             const pageDivList = pageList.map(e => e.Page)
-            const tocItems = document.querySelectorAll('a.toc-list-item');
+            const tocItems = document.querySelectorAll('.toc-item');
             for (const item of tocItems) {
                 const href = item.getAttribute("href")
                 if (href.startsWith('#')) {
@@ -1063,7 +1044,7 @@
                         page = page.parentNode;
                     }
                     const pageNo = pageDivList.indexOf(page) + 1;
-                    item.querySelector('.toc-list-item-page').innerHTML = pageNo;
+                    item.querySelector('.toc-item-page').innerHTML = pageNo;
                 }
             }
         }
@@ -1107,7 +1088,7 @@
             ProcessReferencePointers(citations, captions, footnotes, contentDiv);
             await PreRenderAndWait(templates, contentDiv);
 
-            const pageList = await BuildPages(templates, config, contentDiv);
+            const pageList = await BuildPages(templates, config, footnotes, contentDiv);
             await EvaluatePageNo(pageList);
         }
 
