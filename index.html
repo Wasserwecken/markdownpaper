@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <script id="mdContent" type="text/markdown" src="./documentation.md"></script>
+    <script id="mdContent" type="text/markdown" src="./documentation.mdd"></script>
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -553,11 +553,11 @@
             }
 
             filePicker.addEventListener("dragover", e => e.preventDefault());
-            filePicker.addEventListener("click", (e) => e => filePicker.querySelector('#file-picker-input').click());
+            filePicker.addEventListener("click", e => filePicker.querySelector('#file-picker-input').click());
             filePicker.querySelector('#file-picker-input').addEventListener('change', e => {
                 handleFileUpload(templates, e.target.files[0])
             });
-            filePicker.addEventListener("drop", (e) => e => {
+            filePicker.addEventListener("drop", e => {
                 e.preventDefault();
                 handleFileUpload(templates, e.dataTransfer.files[0]);
             });
